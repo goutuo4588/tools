@@ -105,6 +105,10 @@
   /* ============ 工具（大色块·薰衣草） ============ */
   .tools{background:var(--c-lav);border-radius:var(--radius);margin:clamp(20px,4vw,40px) clamp(10px,3vw,30px) 0}
   .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;margin-top:40px}
+  .subhead{display:flex;align-items:center;gap:12px;margin-top:54px;flex-wrap:wrap}
+  .subhead h3{font-size:21px;font-weight:800;margin:0}
+  .subhead p{margin:0;color:var(--ink-soft);font-size:14px}
+  .sub-dot{width:12px;height:12px;border-radius:50%;display:inline-block}
   .tool{
     background:#fff;border-radius:24px;padding:30px;box-shadow:var(--shadow);
     display:flex;flex-direction:column;transition:transform .18s ease;
@@ -200,7 +204,7 @@
       <h2 class="title">关于这个工具铺</h2>
       <p class="lead">我是 goutuo4588，一个爱折腾工具的学生。这个站点用来集中分享我做的一些小软件——它们大多是为了解决某个具体又琐碎的麻烦事而生。</p>
       <div class="stat-row">
-        <div class="stat"><b>2+</b><span>已分享工具</span></div>
+        <div class="stat"><b>3+</b><span>已分享工具</span></div>
         <div class="stat"><b>0</b><span>运行依赖</span></div>
         <div class="stat"><b>∞</b><span>免费使用</span></div>
       </div>
@@ -255,6 +259,35 @@
           <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
         </div>
         <p class="soon">到 Releases 页面下载压缩包，解压即用。</p>
+      </article>
+
+    </div>
+
+    <!-- 手机 App 专区 -->
+    <div class="subhead">
+      <span class="sub-dot" style="background:var(--c-sky)"></span>
+      <h3>📱 手机 App</h3>
+      <p>安卓端的小工具，装在手机上用。</p>
+    </div>
+
+    <div class="tool-grid">
+
+      <!-- 工具 3：手势刷 (手机版) -->
+      <article class="tool">
+        <div class="tool-icon" style="background:var(--c-sky)">👆</div>
+        <h3>手势刷 (手机版)</h3>
+        <div class="ver">安卓 · v1.0</div>
+        <p>手机端的手势辅助工具，把繁琐的滑动、点击操作交给它自动完成。压缩包内含安装说明，按步骤装到安卓手机即可使用。</p>
+        <div class="tags">
+          <span class="tag">Android</span>
+          <span class="tag">手势辅助</span>
+          <span class="tag">免 Root</span>
+        </div>
+        <div class="tool-links">
+          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/gesture-swipe-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
+          <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
+        </div>
+        <p class="soon">到 Releases 页面下载压缩包，按包内说明安装到手机。</p>
       </article>
 
     </div>
