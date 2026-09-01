@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>工具铺 · 我的小工具分享</title>
-<meta name="description" content="我用业余时间写的一些实用小工具，免费分享，欢迎自取。" />
+<meta name="description" content="狗托儿的工具铺：自己写的实用小工具，外加一些收录的开源 / 免费软件。全部免费，欢迎自取。" />
 <style>
   /* ============ 设计变量 ============ */
   :root{
@@ -16,6 +16,8 @@
     --c-mint:#d6f3e4;       /* 关于 */
     --c-lav:#e7defb;        /* 工具 */
     --c-sky:#d6e9fb;        /* 联系 */
+    --c-butter:#fdf0c8;     /* 收录-暖黄 */
+    --c-teal:#d3f0ee;       /* 收录-青 */
     --accent:#ff7a59;       /* 强调橙 */
     --accent-2:#5b8def;     /* 强调蓝 */
     --radius:28px;
@@ -208,9 +210,9 @@
     <div>
       <div class="eyebrow">About</div>
       <h2 class="title">关于这个工具铺</h2>
-      <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这个站点用来集中分享我做的一些小软件——它们大多是为了解决某个具体又琐碎的麻烦事而生。</p>
+      <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这里集中放我自己写的小软件，也收录一些用着顺手的开源 / 免费工具——收录的部分都标了原作者和出处，方便朋友一站式下载。</p>
       <div class="stat-row">
-        <div class="stat"><b>2</b><span>已分享工具</span></div>
+        <div class="stat"><b>6</b><span>已收录工具</span></div>
         <div class="stat"><b>0</b><span>运行依赖</span></div>
         <div class="stat"><b>∞</b><span>免费使用</span></div>
       </div>
@@ -227,7 +229,7 @@
   <div class="wrap">
     <div class="eyebrow">Toolbox</div>
     <h2 class="title">工具集合</h2>
-    <p class="lead">下面是目前在维护的工具。点击下载会跳转到 GitHub 仓库的发布页。</p>
+    <p class="lead">分两部分：我自己写的工具，以及收录的开源 / 免费软件。点击下载会跳转到 GitHub 仓库的对应发布页。</p>
 
     <div class="tool-grid">
 
@@ -265,6 +267,89 @@
           <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
         </div>
         <p class="soon">到 Releases 页面下载压缩包，解压即用。</p>
+      </article>
+
+    </div>
+
+    <!-- 收录软件专区 -->
+    <div class="subhead">
+      <span class="sub-dot" style="background:var(--c-butter)"></span>
+      <h3>📦 收录软件</h3>
+      <p>不是我写的，但很好用。均为开源或免费软件，版权归原作者，这里只做收录与分流。</p>
+    </div>
+
+    <div class="tool-grid">
+
+      <!-- 收录 1：OpenSpeedy -->
+      <article class="tool">
+        <div class="tool-icon" style="background:var(--c-lav)">⏩</div>
+        <h3>OpenSpeedy</h3>
+        <div class="ver">游戏变速 · v3.3.8</div>
+        <p>开源免费的游戏变速工具，通过 Ring3 层 Hook 时间函数实现加速减速，不碰系统内核。突破单机游戏帧率限制，顺带对部分网盘下载也有加速效果。</p>
+        <div class="tags">
+          <span class="tag">Windows</span>
+          <span class="tag">绿色便携</span>
+          <span class="tag">GPL-3.0</span>
+        </div>
+        <div class="tool-links">
+          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" target="_blank" rel="noopener">GitHub 下载</a>
+          <a class="dl dl-sub" href="https://github.com/game1024/OpenSpeedy" target="_blank" rel="noopener">项目主页</a>
+        </div>
+        <p class="soon">非本人作品 · 作者 game1024 · 解压后运行 openspeedy.exe，无需安装</p>
+      </article>
+
+      <!-- 收录 2：Watt Toolkit -->
+      <article class="tool">
+        <div class="tool-icon" style="background:var(--c-butter)">⚡</div>
+        <h3>Watt Toolkit</h3>
+        <div class="ver">Steam 工具箱 · v3.1.0</div>
+        <p>原名 Steam++，开源的 Steam 多功能工具箱：游戏加速、库存管理、成就统计、本地存档托管等。解压即用，不用装。</p>
+        <div class="tags">
+          <span class="tag">Windows</span>
+          <span class="tag">绿色版</span>
+          <span class="tag">开源</span>
+        </div>
+        <div class="tool-links">
+          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" target="_blank" rel="noopener">GitHub 下载</a>
+          <a class="dl dl-sub" href="https://github.com/BeyondDimension/SteamTools" target="_blank" rel="noopener">项目主页</a>
+        </div>
+        <p class="soon">非本人作品 · 7z 格式，需 7-Zip / Bandizip 解压后运行 Steam++.exe</p>
+      </article>
+
+      <!-- 收录 3：Wireshark -->
+      <article class="tool">
+        <div class="tool-icon" style="background:var(--c-sky)">🦈</div>
+        <h3>Wireshark</h3>
+        <div class="ver">抓包分析 · v4.6.8</div>
+        <p>网络协议分析器的行业标准，看数据包、排查网络问题、分析游戏通信就靠它。安装包自带 Npcap 驱动，安装时记得勾选。</p>
+        <div class="tags">
+          <span class="tag">Windows</span>
+          <span class="tag">安装包</span>
+          <span class="tag">GPL-2.0</span>
+        </div>
+        <div class="tool-links">
+          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" target="_blank" rel="noopener">GitHub 下载</a>
+          <a class="dl dl-sub" href="https://www.wireshark.org/" target="_blank" rel="noopener">官方网站</a>
+        </div>
+        <p class="soon">非本人作品 · Wireshark Foundation · 需安装，抓包功能依赖 Npcap</p>
+      </article>
+
+      <!-- 收录 4：Geek Uninstaller -->
+      <article class="tool">
+        <div class="tool-icon" style="background:var(--c-teal)">🧹</div>
+        <h3>Geek Uninstaller</h3>
+        <div class="ver">卸载清理 · 便携版</div>
+        <p>单文件卸载工具，7 MB 不到。卸载软件后自动扫残留的文件和注册表项，比系统自带的「添加或删除程序」干净得多。</p>
+        <div class="tags">
+          <span class="tag">Windows</span>
+          <span class="tag">单文件</span>
+          <span class="tag">免安装</span>
+        </div>
+        <div class="tool-links">
+          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" target="_blank" rel="noopener">GitHub 下载</a>
+          <a class="dl dl-sub" href="https://geekuninstaller.com/" target="_blank" rel="noopener">官方网站</a>
+        </div>
+        <p class="soon">非本人作品 · 免费软件（非开源）· 双击即用，卸载系统组件前请谨慎</p>
       </article>
 
     </div>
