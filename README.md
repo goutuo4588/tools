@@ -1,6 +1,6 @@
 # 工具铺 · 我的小工具
 
-免费分享的实用小工具合集。包含 Windows 程序与安卓 App，下载即用、零依赖，适合直接发给同学使用。
+免费分享的实用小工具合集。Windows 程序，下载即用、零依赖，适合直接发给同学使用。
 
 ## 工具列表
 
@@ -15,12 +15,6 @@
 - 内置多重安全校验，避免误删系统文件
 - 下载 `CDriveCleanup-v1.0.zip`，解压后运行其中的 `CDriveCleanup.exe`
 - 下载见 Release：[cdrivecleanup-v1.0](https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0)
-
-### 3. 手势刷（手机版 · 安卓）
-手机端的手势辅助工具，把繁琐的滑动、点击操作交给它自动完成。
-- 无需 Root
-- 下载 `gesture-swipe-android.zip`，按压缩包内的安装说明装到安卓手机
-- 下载见 Release：[gesture-swipe-v1.0](https://github.com/goutuo4588/tools/releases/tag/gesture-swipe-v1.0)
 
 ## 使用方法
 1. 到上方对应 Release 下载工具。
