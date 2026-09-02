@@ -887,11 +887,13 @@
       '<div style="margin:14px 0;display:flex;gap:10px;flex-wrap:wrap">'+
         '<button class="auth-btn" id="aLogout" style="width:auto;padding:9px 18px">退出后台</button>'+
         '<button class="auth-btn" id="aExport" style="width:auto;padding:9px 18px;background:var(--accent-2)">导出本机数据</button>'+
+        '<button class="auth-btn" id="aReport" style="width:auto;padding:9px 18px;background:#5b3cc4">📊 数据可视化报表（新窗口）</button>'+
         '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a></div>'+
       '<h3 style="margin-top:8px">本机账号</h3><div id="aUsers" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';localStorage.removeItem(ADMIN_KEY);refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
+    adminPanel.querySelector('#aReport').onclick=openReport;
     loadAdminUsers();loadAdminComments();
   }
   function loadAdminUsers(){
@@ -970,6 +972,101 @@
     const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
+  // ============ 数据可视化报表（新窗口离线生成） ============
+  function svgVBar(title,items,color){
+    const W=340,H=230,padL=36,padB=48,padT=36,padR=12;
+    const plotW=W-padL-padR,plotH=H-padT-padB;
+    const max=Math.max(1,...items.map(i=>i.v));
+    const n=items.length||1,step=plotW/n,bw=Math.min(46,step*0.6);
+    let s='';
+    items.forEach((it,i)=>{
+      const h=it.v/max*plotH,x=padL+step*i+(step-bw)/2,y=padT+plotH-h;
+      s+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="4" fill="'+color+'"></rect>';
+      s+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-6).toFixed(1)+'" font-size="11" fill="#444" text-anchor="middle">'+it.v+'</text>';
+      let lb=it.l; if(lb.length>5) lb=lb.slice(0,5);
+      s+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-padB+16).toFixed(1)+'" font-size="10" fill="#666" text-anchor="middle">'+lb+'</text>';
+    });
+    return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet">'
+      +'<text x="'+(W/2)+'" y="20" font-size="13" font-weight="700" fill="#1f2430" text-anchor="middle">'+title+'</text>'
+      +'<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="#ddd"></line>'+s+'</svg>';
+  }
+  function svgHBar(title,items,color){
+    const W=340,H=230,padL=70,padR=26,padT=36,padB=12;
+    const plotW=W-padL-padR,max=Math.max(1,...items.map(i=>i.v));
+    const n=items.length||1,rowH=Math.min(34,(H-padT-padB)/n),gap=(H-padT-padB-n*rowH)/(n+1);
+    let s='';
+    items.forEach((it,i)=>{
+      const w=it.v/max*plotW,y=padT+gap*(i+1)+rowH*i;
+      s+='<rect x="'+padL+'" y="'+y.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+rowH.toFixed(1)+'" rx="4" fill="'+color+'"></rect>';
+      s+='<text x="'+(padL+w+6).toFixed(1)+'" y="'+(y+rowH/2+4).toFixed(1)+'" font-size="11" fill="#444">'+it.v+'</text>';
+      let lb=it.l; if(lb.length>6) lb=lb.slice(0,6);
+      s+='<text x="'+(padL-8)+'" y="'+(y+rowH/2+4).toFixed(1)+'" font-size="11" fill="#555" text-anchor="end">'+lb+'</text>';
+    });
+    return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet">'
+      +'<text x="'+(W/2)+'" y="20" font-size="13" font-weight="700" fill="#1f2430" text-anchor="middle">'+title+'</text>'+s+'</svg>';
+  }
+  function svgLine(title,labels,values,color){
+    const W=700,H=240,padL=40,padR=20,padB=40,padT=36;
+    const plotW=W-padL-padR,plotH=H-padT-padB,max=Math.max(1,...values),n=labels.length;
+    const stepX=n>1?plotW/(n-1):plotW;
+    const pts=values.map((v,i)=>{const x=padL+stepX*i,y=padT+plotH-(v/max*plotH);return [x,y];});
+    let path='';pts.forEach((p,i)=>{path+=(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)+' ';});
+    let dots='';pts.forEach(p=>{dots+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.5" fill="'+color+'"></circle>';});
+    let xl='';labels.forEach((lb,i)=>{xl+='<text x="'+pts[i][0].toFixed(1)+'" y="'+(H-padB+18)+'" font-size="11" fill="#666" text-anchor="middle">'+lb+'</text>';});
+    let yl='<text x="'+(padL-6)+'" y="'+(padT+4)+'" font-size="10" fill="#999" text-anchor="end">'+max+'</text>';
+    return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet">'
+      +'<text x="'+(W/2)+'" y="20" font-size="13" font-weight="700" fill="#1f2430" text-anchor="middle">'+title+'</text>'
+      +'<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="#ddd"></line>'+yl+xl
+      +'<path d="'+path+'" fill="none" stroke="'+color+'" stroke-width="2.5"></path>'+dots+'</svg>';
+  }
+  function openReport(){
+    const slugs=TOOL_SLUGS;
+    const rows=slugs.map(s=>{
+      const st=stats[s]||{views:0,downloads:0};
+      return {slug:s,name:toolName(s),views:st.views,downloads:st.downloads,comments:(comments[s]||[]).length,favs:(favs.indexOf(s)>=0?1:0)};
+    });
+    const totalV=rows.reduce((a,r)=>a+r.views,0);
+    const totalD=rows.reduce((a,r)=>a+r.downloads,0);
+    const totalC=rows.reduce((a,r)=>a+r.comments,0);
+    const totalF=favs.length,acc=profile?1:0;
+    const labels=[];
+    for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);labels.push((dt.getMonth()+1)+'/'+dt.getDate());}
+    const vals=labels.map(lb=>{
+      const p=lb.split('/').map(Number);let c=0;
+      Object.values(comments).forEach(arr=>(arr||[]).forEach(x=>{const t=new Date(x.ts);if(t.getMonth()+1===p[0]&&t.getDate()===p[1])c++;}));
+      return c;
+    });
+    const top=rows.slice().sort((a,b)=>b.views-a.views)[0];
+    const topD=rows.slice().sort((a,b)=>b.downloads-a.downloads)[0];
+    const c1=svgVBar('各工具浏览量',rows.map(r=>({l:r.name,v:r.views})),'#6c5ce7');
+    const c2=svgVBar('各工具下载量',rows.map(r=>({l:r.name,v:r.downloads})),'#00b894');
+    const c3=svgHBar('各工具评论数',rows.map(r=>({l:r.name,v:r.comments})),'#0984e3');
+    const c4=svgLine('近7天评论趋势',labels,vals,'#e17055');
+    const summary='截至'+new Date().toLocaleString('zh-CN')+'，你的「工具铺」共上架 <b>'+slugs.length+'</b> 款工具；本机累计被浏览 <b>'+totalV+'</b> 次、下载 <b>'+totalD+'</b> 次；你收藏了 <b>'+totalF+'</b> 款，本机留下 <b>'+totalC+'</b> 条评论，'+(acc?'本机已登录 1 个账号。':'本机尚未登录账号。')+'浏览量最高的是「'+top.name+'」（'+top.views+' 次），下载最多的是「'+topD.name+'」（'+topD.downloads+' 次）。朋友在 GitHub Discussions 的留言不计入本机统计，请到仓库 Discussions 查看。';
+    const thead='<tr><th>工具</th><th>浏览</th><th>下载</th><th>评论</th><th>已收藏</th></tr>';
+    const tbody=rows.map(r=>'<tr><td>'+r.name+'</td><td>'+r.views+'</td><td>'+r.downloads+'</td><td>'+r.comments+'</td><td>'+(r.favs?'是':'否')+'</td></tr>').join('');
+    const table='<table class="rpt"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody><tfoot><tr><td>合计</td><td>'+totalV+'</td><td>'+totalD+'</td><td>'+totalC+'</td><td>'+totalF+'</td></tr></tfoot></table>';
+    const html='<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>工具铺 · 数据可视化报表</title>'
+      +'<style>body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f6fa;color:#1f2430;margin:0;padding:28px}'
+      +'.wrap{max-width:840px;margin:0 auto}.h1{font-size:22px;margin:0 0 4px}.sub{color:#888;font-size:13px;margin-bottom:18px}'
+      +'.summary{background:#fff;border-left:4px solid #6c5ce7;border-radius:10px;padding:16px 18px;line-height:1.9;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,.05)}'
+      +'.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}@media(max-width:640px){.grid{grid-template-columns:1fr}}'
+      +'.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}'
+      +'.sec{font-size:17px;margin:26px 0 6px}.rpt{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-top:10px}'
+      +'.rpt th,.rpt td{padding:10px 12px;text-align:center;border-bottom:1px solid #eee;font-size:14px}.rpt th{background:#6c5ce7;color:#fff}.rpt tfoot td{font-weight:700;background:#f0eeff}</style></head>'
+      +'<body><div class="wrap"><h1 class="h1">📊 工具铺 · 数据可视化报表</h1>'
+      +'<div class="sub">数据来源：本机浏览器（'+new Date().toLocaleString('zh-CN')+'）</div>'
+      +'<div class="summary">'+summary+'</div>'
+      +'<div class="grid"><div class="card">'+c1+'</div><div class="card">'+c2+'</div><div class="card">'+c3+'</div><div class="card">'+c4+'</div></div>'
+      +'<h2 class="sec">📋 具体数据明细</h2>'+table
+      +'<p class="sub" style="margin-top:18px">提示：本报表为离线生成，数据仅来自当前浏览器。朋友的留言请到 GitHub Discussions 查看。</p>'
+      +'</div></body></html>';
+    const blob=new Blob([html],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    window.open(url,'_blank');
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
   }
 
   // 在线徽标（静态说明，无需联网）
