@@ -16,9 +16,9 @@
 - 下载 `CDriveCleanup-v1.0.zip`，解压后运行其中的 `CDriveCleanup.exe`
 - 下载见 Release：[cdrivecleanup-v1.0](https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0)
 
-## 收录的软件（非本人作品）
+## 收录的软件
 
-下面这些是我用着顺手、顺手收录分流的第三方软件。**它们都不是我写的**，这里只做下载渠道，版权与许可归原作者所有。需要最新版或想支持作者，请走各自的官网 / 项目主页。
+下面这些是我用着顺手、顺手收录分流的第三方软件。需要最新版或想支持作者，请走各自的官网 / 项目主页。
 
 ### 1. OpenSpeedy（游戏变速 · 绿色版）
 开源免费的游戏变速工具，通过 Hook Windows 时间函数实现加速 / 减速，无需管理员权限。
