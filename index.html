@@ -189,6 +189,44 @@
   @keyframes ripple{to{transform:scale(2.6);opacity:0}}
   .btn,.copy-btn,.dl,.nav-btn{position:relative;overflow:hidden}
 
+  /* ============ 后端接入：登录/收藏/评论/统计 ============ */
+  .auth-wrap{max-width:420px;margin:24px auto 0;background:rgba(255,255,255,.72);border-radius:22px;padding:26px;box-shadow:var(--shadow);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%)}
+  .auth-tabs{display:flex;gap:8px;margin-bottom:18px}
+  .auth-tabs button{flex:1;padding:11px;border:0;border-radius:12px;font-weight:700;cursor:pointer;background:rgba(35,37,43,.06);color:var(--ink-soft);font-family:inherit}
+  .auth-tabs button.on{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
+  .field{margin-bottom:14px}
+  .field input{width:100%;padding:13px 15px;border-radius:12px;border:1px solid rgba(35,37,43,.12);font-size:15px;font-family:inherit;background:#fff}
+  .field input:focus{outline:none;border-color:var(--accent-2)}
+  .auth-btn{width:100%;padding:14px;border:0;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit}
+  .auth-msg{font-size:13px;margin-top:10px;min-height:18px;text-align:center}
+  .auth-msg.err{color:#e0443e}.auth-msg.ok{color:#1f9d55}
+  .me-panel{max-width:560px;margin:24px auto 0}
+  .me-card{background:rgba(255,255,255,.72);border-radius:22px;padding:24px;box-shadow:var(--shadow);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%)}
+  .me-card h3{font-size:18px;margin-bottom:6px}
+  .me-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+  .me-fav{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .me-fav .chip{background:var(--c-lav);padding:8px 14px;border-radius:999px;font-size:14px;font-weight:600}
+  .card-actions{display:flex;gap:10px;margin-top:14px}
+  .fav-star,.cm-btn{flex:1;text-align:center;padding:10px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;border:1px solid rgba(35,37,43,.12);background:rgba(255,255,255,.7);font-family:inherit;transition:.15s}
+  .fav-star.on{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;border-color:transparent}
+  .card-stats{margin-top:12px;font-size:13px;color:var(--ink-soft);display:flex;gap:16px;flex-wrap:wrap}
+  .card-stats b{color:var(--ink)}
+  .online-badge{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--ink-soft)}
+  .online-badge .dot{width:8px;height:8px;border-radius:50%;background:#1f9d55;box-shadow:0 0 0 3px rgba(31,157,85,.25)}
+  .modal-back{position:fixed;inset:0;background:rgba(35,37,43,.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .modal{background:#fff;border-radius:22px;max-width:520px;width:100%;max-height:84vh;overflow:auto;padding:26px;box-shadow:var(--shadow)}
+  .modal h3{font-size:19px;margin-bottom:4px}
+  .modal .close{float:right;cursor:pointer;border:0;background:none;font-size:24px;color:var(--ink-soft);line-height:1}
+  .cm-list{margin:16px 0;display:flex;flex-direction:column;gap:12px}
+  .cm-item{background:rgba(35,37,43,.04);border-radius:14px;padding:12px 14px}
+  .cm-item .who{font-weight:700;font-size:14px}
+  .cm-item .rt{color:#f5a623;font-size:13px}
+  .cm-item .tx{font-size:14px;color:var(--ink-soft);margin-top:4px}
+  .cm-form textarea{width:100%;height:74px;border-radius:12px;border:1px solid rgba(35,37,43,.12);padding:12px;font-family:inherit;font-size:14px;resize:vertical}
+  .stars{display:flex;gap:6px;margin:8px 0;font-size:24px}
+  .stars span{cursor:pointer;color:#d9dde5;transition:.1s}
+  .stars span.on{color:#f5a623}
+
   /* ============ 响应式 ============ */
   @media(max-width:760px){
     .app{flex-direction:column}
@@ -215,7 +253,7 @@
     <button class="nav-btn active" data-view="intro"><span class="ic">📖</span><span class="txt">简介</span></button>
     <button class="nav-btn" data-view="tools"><span class="ic">🧰</span><span class="txt">工具</span></button>
     <button class="nav-btn" data-view="me"><span class="ic">👤</span><span class="txt">我的</span></button>
-    <div class="side-foot">© <span id="year"></span> 工具铺<br/>由 狗托儿 用 ❤️ 与咖啡因驱动</div>
+    <div class="side-foot">© <span id="year"></span> 工具铺<br/>由 狗托儿 用 ❤️ 与咖啡因驱动<div class="online-badge" id="onlineBadge"><span class="dot"></span>当前在线 – 人</div></div>
   </aside>
 
   <!-- 主内容区 -->
@@ -297,7 +335,7 @@
           <div class="tool-grid">
 
             <!-- 工具 1：抖音辅助器 -->
-            <article class="tool">
+            <article class="tool" data-slug="douyin-helper">
               <div class="tool-icon" style="background:var(--c-peach)">🎬</div>
               <h3>抖音辅助器</h3>
               <div class="ver">电脑版 · v1.0</div>
@@ -318,7 +356,7 @@
             </article>
 
             <!-- 工具 2：CDriveCleanup -->
-            <article class="tool">
+            <article class="tool" data-slug="cdrivecleanup">
               <div class="tool-icon" style="background:var(--c-mint)">💾</div>
               <h3>CDriveCleanup</h3>
               <div class="ver">.NET 10 · 单文件版</div>
@@ -363,7 +401,7 @@
           <div class="tool-grid">
 
             <!-- 收录 1：OpenSpeedy -->
-            <article class="tool">
+            <article class="tool" data-slug="openspeedy">
               <div class="tool-icon" style="background:var(--c-lav)">⏩</div>
               <h3>OpenSpeedy</h3>
               <div class="ver">游戏变速 · v3.3.8</div>
@@ -384,7 +422,7 @@
             </article>
 
             <!-- 收录 2：Watt Toolkit -->
-            <article class="tool">
+            <article class="tool" data-slug="watt-toolkit">
               <div class="tool-icon" style="background:var(--c-butter)">⚡</div>
               <h3>Watt Toolkit</h3>
               <div class="ver">Steam 工具箱 · v3.1.0</div>
@@ -406,7 +444,7 @@
             </article>
 
             <!-- 收录 3：Wireshark -->
-            <article class="tool">
+            <article class="tool" data-slug="wireshark">
               <div class="tool-icon" style="background:var(--c-sky)">🦈</div>
               <h3>Wireshark</h3>
               <div class="ver">抓包分析 · v4.6.8</div>
@@ -428,7 +466,7 @@
             </article>
 
             <!-- 收录 4：Geek Uninstaller -->
-            <article class="tool">
+            <article class="tool" data-slug="geek">
               <div class="tool-icon" style="background:var(--c-teal)">🧹</div>
               <h3>Geek Uninstaller</h3>
               <div class="ver">卸载清理 · 便携版</div>
@@ -463,11 +501,8 @@
         <div class="wrap">
           <div class="eyebrow">Profile</div>
           <h2 class="title">我的</h2>
-          <div class="empty" style="margin-top:24px">
-            <div class="empty-ico">👤</div>
-            <b>个人中心开发中</b>
-            <span>以后这里会接入后端，支持用户登录、收藏自己常用的工具等。敬请期待。</span>
-          </div>
+          <div id="authBox"></div>
+          <div id="mePanel" style="display:none"></div>
 
           <div class="me-mail">
             <div class="eyebrow">联系我</div>
@@ -492,6 +527,7 @@
   </main>
 </div>
 
+<div id="cmModal" class="modal-back" style="display:none"></div>
 <footer>
   © <span id="year">2026</span> 工具铺 · 由 狗托儿 用 ❤️ 与咖啡因驱动
 </footer>
@@ -630,6 +666,182 @@
   document.querySelectorAll('.dl-main,.dl-sub').forEach(el=>{
     el.addEventListener('pointerdown', e=>{ e.stopPropagation(); playPiano(); });
   });
+
+  // =================== 后端接入（Cloudflare Workers） ===================
+  // TODO: wrangler deploy 后，把下面换成你的真实 Worker 地址
+  const API_BASE = 'https://tools-backend.<你的子域>.workers.dev';
+  const TOKEN_KEY = 'tb_token', CONN_KEY = 'tb_conn';
+  let token = localStorage.getItem(TOKEN_KEY) || '';
+  let me = null;
+  if (!localStorage.getItem(CONN_KEY))
+    localStorage.setItem(CONN_KEY, (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)));
+  const connId = localStorage.getItem(CONN_KEY);
+
+  function authHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (token) h.Authorization = 'Bearer ' + token;
+    return h;
+  }
+  async function api(path, opts = {}) {
+    let res;
+    try { res = await fetch(API_BASE + path, Object.assign({ headers: authHeaders() }, opts)); }
+    catch (e) { return { ok: false, status: 0, data: { error: '网络错误（检查 API_BASE 是否已配置）' } }; }
+    let data = {}; try { data = await res.json(); } catch (e) {}
+    if (res.status === 401) { token = ''; localStorage.removeItem(TOKEN_KEY); me = null; refreshMe(); }
+    return { ok: res.ok, status: res.status, data };
+  }
+
+  // 「我的」视图
+  const authBox = document.getElementById('authBox');
+  const mePanel = document.getElementById('mePanel');
+  function meHtml(u, favs) {
+    const chips = (favs || []).map(s => {
+      const el = document.querySelector('.tool[data-slug="' + s + '"] h3');
+      return el ? '<span class="chip">' + el.textContent + '</span>' : '';
+    }).join('');
+    return '<div class="me-card"><h3>👋 ' + (u.nickName || u.email) + '</h3>' +
+      '<p style="color:var(--ink-soft);font-size:14px">' + u.email + '</p>' +
+      '<div class="row"><b style="font-size:16px">我的收藏</b>' +
+      '<button class="auth-btn" style="width:auto;padding:9px 18px" id="logoutBtn">退出登录</button></div>' +
+      '<div class="me-fav">' + (chips || '<span style="color:var(--ink-soft);font-size:14px">还没有收藏任何工具</span>') + '</div></div>';
+  }
+  async function refreshMe() {
+    if (!token) { authBox.style.display = ''; mePanel.style.display = 'none'; renderAuthForm(); return; }
+    const r = await api('/api/auth/me');
+    if (r.ok) {
+      me = r.data.user; authBox.style.display = 'none'; mePanel.style.display = '';
+      const f = await api('/api/favorites');
+      mePanel.innerHTML = meHtml(me, (r.data && r.data.favorites) || (f.data && f.data.favorites) || []);
+      mePanel.querySelector('#logoutBtn').onclick = () => { token = ''; localStorage.removeItem(TOKEN_KEY); me = null; refreshMe(); syncStars(); };
+      syncStars();
+    } else { authBox.style.display = ''; mePanel.style.display = 'none'; renderAuthForm(); }
+  }
+  function renderAuthForm() {
+    authBox.innerHTML = '<div class="auth-wrap"><div class="auth-tabs">' +
+      '<button id="tabLogin" class="on">登录</button><button id="tabReg">注册</button></div>' +
+      '<div class="field"><input id="fEmail" type="email" placeholder="邮箱" autocomplete="email"></div>' +
+      '<div class="field"><input id="fNick" type="text" placeholder="昵称（注册时填）" style="display:none"></div>' +
+      '<div class="field"><input id="fPwd" type="password" placeholder="密码（至少6位）" autocomplete="current-password"></div>' +
+      '<button class="auth-btn" id="authSubmit">登录</button>' +
+      '<div class="auth-msg" id="authMsg"></div></div>';
+    let mode = 'login';
+    const tL = authBox.querySelector('#tabLogin'), tR = authBox.querySelector('#tabReg');
+    tL.onclick = () => { mode = 'login'; tL.classList.add('on'); tR.classList.remove('on'); authBox.querySelector('#fNick').style.display = 'none'; authBox.querySelector('#authSubmit').textContent = '登录'; authBox.querySelector('#authMsg').textContent = ''; };
+    tR.onclick = () => { mode = 'register'; tR.classList.add('on'); tL.classList.remove('on'); authBox.querySelector('#fNick').style.display = ''; authBox.querySelector('#authSubmit').textContent = '注册'; authBox.querySelector('#authMsg').textContent = ''; };
+    authBox.querySelector('#authSubmit').onclick = async () => {
+      const email = authBox.querySelector('#fEmail').value.trim();
+      const pwd = authBox.querySelector('#fPwd').value;
+      const nick = authBox.querySelector('#fNick').value.trim();
+      const msg = authBox.querySelector('#authMsg'); msg.className = 'auth-msg'; msg.textContent = '';
+      if (!email || !pwd) { msg.className = 'auth-msg err'; msg.textContent = '邮箱和密码必填'; return; }
+      const body = mode === 'register' ? JSON.stringify({ email, password: pwd, nickName: nick }) : JSON.stringify({ email, password: pwd });
+      const r = await api('/api/auth/' + mode, { method: 'POST', body });
+      if (r.ok) { token = r.data.token; localStorage.setItem(TOKEN_KEY, token); me = r.data.user; msg.className = 'auth-msg ok'; msg.textContent = '成功！'; refreshMe(); }
+      else { msg.className = 'auth-msg err'; msg.textContent = (r.data && r.data.error) || '失败'; }
+    };
+  }
+
+  // 卡片扩展：收藏星 + 评论按钮 + 统计
+  function buildCardExtras() {
+    document.querySelectorAll('.tool[data-slug]').forEach(card => {
+      const slug = card.dataset.slug;
+      if (card.querySelector('.card-actions')) return;
+      const acts = document.createElement('div'); acts.className = 'card-actions';
+      acts.innerHTML = '<button class="fav-star" data-slug="' + slug + '">☆ 收藏</button><button class="cm-btn" data-slug="' + slug + '">💬 评论/评分</button>';
+      card.appendChild(acts);
+      const stats = document.createElement('div'); stats.className = 'card-stats'; stats.dataset.slug = slug;
+      stats.innerHTML = '<span>👁 <b class="v">0</b> 浏览</span><span>⬇ <b class="d">0</b> 下载</span><span>💬 <b class="c">0</b></span>';
+      card.appendChild(stats);
+      const dl = card.querySelector('.dl-main'); if (dl) dl.addEventListener('click', () => { api('/api/stats/download/' + slug, { method: 'POST' }).then(() => loadStats(slug)); });
+      acts.querySelector('.cm-btn').onclick = () => openComments(slug);
+      acts.querySelector('.fav-star').onclick = () => toggleFav(slug);
+    });
+  }
+  async function loadStats(slug) {
+    const r = await api('/api/stats/' + slug); if (!r.ok) return;
+    const el = document.querySelector('.card-stats[data-slug="' + slug + '"]'); if (!el) return;
+    el.querySelector('.v').textContent = r.data.views;
+    el.querySelector('.d').textContent = r.data.downloads;
+    el.querySelector('.c').textContent = r.data.comments;
+  }
+  async function syncStars() {
+    const r = token ? await api('/api/favorites') : { data: { favorites: [] } };
+    const favs = (r.data && r.data.favorites) || [];
+    document.querySelectorAll('.fav-star').forEach(b => {
+      const on = favs.includes(b.dataset.slug);
+      b.classList.toggle('on', on); b.textContent = on ? '★ 已收藏' : '☆ 收藏';
+    });
+  }
+  async function toggleFav(slug) {
+    if (!token) { alert('请先在「我的」页登录'); showView('me'); return; }
+    const r = await api('/api/favorites/' + slug, { method: 'POST' });
+    if (r.ok) { syncStars(); if (mePanel.style.display !== 'none') refreshMe(); }
+    else if (r.status === 401) alert('登录已失效，请重新登录');
+  }
+
+  // 评论弹层
+  const cmModal = document.getElementById('cmModal');
+  let curSlug = null, curRating = 0;
+  function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function openComments(slug) {
+    curSlug = slug; curRating = 0;
+    const name = (document.querySelector('.tool[data-slug="' + slug + '"] h3') || {}).textContent || slug;
+    cmModal.style.display = 'flex';
+    cmModal.innerHTML = '<div class="modal"><button class="close" id="cmClose">×</button>' +
+      '<h3>' + name + ' · 评论与评分</h3>' +
+      '<div class="cm-list" id="cmList"><span style="color:var(--ink-soft)">加载中…</span></div>' +
+      '<div class="cm-form"><div class="stars" id="cmStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div>' +
+      '<textarea id="cmText" placeholder="说点什么…（登录后才能发表）"></textarea>' +
+      '<button class="auth-btn" id="cmSend">发表评论</button></div></div>';
+    cmModal.querySelector('#cmClose').onclick = () => cmModal.style.display = 'none';
+    cmModal.querySelectorAll('#cmStars span').forEach(s => s.onclick = () => { curRating = +s.dataset.v; renderStars(curRating); });
+    cmModal.querySelector('#cmSend').onclick = sendComment;
+    loadComments(slug);
+  }
+  function renderStars(n) { cmModal.querySelectorAll('#cmStars span').forEach(s => s.classList.toggle('on', +s.dataset.v <= n)); }
+  async function loadComments(slug) {
+    const r = await api('/api/tools/' + slug + '/comments');
+    const list = cmModal.querySelector('#cmList'); if (!list) return;
+    if (!r.ok) { list.innerHTML = '<span style="color:var(--ink-soft)">加载失败</span>'; return; }
+    const d = r.data;
+    list.innerHTML = '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:8px">平均评分 <b style="color:#f5a623;font-size:16px">' + d.avgRating + '</b> · ' + d.count + ' 条评论</div>' +
+      (d.comments.length ? d.comments.map(c => '<div class="cm-item"><div class="who">' + c.nickName + '<span class="rt">' + (c.rating ? ' ' + '★'.repeat(c.rating) : '') + '</span></div><div class="tx">' + escapeHtml(c.content) + '</div></div>').join('') : '<span style="color:var(--ink-soft)">还没有评论，来抢沙发</span>');
+    const st = document.querySelector('.card-stats[data-slug="' + slug + '"]'); if (st) st.querySelector('.c').textContent = d.count;
+  }
+  async function sendComment() {
+    if (!token) { alert('请先在「我的」页登录'); cmModal.style.display = 'none'; showView('me'); return; }
+    const text = cmModal.querySelector('#cmText').value.trim();
+    if (!text) { alert('评论不能为空'); return; }
+    const r = await api('/api/tools/' + curSlug + '/comments', { method: 'POST', body: JSON.stringify({ content: text, rating: curRating }) });
+    if (r.ok) { cmModal.querySelector('#cmText').value = ''; curRating = 0; renderStars(0); loadComments(curSlug); loadStats(curSlug); }
+    else if (r.status === 401) alert('登录已失效');
+    else alert((r.data && r.data.error) || '发表失败');
+  }
+
+  // 在线人数
+  const onlineBadge = document.getElementById('onlineBadge');
+  async function pingOnline() {
+    try { await api('/api/ping', { method: 'POST', body: JSON.stringify({ connId }) }); } catch (e) {}
+    const r = await api('/api/stats/online');
+    if (r.ok && onlineBadge) onlineBadge.innerHTML = '<span class="dot"></span>当前在线 ' + r.data.online + ' 人';
+  }
+
+  // 初始化
+  buildCardExtras();
+  refreshMe();
+  pingOnline(); setInterval(pingOnline, 30000);
+  const viewedOnce = new Set();
+  const _showView = showView;
+  showView = function (name) {
+    _showView(name);
+    if (name === 'tools') {
+      document.querySelectorAll('.tool[data-slug]').forEach(card => {
+        const slug = card.dataset.slug;
+        loadStats(slug);
+        if (!viewedOnce.has(slug)) { viewedOnce.add(slug); api('/api/stats/view/' + slug, { method: 'POST' }).then(() => loadStats(slug)); }
+      });
+    }
+  };
 </script>
 </body>
 </html>
