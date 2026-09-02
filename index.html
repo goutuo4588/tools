@@ -206,10 +206,15 @@
   .me-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
   .me-fav{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
   .me-fav .chip{background:var(--c-lav);padding:8px 14px;border-radius:999px;font-size:14px;font-weight:600}
-  .card-actions{display:flex;gap:10px;margin-top:14px}
-  .fav-star,.cm-btn{flex:1;text-align:center;padding:10px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;border:1px solid rgba(35,37,43,.12);background:rgba(255,255,255,.7);font-family:inherit;transition:.15s}
-  .fav-star.on{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;border-color:transparent}
-  .card-stats{margin-top:12px;font-size:13px;color:var(--ink-soft);display:flex;gap:16px;flex-wrap:wrap}
+  .card-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .act-btn{flex:1;min-width:66px;display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 6px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;border:1px solid rgba(35,37,43,.12);background:rgba(255,255,255,.7);font-family:inherit;color:var(--ink);transition:transform .18s,box-shadow .18s,background .18s}
+  .act-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(35,37,43,.12)}
+  .act-btn .ico{font-size:16px;line-height:1}
+  .act-btn.on{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;border-color:transparent}
+  .act-btn.like-btn.on{background:linear-gradient(135deg,#ff6b6b,#ee5a6f);color:#fff;border-color:transparent}
+  .act-btn.pop{animation:actPop .34s ease}
+  @keyframes actPop{0%{transform:scale(1)}45%{transform:scale(1.16)}100%{transform:scale(1)}}
+  .card-stats{margin-top:12px;font-size:13px;color:var(--ink-soft);display:flex;gap:14px;flex-wrap:wrap}
   .card-stats b{color:var(--ink)}
   .online-badge{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--ink-soft)}
   .online-badge .dot{width:8px;height:8px;border-radius:50%;background:#1f9d55;box-shadow:0 0 0 3px rgba(31,157,85,.25)}
@@ -720,6 +725,7 @@
     set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
   };
   const PROFILE_KEY='tp_profile', FAV_KEY='tp_favs', CMT_KEY='tp_comments', STAT_KEY='tp_stats', ADMIN_KEY='tp_admin';
+  const LIKE_KEY='tp_likes', LIKED_KEY='tp_liked', SHARE_KEY='tp_shares';
   const ADMIN_USER='admin', ADMIN_PWD='a9727d9752dadada';
   const TOOL_SLUGS=['douyin-helper','cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
@@ -734,6 +740,9 @@
   let favs = LS.get(FAV_KEY, []);
   let comments = LS.get(CMT_KEY, null); if (comments===null){ comments=SEED; LS.set(CMT_KEY, comments); }
   let stats = LS.get(STAT_KEY, {});
+  let likes = LS.get(LIKE_KEY, {});      // {slug: 点赞累计次数}
+  let liked = LS.get(LIKED_KEY, []);     // 本机已点赞的工具（可取消）
+  let shares = LS.get(SHARE_KEY, {});    // {slug: 分享次数}
 
   // ---------- 我的：本机账号（登录/注册均为本地，无服务器校验） ----------
   const authBox=document.getElementById('authBox'), mePanel=document.getElementById('mePanel');
@@ -791,29 +800,71 @@
       const slug=card.dataset.slug;
       if(card.querySelector('.card-actions'))return;
       const acts=document.createElement('div');acts.className='card-actions';
-      acts.innerHTML='<button class="fav-star" data-slug="'+slug+'">☆ 收藏</button><button class="cm-btn" data-slug="'+slug+'">💬 评论/评分</button>';
+      acts.innerHTML=
+        '<button class="act-btn like-btn" data-slug="'+slug+'" title="点赞"><span class="ico">👍</span><span class="txt">赞 0</span></button>'+
+        '<button class="act-btn fav-star" data-slug="'+slug+'" title="收藏"><span class="ico">☆</span><span class="txt">收藏</span></button>'+
+        '<button class="act-btn cm-btn" data-slug="'+slug+'" title="留言"><span class="ico">💬</span><span class="txt">留言</span></button>'+
+        '<button class="act-btn share-btn" data-slug="'+slug+'" title="复制分享链接"><span class="ico">🔗</span><span class="txt">分享</span></button>';
       card.appendChild(acts);
       const st=document.createElement('div');st.className='card-stats';st.dataset.slug=slug;
-      st.innerHTML='<span>👁 <b class="v">0</b> 浏览</span><span>⬇ <b class="d">0</b> 下载</span><span style="cursor:pointer">💬 留言</span>';
+      st.innerHTML='<span>👁 <b class="v">0</b> 浏览</span><span>⬇ <b class="d">0</b> 下载</span><span>👍 <b class="k">0</b> 赞</span><span>🔗 <b class="sh">0</b> 分享</span>';
       card.appendChild(st);
       const dl=card.querySelector('.dl-main');if(dl)dl.addEventListener('click',()=>{bumpStat(slug,'downloads');});
       acts.querySelector('.cm-btn').onclick=()=>openComments(slug);
       acts.querySelector('.fav-star').onclick=()=>toggleFav(slug);
+      acts.querySelector('.like-btn').onclick=()=>toggleLike(slug);
+      acts.querySelector('.share-btn').onclick=()=>shareTool(slug);
     });
   }
+  function popBtn(sel){document.querySelectorAll(sel).forEach(b=>{b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');setTimeout(()=>b.classList.remove('pop'),400);});}
   function bumpStat(slug,key){stats[slug]=stats[slug]||{views:0,downloads:0};stats[slug][key]=(stats[slug][key]||0)+1;LS.set(STAT_KEY,stats);loadStats(slug);}
   function loadStats(slug){
     const s=stats[slug]||{views:0,downloads:0};
     const el=document.querySelector('.card-stats[data-slug="'+slug+'"]');if(!el)return;
     el.querySelector('.v').textContent=s.views;el.querySelector('.d').textContent=s.downloads;
+    const k=el.querySelector('.k'); if(k) k.textContent=(likes[slug]||0);
+    const sh=el.querySelector('.sh'); if(sh) sh.textContent=(shares[slug]||0);
+  }
+  function setBtn(btn,on,icoOn,icoOff,txtOn,txtOff){
+    btn.classList.toggle('on',on);
+    const i=btn.querySelector('.ico'), t=btn.querySelector('.txt');
+    if(i)i.textContent=on?icoOn:icoOff; if(t)t.textContent=on?txtOn:txtOff;
   }
   function syncStars(){
-    document.querySelectorAll('.fav-star').forEach(b=>{const on=favs.includes(b.dataset.slug);b.classList.toggle('on',on);b.textContent=on?'★ 已收藏':'☆ 收藏';});
+    document.querySelectorAll('.fav-star').forEach(b=>setBtn(b,favs.includes(b.dataset.slug),'★','☆','已收藏','收藏'));
+  }
+  function syncLikes(){
+    document.querySelectorAll('.like-btn').forEach(b=>{
+      const s=b.dataset.slug, n=likes[s]||0, on=liked.indexOf(s)>=0;
+      setBtn(b,on,'👍','👍','已赞 '+n,'赞 '+n);
+    });
+    TOOL_SLUGS.forEach(loadStats);
   }
   function toggleFav(slug){
     if(!profile){alert('请先在「我的」页登录/注册');showView('me');return;}
     const i=favs.indexOf(slug);if(i>=0)favs.splice(i,1);else favs.push(slug);
     LS.set(FAV_KEY,favs);syncStars();renderMeFavs();
+    popBtn('.fav-star[data-slug="'+slug+'"]');
+    if(adminToken)refreshAdmin();
+  }
+  function toggleLike(slug){
+    const i=liked.indexOf(slug);
+    if(i>=0){liked.splice(i,1);likes[slug]=Math.max(0,(likes[slug]||0)-1);}
+    else{liked.push(slug);likes[slug]=(likes[slug]||0)+1;}
+    LS.set(LIKED_KEY,liked);LS.set(LIKE_KEY,likes);
+    syncLikes();popBtn('.like-btn[data-slug="'+slug+'"]');
+    if(adminToken)refreshAdmin();
+  }
+  function shareTool(slug){
+    const name=toolName(slug);
+    const link=location.origin+location.pathname+'#'+slug;
+    const text=name+' — 工具铺：'+link;
+    shares[slug]=(shares[slug]||0)+1;LS.set(SHARE_KEY,shares);loadStats(slug);
+    popBtn('.share-btn[data-slug="'+slug+'"]');
+    if(adminToken)refreshAdmin();
+    const done=()=>{const b=document.querySelector('.share-btn[data-slug="'+slug+'"] .txt');if(b){b.textContent='已复制';setTimeout(()=>b.textContent='分享',1600);}};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(()=>prompt('复制下面的分享链接：',text));}
+    else prompt('复制下面的分享链接：',text);
   }
 
   // ---------- 评论弹层（Giscus：GitHub Discussions 托管，公开可见，站长可在仓库管理） ----------
@@ -876,10 +927,14 @@
     adminBox.style.display='none';adminPanel.style.display='';
     const totalV=Object.values(stats).reduce((s,x)=>s+((x&&x.views)||0),0);
     const totalD=Object.values(stats).reduce((s,x)=>s+((x&&x.downloads)||0),0);
+    const totalL=TOOL_SLUGS.reduce((s,x)=>s+(likes[x]||0),0);
+    const totalS=TOOL_SLUGS.reduce((s,x)=>s+(shares[x]||0),0);
     adminPanel.innerHTML=
       '<div class="admin-stat">'+
         '<div class="admin-card"><b>'+(profile?'1':'0')+'</b><span>本机账号</span></div>'+
-        '<div class="admin-card"><b>'+favs.length+'</b><span>收藏</span></div>'+
+        '<div class="admin-card"><b>'+totalL+'</b><span>👍 点赞</span></div>'+
+        '<div class="admin-card"><b>'+favs.length+'</b><span>⭐ 收藏</span></div>'+
+        '<div class="admin-card"><b>'+totalS+'</b><span>🔗 分享</span></div>'+
         '<div class="admin-card"><b>'+TOOL_SLUGS.length+'</b><span>工具</span></div>'+
         '<div class="admin-card"><b>'+totalV+'</b><span>总浏览</span></div>'+
         '<div class="admin-card"><b>'+totalD+'</b><span>总下载</span></div>'+
@@ -889,12 +944,31 @@
         '<button class="auth-btn" id="aExport" style="width:auto;padding:9px 18px;background:var(--accent-2)">导出本机数据</button>'+
         '<button class="auth-btn" id="aReport" style="width:auto;padding:9px 18px;background:#5b3cc4">📊 数据可视化报表（新窗口）</button>'+
         '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a></div>'+
-      '<h3 style="margin-top:8px">本机账号</h3><div id="aUsers" class="admin-list"></div>'+
+      '<h3 style="margin-top:8px">各工具互动明细</h3><div id="aInteract" class="admin-list"></div>'+
+      '<h3 style="margin-top:18px">本机账号</h3><div id="aUsers" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';localStorage.removeItem(ADMIN_KEY);refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
     adminPanel.querySelector('#aReport').onclick=openReport;
-    loadAdminUsers();loadAdminComments();
+    loadAdminInteract();loadAdminUsers();loadAdminComments();
+  }
+  function loadAdminInteract(){
+    const el=adminPanel.querySelector('#aInteract');if(!el)return;
+    el.innerHTML=TOOL_SLUGS.map(s=>{
+      const st=stats[s]||{views:0,downloads:0};
+      const n=likes[s]||0, sh=shares[s]||0, fv=favs.indexOf(s)>=0, cm=(comments[s]||[]).length;
+      return '<div class="admin-item"><div><b>'+escapeHtml(toolName(s))+'</b>'+
+        '<br><small style="line-height:1.9">👁 浏览 '+st.views+' ｜ ⬇ 下载 '+st.downloads+' ｜ 👍 赞 '+n+' ｜ 🔗 分享 '+sh+' ｜ ⭐ 收藏 '+(fv?'是':'否')+' ｜ 💬 本机评论 '+cm+'</small></div>'+
+        '<button class="del" data-reset="'+s+'">清零</button></div>';
+    }).join('');
+    el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
+      const s=b.dataset.reset;
+      if(!confirm('确定把「'+toolName(s)+'」的浏览/下载/点赞/分享计数清零？（收藏与评论不受影响）'))return;
+      stats[s]={views:0,downloads:0};likes[s]=0;shares[s]=0;
+      const i=liked.indexOf(s);if(i>=0)liked.splice(i,1);
+      LS.set(STAT_KEY,stats);LS.set(LIKE_KEY,likes);LS.set(SHARE_KEY,shares);LS.set(LIKED_KEY,liked);
+      syncLikes();refreshAdmin();
+    });
   }
   function loadAdminUsers(){
     const el=adminPanel.querySelector('#aUsers');if(!el)return;
@@ -916,7 +990,8 @@
       if(!confirm('确定删除该评论？'))return;
       const sl=b.dataset.slug, ts=+b.dataset.ts;
       comments[sl]=(comments[sl]||[]).filter(c=>c.ts!==ts);LS.set(CMT_KEY,comments);
-      loadAdminComments();document.querySelectorAll('.card-stats[data-slug="'+sl+'"]').forEach(x=>{const cc=(comments[sl]||[]).length;x.querySelector('.c').textContent=cc;});
+      loadAdminComments();loadAdminInteract();
+      document.querySelectorAll('.card-stats[data-slug="'+sl+'"]').forEach(x=>{const c=x.querySelector('.c');if(c)c.textContent=(comments[sl]||[]).length;});
     });
   }
   function toolName(slug){const el=document.querySelector('.tool[data-slug="'+slug+'"] h3');return el?el.textContent:slug;}
@@ -934,10 +1009,21 @@
     if(favs.length) favs.forEach(s=>L.push('  - '+toolName(s)));
     else L.push('  （无）');
     L.push('');
-    L.push('【工具统计】');
+    L.push('【互动汇总】');
+    const tV=TOOL_SLUGS.reduce((a,s)=>a+((stats[s]||{}).views||0),0);
+    const tD=TOOL_SLUGS.reduce((a,s)=>a+((stats[s]||{}).downloads||0),0);
+    const tL=TOOL_SLUGS.reduce((a,s)=>a+(likes[s]||0),0);
+    const tS=TOOL_SLUGS.reduce((a,s)=>a+(shares[s]||0),0);
+    const tC=TOOL_SLUGS.reduce((a,s)=>a+((comments[s]||[]).length),0);
+    L.push('  总浏览 '+tV+' ｜ 总下载 '+tD+' ｜ 总点赞 '+tL+' ｜ 总分享 '+tS+' ｜ 收藏 '+favs.length+' ｜ 本机评论 '+tC);
+    L.push('');
+    L.push('【各工具互动明细】');
     TOOL_SLUGS.forEach(s=>{
       const st=stats[s]||{views:0,downloads:0};
-      L.push('  - '+toolName(s)+'：浏览 '+st.views+' / 下载 '+st.downloads);
+      L.push('  - '+toolName(s));
+      L.push('      浏览 '+st.views+' ｜ 下载 '+st.downloads+' ｜ 点赞 '+(likes[s]||0)+
+             ' ｜ 分享 '+(shares[s]||0)+' ｜ 收藏 '+(favs.indexOf(s)>=0?'是':'否')+
+             ' ｜ 我已点赞 '+(liked.indexOf(s)>=0?'是':'否')+' ｜ 本机评论 '+((comments[s]||[]).length));
     });
     L.push('');
     L.push('【历史评论（本机）】');
@@ -1025,11 +1111,13 @@
     const slugs=TOOL_SLUGS;
     const rows=slugs.map(s=>{
       const st=stats[s]||{views:0,downloads:0};
-      return {slug:s,name:toolName(s),views:st.views,downloads:st.downloads,comments:(comments[s]||[]).length,favs:(favs.indexOf(s)>=0?1:0)};
+      return {slug:s,name:toolName(s),views:st.views,downloads:st.downloads,comments:(comments[s]||[]).length,favs:(favs.indexOf(s)>=0?1:0),likes:(likes[s]||0),shares:(shares[s]||0)};
     });
     const totalV=rows.reduce((a,r)=>a+r.views,0);
     const totalD=rows.reduce((a,r)=>a+r.downloads,0);
     const totalC=rows.reduce((a,r)=>a+r.comments,0);
+    const totalL=rows.reduce((a,r)=>a+r.likes,0);
+    const totalS=rows.reduce((a,r)=>a+r.shares,0);
     const totalF=favs.length,acc=profile?1:0;
     const labels=[];
     for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);labels.push((dt.getMonth()+1)+'/'+dt.getDate());}
@@ -1040,14 +1128,18 @@
     });
     const top=rows.slice().sort((a,b)=>b.views-a.views)[0];
     const topD=rows.slice().sort((a,b)=>b.downloads-a.downloads)[0];
+    const topL=rows.slice().sort((a,b)=>b.likes-a.likes)[0];
     const c1=svgVBar('各工具浏览量',rows.map(r=>({l:r.name,v:r.views})),'#6c5ce7');
     const c2=svgVBar('各工具下载量',rows.map(r=>({l:r.name,v:r.downloads})),'#00b894');
-    const c3=svgHBar('各工具评论数',rows.map(r=>({l:r.name,v:r.comments})),'#0984e3');
-    const c4=svgLine('近7天评论趋势',labels,vals,'#e17055');
-    const summary='截至'+new Date().toLocaleString('zh-CN')+'，你的「工具铺」共上架 <b>'+slugs.length+'</b> 款工具；本机累计被浏览 <b>'+totalV+'</b> 次、下载 <b>'+totalD+'</b> 次；你收藏了 <b>'+totalF+'</b> 款，本机留下 <b>'+totalC+'</b> 条评论，'+(acc?'本机已登录 1 个账号。':'本机尚未登录账号。')+'浏览量最高的是「'+top.name+'」（'+top.views+' 次），下载最多的是「'+topD.name+'」（'+topD.downloads+' 次）。朋友在 GitHub Discussions 的留言不计入本机统计，请到仓库 Discussions 查看。';
-    const thead='<tr><th>工具</th><th>浏览</th><th>下载</th><th>评论</th><th>已收藏</th></tr>';
-    const tbody=rows.map(r=>'<tr><td>'+r.name+'</td><td>'+r.views+'</td><td>'+r.downloads+'</td><td>'+r.comments+'</td><td>'+(r.favs?'是':'否')+'</td></tr>').join('');
-    const table='<table class="rpt"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody><tfoot><tr><td>合计</td><td>'+totalV+'</td><td>'+totalD+'</td><td>'+totalC+'</td><td>'+totalF+'</td></tr></tfoot></table>';
+    const c3=svgVBar('各工具点赞数',rows.map(r=>({l:r.name,v:r.likes})),'#ee5a6f');
+    const c4=svgVBar('各工具分享次数',rows.map(r=>({l:r.name,v:r.shares})),'#f0932b');
+    const c5=svgHBar('各工具评论数',rows.map(r=>({l:r.name,v:r.comments})),'#0984e3');
+    const c6=svgHBar('各工具收藏状态',rows.map(r=>({l:r.name,v:r.favs})),'#fdcb6e');
+    const c7=svgLine('近7天评论趋势',labels,vals,'#e17055');
+    const summary='截至'+new Date().toLocaleString('zh-CN')+'，你的「工具铺」共上架 <b>'+slugs.length+'</b> 款工具；本机累计被浏览 <b>'+totalV+'</b> 次、下载 <b>'+totalD+'</b> 次，收到 <b>'+totalL+'</b> 次点赞、<b>'+totalS+'</b> 次分享；你收藏了 <b>'+totalF+'</b> 款，本机留下 <b>'+totalC+'</b> 条评论，'+(acc?'本机已登录 1 个账号。':'本机尚未登录账号。')+'浏览量最高的是「'+top.name+'」（'+top.views+' 次），下载最多的是「'+topD.name+'」（'+topD.downloads+' 次），最受欢迎（点赞最多）的是「'+topL.name+'」（'+topL.likes+' 赞）。朋友在 GitHub Discussions 的留言不计入本机统计，请到仓库 Discussions 查看。';
+    const thead='<tr><th>工具</th><th>浏览</th><th>下载</th><th>👍 点赞</th><th>🔗 分享</th><th>评论</th><th>⭐ 已收藏</th></tr>';
+    const tbody=rows.map(r=>'<tr><td>'+r.name+'</td><td>'+r.views+'</td><td>'+r.downloads+'</td><td>'+r.likes+'</td><td>'+r.shares+'</td><td>'+r.comments+'</td><td>'+(r.favs?'是':'否')+'</td></tr>').join('');
+    const table='<table class="rpt"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody><tfoot><tr><td>合计</td><td>'+totalV+'</td><td>'+totalD+'</td><td>'+totalL+'</td><td>'+totalS+'</td><td>'+totalC+'</td><td>'+totalF+'</td></tr></tfoot></table>';
     const html='<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>工具铺 · 数据可视化报表</title>'
       +'<style>body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f6fa;color:#1f2430;margin:0;padding:28px}'
       +'.wrap{max-width:840px;margin:0 auto}.h1{font-size:22px;margin:0 0 4px}.sub{color:#888;font-size:13px;margin-bottom:18px}'
@@ -1059,7 +1151,8 @@
       +'<body><div class="wrap"><h1 class="h1">📊 工具铺 · 数据可视化报表</h1>'
       +'<div class="sub">数据来源：本机浏览器（'+new Date().toLocaleString('zh-CN')+'）</div>'
       +'<div class="summary">'+summary+'</div>'
-      +'<div class="grid"><div class="card">'+c1+'</div><div class="card">'+c2+'</div><div class="card">'+c3+'</div><div class="card">'+c4+'</div></div>'
+      +'<div class="grid"><div class="card">'+c1+'</div><div class="card">'+c2+'</div><div class="card">'+c3+'</div><div class="card">'+c4+'</div><div class="card">'+c5+'</div><div class="card">'+c6+'</div></div>'
+      +'<div class="card" style="margin-top:16px">'+c7+'</div>'
       +'<h2 class="sec">📋 具体数据明细</h2>'+table
       +'<p class="sub" style="margin-top:18px">提示：本报表为离线生成，数据仅来自当前浏览器。朋友的留言请到 GitHub Discussions 查看。</p>'
       +'</div></body></html>';
@@ -1075,6 +1168,7 @@
 
   // 初始化
   buildCardExtras();
+  syncLikes();
   refreshMe();
   refreshAdmin();
   const adminFab=document.getElementById('adminFab');
