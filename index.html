@@ -133,6 +133,10 @@
   .dl-main:hover{background:#000}
   .dl-sub{background:rgba(35,37,43,.06);color:var(--ink)}
   .dl-sub:hover{background:rgba(35,37,43,.12)}
+  .empty{margin-top:16px;padding:36px 20px;border-radius:var(--radius);border:2px dashed rgba(35,37,43,.16);background:rgba(35,37,43,.02);text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .empty-ico{font-size:34px;opacity:.5}
+  .empty b{font-size:15px;font-weight:800}
+  .empty span{font-size:13px;color:var(--ink-soft);max-width:420px;line-height:1.7}
   .note{list-style:none;margin:14px 0 0;padding:10px 13px;border-radius:12px;background:rgba(35,37,43,.04);border-left:3px solid var(--accent-2)}
   .note li{position:relative;padding-left:14px;font-size:12.5px;line-height:1.7;color:var(--ink-soft)}
   .note li+li{margin-top:5px}
@@ -233,7 +237,14 @@
   <div class="wrap">
     <div class="eyebrow">Toolbox</div>
     <h2 class="title">工具集合</h2>
-    <p class="lead">分两部分：我自己写的工具，以及收录的开源 / 免费软件。点击下载会跳转到 GitHub 仓库的对应发布页。</p>
+    <p class="lead">分三个模块：电脑端工具、手机端工具、开源免费工具。点击下载会跳转到 GitHub 仓库的对应发布页。</p>
+
+    <!-- 模块一：电脑端工具 -->
+    <div class="subhead">
+      <span class="sub-dot" style="background:var(--c-lav)"></span>
+      <h3>💻 电脑端工具</h3>
+      <p>我自己写的 Windows 小工具，绿色免安装，源码都在仓库里。</p>
+    </div>
 
     <div class="tool-grid">
 
@@ -281,10 +292,23 @@
 
     </div>
 
-    <!-- 收录软件专区 -->
+    <!-- 模块二：手机端工具 -->
     <div class="subhead">
-      <span class="sub-dot" style="background:var(--c-butter)"></span>
-      <h3>📦 收录软件</h3>
+      <span class="sub-dot" style="background:var(--c-peach)"></span>
+      <h3>📱 手机端工具</h3>
+      <p>Android 端小工具，开发中。</p>
+    </div>
+
+    <div class="empty">
+      <div class="empty-ico">📱</div>
+      <b>暂无上架</b>
+      <span>手机端工具正在开发中，上架后会第一时间更新到这里。</span>
+    </div>
+
+    <!-- 模块三：开源免费工具 -->
+    <div class="subhead">
+      <span class="sub-dot" style="background:var(--c-teal)"></span>
+      <h3>🌐 开源免费工具</h3>
       <p>必备匠心软件，来自各个大神的手笔，此处仅作快捷下载入口（非盈利）。</p>
     </div>
 
