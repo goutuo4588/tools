@@ -955,7 +955,9 @@
   }
   async function exportData(){
     const text=buildExportText();
-    const fname='工具铺-本机数据.txt';
+    const d=new Date();
+    const ymd=''+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+    const fname='工具铺-本机数据-'+ymd+'.txt';
     try{
       if(window.showSaveFilePicker){
         const handle=await window.showSaveFilePicker({suggestedName:fname,startIn:'desktop',types:[{description:'文本文档',accept:{'text/plain':['.txt']}}]});
