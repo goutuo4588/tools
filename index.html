@@ -240,6 +240,23 @@
   .admin-item .del:hover{background:#c83a35}
   .admin-hint{font-size:13px;color:var(--ink-soft);margin:6px 0 0}
 
+  /* 右下角浮动按钮 */
+  .admin-fab{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;align-items:center;gap:8px;
+    padding:13px 18px;border:0;border-radius:40px;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 10px 30px rgba(35,37,43,.25);
+    transition:transform .18s ease, box-shadow .18s ease}
+  .admin-fab:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(35,37,43,.32)}
+  .admin-fab .ic{font-size:19px;line-height:1}
+  @media(max-width:760px){.admin-fab{right:14px;bottom:14px;padding:11px 15px;font-size:14px;gap:6px}}
+
+  /* 站长后台独立登录界面 */
+  .admin-login-screen{min-height:72vh;display:flex;align-items:center;justify-content:center;padding:34px 16px}
+  .admin-login-card{width:100%;max-width:680px;background:rgba(255,255,255,.8);border-radius:24px;padding:34px 30px;
+    box-shadow:var(--shadow);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);text-align:center}
+  .admin-login-ic{font-size:44px;margin-bottom:4px}
+  .admin-login-sub{color:var(--ink-soft);font-size:14px;margin:6px 0 20px}
+  .admin-login-card .auth-wrap{max-width:340px;margin:0 auto;text-align:left}
+
   /* ============ 响应式 ============ */
   @media(max-width:760px){
     .app{flex-direction:column}
@@ -517,13 +534,7 @@
           <div id="authBox"></div>
           <div id="mePanel" style="display:none"></div>
 
-          <div id="adminWrap" class="admin-wrap" style="margin-top:26px">
-            <div class="eyebrow">Admin</div>
-            <h2 class="title">站长后台</h2>
-            <div id="adminBox"></div>
-            <div id="adminPanel" style="display:none"></div>
-            <p class="admin-hint">仅站长可进入（密码由部署时设置）。</p>
-          </div>
+          <!-- 站长后台已移至独立视图 view-admin（右下角浮动按钮进入） -->
 
           <div class="me-mail">
             <div class="eyebrow">联系我</div>
@@ -545,10 +556,24 @@
 
     </section>
 
+    <!-- ====== 视图：站长后台（独立登录界面，右下角浮动按钮进入） ====== -->
+    <section id="view-admin" class="view">
+      <div class="admin-login-screen">
+        <div class="admin-login-card reveal">
+          <div class="admin-login-ic">🔧</div>
+          <h2 class="title">站长后台</h2>
+          <p class="admin-login-sub">请输入账号和密码进入管理后台</p>
+          <div id="adminBox"></div>
+          <div id="adminPanel" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
 <div id="cmModal" class="modal-back" style="display:none"></div>
+<button id="adminFab" class="admin-fab" title="站长后台"><span class="ic">🔧</span><span>站长后台</span></button>
 <footer>
   © <span id="year">2026</span> 工具铺 · 由 狗托儿 用 ❤️ 与咖啡因驱动
 </footer>
@@ -609,6 +634,7 @@
     intro: document.getElementById('view-intro'),
     tools: document.getElementById('view-tools'),
     me:    document.getElementById('view-me'),
+    admin: document.getElementById('view-admin'),
   };
   const navBtns = document.querySelectorAll('.nav-btn');
   function showView(name){
@@ -694,7 +720,7 @@
     set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
   };
   const PROFILE_KEY='tp_profile', FAV_KEY='tp_favs', CMT_KEY='tp_comments', STAT_KEY='tp_stats', ADMIN_KEY='tp_admin';
-  const ADMIN_PWD='a9727d9752dadada';
+  const ADMIN_USER='admin', ADMIN_PWD='a9727d9752dadada';
   const TOOL_SLUGS=['douyin-helper','cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
   const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
@@ -831,16 +857,18 @@
   const adminBox=document.getElementById('adminBox'), adminPanel=document.getElementById('adminPanel');
   let adminToken=localStorage.getItem(ADMIN_KEY)||'';
   function renderAdminLogin(){
-    adminBox.innerHTML='<div class="auth-wrap"><div class="field"><input id="aPwd" type="password" placeholder="站长密码" autocomplete="current-password"></div>'+
+    adminBox.innerHTML='<div class="auth-wrap"><div class="field"><input id="aUser" type="text" placeholder="账号" autocomplete="username"></div>'+
+      '<div class="field"><input id="aPwd" type="password" placeholder="密码" autocomplete="current-password"></div>'+
       '<button class="auth-btn" id="aLogin">进入后台</button>'+
       '<div class="auth-msg" id="aMsg"></div>'+
-      '<div style="font-size:12px;color:var(--ink-soft);margin-top:10px">本站为静态站点，后台仅管理「本机数据」（评论 / 收藏 / 账号）。</div></div>';
+      '<div style="font-size:12px;color:var(--ink-soft);margin-top:10px">账号：admin ｜ 本站为静态站点，后台仅管理「本机数据」（评论 / 收藏 / 账号）。</div></div>';
     adminBox.querySelector('#aLogin').onclick=()=>{
+      const user=adminBox.querySelector('#aUser').value.trim();
       const pwd=adminBox.querySelector('#aPwd').value;
       const msg=adminBox.querySelector('#aMsg');msg.className='auth-msg';msg.textContent='';
-      if(!pwd){msg.className='auth-msg err';msg.textContent='请输入密码';return;}
-      if(pwd===ADMIN_PWD){adminToken='1';localStorage.setItem(ADMIN_KEY,adminToken);refreshAdmin();}
-      else{msg.className='auth-msg err';msg.textContent='密码错误';}
+      if(!user||!pwd){msg.className='auth-msg err';msg.textContent='请输入账号和密码';return;}
+      if(user===ADMIN_USER&&pwd===ADMIN_PWD){adminToken='1';localStorage.setItem(ADMIN_KEY,adminToken);refreshAdmin();}
+      else{msg.className='auth-msg err';msg.textContent='账号或密码错误';}
     };
   }
   function refreshAdmin(){
@@ -904,6 +932,8 @@
   buildCardExtras();
   refreshMe();
   refreshAdmin();
+  const adminFab=document.getElementById('adminFab');
+  if(adminFab){adminFab.onclick=()=>{showView('admin');refreshAdmin();};}
   const viewedOnce=new Set();
   const _showView=showView;
   showView=function(name){
