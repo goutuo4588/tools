@@ -696,6 +696,8 @@
   const PROFILE_KEY='tp_profile', FAV_KEY='tp_favs', CMT_KEY='tp_comments', STAT_KEY='tp_stats', ADMIN_KEY='tp_admin';
   const ADMIN_PWD='a9727d9752dadada';
   const TOOL_SLUGS=['douyin-helper','cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek'];
+  // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
+  const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
 
   // 种子评论：首次无数据时展示，避免空荡
   const SEED={ 'douyin-helper':[{nick:'阿成',rating:5,content:'机械操作终于不用自己点了，省心！',ts:Date.now()-86400000}],
@@ -766,7 +768,7 @@
       acts.innerHTML='<button class="fav-star" data-slug="'+slug+'">☆ 收藏</button><button class="cm-btn" data-slug="'+slug+'">💬 评论/评分</button>';
       card.appendChild(acts);
       const st=document.createElement('div');st.className='card-stats';st.dataset.slug=slug;
-      st.innerHTML='<span>👁 <b class="v">0</b> 浏览</span><span>⬇ <b class="d">0</b> 下载</span><span>💬 <b class="c">0</b></span>';
+      st.innerHTML='<span>👁 <b class="v">0</b> 浏览</span><span>⬇ <b class="d">0</b> 下载</span><span style="cursor:pointer">💬 留言</span>';
       card.appendChild(st);
       const dl=card.querySelector('.dl-main');if(dl)dl.addEventListener('click',()=>{bumpStat(slug,'downloads');});
       acts.querySelector('.cm-btn').onclick=()=>openComments(slug);
@@ -776,9 +778,8 @@
   function bumpStat(slug,key){stats[slug]=stats[slug]||{views:0,downloads:0};stats[slug][key]=(stats[slug][key]||0)+1;LS.set(STAT_KEY,stats);loadStats(slug);}
   function loadStats(slug){
     const s=stats[slug]||{views:0,downloads:0};
-    const c=(comments[slug]||[]).length;
     const el=document.querySelector('.card-stats[data-slug="'+slug+'"]');if(!el)return;
-    el.querySelector('.v').textContent=s.views;el.querySelector('.d').textContent=s.downloads;el.querySelector('.c').textContent=c;
+    el.querySelector('.v').textContent=s.views;el.querySelector('.d').textContent=s.downloads;
   }
   function syncStars(){
     document.querySelectorAll('.fav-star').forEach(b=>{const on=favs.includes(b.dataset.slug);b.classList.toggle('on',on);b.textContent=on?'★ 已收藏':'☆ 收藏';});
@@ -789,44 +790,42 @@
     LS.set(FAV_KEY,favs);syncStars();renderMeFavs();
   }
 
-  // ---------- 评论弹层（本地） ----------
+  // ---------- 评论弹层（Giscus：GitHub Discussions 托管，公开可见，站长可在仓库管理） ----------
   const cmModal=document.getElementById('cmModal');
-  let curSlug=null,curRating=0;
+  let curSlug=null;
   function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function openComments(slug){
-    curSlug=slug;curRating=0;
+    curSlug=slug;
     const name=(document.querySelector('.tool[data-slug="'+slug+'"] h3')||{}).textContent||slug;
     cmModal.style.display='flex';
     cmModal.innerHTML='<div class="modal"><button class="close" id="cmClose">×</button>'+
-      '<h3>'+name+' · 评论与评分</h3>'+
-      '<div class="cm-list" id="cmList"><span style="color:var(--ink-soft)">加载中…</span></div>'+
-      '<div class="cm-form"><div class="stars" id="cmStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div>'+
-      '<textarea id="cmText" placeholder="说点什么…（登录后才能发表）"></textarea>'+
-      '<button class="auth-btn" id="cmSend">发表评论</button></div></div>';
-    cmModal.querySelector('#cmClose').onclick=()=>cmModal.style.display='none';
-    cmModal.querySelectorAll('#cmStars span').forEach(s=>s.onclick=()=>{curRating=+s.dataset.v;renderStars(curRating);});
-    cmModal.querySelector('#cmSend').onclick=sendComment;
-    loadComments(slug);
+      '<h3>'+name+' · 留言</h3>'+
+      '<div style="font-size:13px;color:var(--ink-soft);background:rgba(125,125,160,.12);border-radius:12px;padding:10px 12px;margin-bottom:12px;line-height:1.6">留言由 GitHub Discussions 托管，<b>公开可见</b>，需用 <b>GitHub 账号</b> 登录后发表。你（站长）可在仓库 Discussions 中查看 / 删除 / 回复。</div>'+
+      '<div id="giscusHost"></div></div>';
+    cmModal.querySelector('#cmClose').onclick=()=>{cmModal.style.display='none';clearGiscus();};
+    loadGiscus(slug);
   }
-  function renderStars(n){cmModal.querySelectorAll('#cmStars span').forEach(s=>s.classList.toggle('on',+s.dataset.v<=n));}
-  function loadComments(slug){
-    const list=cmModal.querySelector('#cmList');if(!list)return;
-    const arr=(comments[slug]||[]).slice().sort((a,b)=>b.ts-a.ts);
-    const avg=arr.length?Math.round(arr.reduce((s,c)=>s+(c.rating||0),0)/arr.length):0;
-    list.innerHTML='<div style="font-size:13px;color:var(--ink-soft);margin-bottom:8px">平均评分 <b style="color:#f5a623;font-size:16px">'+avg+'</b> · '+arr.length+' 条评论</div>'+
-      (arr.length?arr.map(c=>'<div class="cm-item"><div class="who">'+escapeHtml(c.nick)+'<span class="rt">'+(c.rating?' '+('★'.repeat(c.rating)):'')+'</span></div><div class="tx">'+escapeHtml(c.content)+'</div></div>').join(''):'<span style="color:var(--ink-soft)">还没有评论，来抢沙发</span>');
-    const st=document.querySelector('.card-stats[data-slug="'+slug+'"]');if(st)st.querySelector('.c').textContent=arr.length;
+  function loadGiscus(slug){
+    const host=document.getElementById('giscusHost');if(!host)return;
+    host.innerHTML='';
+    const s=document.createElement('script');
+    s.src='https://giscus.app/client.js';
+    s.async=true; s.crossOrigin='anonymous';
+    s.setAttribute('data-repo',GISCUS.repo);
+    s.setAttribute('data-repo-id',GISCUS.repoId);
+    s.setAttribute('data-category',GISCUS.category);
+    s.setAttribute('data-category-id',GISCUS.categoryId);
+    s.setAttribute('data-mapping','specific-term');
+    s.setAttribute('data-term',slug);
+    s.setAttribute('data-strict','0');
+    s.setAttribute('data-reactions-enabled','1');
+    s.setAttribute('data-emit-metadata','0');
+    s.setAttribute('data-input-position','bottom');
+    s.setAttribute('data-theme','preferred_color_scheme');
+    s.setAttribute('data-lang','zh-CN');
+    host.appendChild(s);
   }
-  function sendComment(){
-    if(!profile){alert('请先在「我的」页登录/注册');cmModal.style.display='none';showView('me');return;}
-    const text=cmModal.querySelector('#cmText').value.trim();
-    if(!text){alert('评论不能为空');return;}
-    comments[curSlug]=comments[curSlug]||[];
-    comments[curSlug].push({nick:profile.nickName,rating:curRating,content:text,ts:Date.now()});
-    LS.set(CMT_KEY,comments);
-    cmModal.querySelector('#cmText').value='';curRating=0;renderStars(0);
-    loadComments(curSlug);loadStats(curSlug);
-  }
+  function clearGiscus(){const host=document.getElementById('giscusHost');if(host)host.innerHTML='';}
 
   // ---------- 站长后台（本地，密码门） ----------
   const adminBox=document.getElementById('adminBox'), adminPanel=document.getElementById('adminPanel');
@@ -847,13 +846,11 @@
   function refreshAdmin(){
     if(!adminToken){adminBox.style.display='';adminPanel.style.display='none';renderAdminLogin();return;}
     adminBox.style.display='none';adminPanel.style.display='';
-    const totalC=Object.values(comments).reduce((s,a)=>s+(a?a.length:0),0);
     const totalV=Object.values(stats).reduce((s,x)=>s+((x&&x.views)||0),0);
     const totalD=Object.values(stats).reduce((s,x)=>s+((x&&x.downloads)||0),0);
     adminPanel.innerHTML=
       '<div class="admin-stat">'+
         '<div class="admin-card"><b>'+(profile?'1':'0')+'</b><span>本机账号</span></div>'+
-        '<div class="admin-card"><b>'+totalC+'</b><span>评论</span></div>'+
         '<div class="admin-card"><b>'+favs.length+'</b><span>收藏</span></div>'+
         '<div class="admin-card"><b>'+TOOL_SLUGS.length+'</b><span>工具</span></div>'+
         '<div class="admin-card"><b>'+totalV+'</b><span>总浏览</span></div>'+
@@ -861,9 +858,10 @@
       '</div>'+
       '<div style="margin:14px 0;display:flex;gap:10px;flex-wrap:wrap">'+
         '<button class="auth-btn" id="aLogout" style="width:auto;padding:9px 18px">退出后台</button>'+
-        '<button class="auth-btn" id="aExport" style="width:auto;padding:9px 18px;background:var(--accent-2)">导出本机数据</button></div>'+
+        '<button class="auth-btn" id="aExport" style="width:auto;padding:9px 18px;background:var(--accent-2)">导出本机数据</button>'+
+        '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a></div>'+
       '<h3 style="margin-top:8px">本机账号</h3><div id="aUsers" class="admin-list"></div>'+
-      '<h3 style="margin-top:18px">全部评论（本机）</h3><div id="aComments" class="admin-list"></div>';
+      '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';localStorage.removeItem(ADMIN_KEY);refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
     loadAdminUsers();loadAdminComments();
