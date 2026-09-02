@@ -133,7 +133,11 @@
   .dl-main:hover{background:#000}
   .dl-sub{background:rgba(35,37,43,.06);color:var(--ink)}
   .dl-sub:hover{background:rgba(35,37,43,.12)}
-  .soon{font-size:12px;color:var(--ink-soft);margin-top:12px}
+  .note{list-style:none;margin:14px 0 0;padding:10px 13px;border-radius:12px;background:rgba(35,37,43,.04);border-left:3px solid var(--accent-2)}
+  .note li{position:relative;padding-left:14px;font-size:12.5px;line-height:1.7;color:var(--ink-soft)}
+  .note li+li{margin-top:5px}
+  .note li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent-2);opacity:.55}
+  .note b{color:var(--ink);font-weight:700}
 
   /* ============ 联系（大色块·天空） ============ */
   .contact{background:var(--c-sky);border-radius:var(--radius);margin:clamp(20px,4vw,40px) clamp(10px,3vw,30px) 0}
@@ -248,7 +252,10 @@
           <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
           <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
         </div>
-        <p class="soon">到 Releases 页面选取对应版本 exe 下载即可。</p>
+        <ul class="note">
+          <li><b>本人作品</b> · 源码已开源在上方仓库</li>
+          <li><b>.exe 可执行文件</b> · 到 Releases 页面选取对应版本下载，双击即用</li>
+        </ul>
       </article>
 
       <!-- 工具 2：CDriveCleanup -->
@@ -266,7 +273,10 @@
           <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
           <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
         </div>
-        <p class="soon">到 Releases 页面下载压缩包，解压即用。</p>
+        <ul class="note">
+          <li><b>本人作品</b> · 源码已开源在上方仓库</li>
+          <li><b>.exe 可执行文件</b> · 下载压缩包解压后运行主程序，无需安装</li>
+        </ul>
       </article>
 
     </div>
@@ -275,7 +285,7 @@
     <div class="subhead">
       <span class="sub-dot" style="background:var(--c-butter)"></span>
       <h3>📦 收录软件</h3>
-      <p>不是我写的，但很好用。均为开源或免费软件，版权归原作者，这里只做收录与分流。</p>
+      <p>必备匠心软件，来自各个大神的手笔，此处仅作快捷下载入口（非盈利）。</p>
     </div>
 
     <div class="tool-grid">
@@ -295,11 +305,14 @@
           <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" target="_blank" rel="noopener">GitHub 下载</a>
           <a class="dl dl-sub" href="https://github.com/game1024/OpenSpeedy" target="_blank" rel="noopener">项目主页</a>
         </div>
+        <ul class="note">
+          <li><b>非本人作品</b> · 作者 game1024，GPL-3.0 开源</li>
+          <li><b>.exe 可执行文件</b> · zip 解压后运行 openspeedy.exe，无需安装</li>
+        </ul>
       </article>
 
       <!-- 收录 2：Watt Toolkit -->
       <article class="tool">
-        <div class="tool-icon" style="background:var(--c-butter)">⚡</div>
         <h3>Watt Toolkit</h3>
         <div class="ver">Steam 工具箱 · v3.1.0</div>
         <p>原名 Steam++，开源的 Steam 多功能工具箱：游戏加速、库存管理、成就统计、本地存档托管等。解压即用，不用装。</p>
@@ -312,7 +325,11 @@
           <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" target="_blank" rel="noopener">GitHub 下载</a>
           <a class="dl dl-sub" href="https://github.com/BeyondDimension/SteamTools" target="_blank" rel="noopener">项目主页</a>
         </div>
-        <p class="soon">非本人作品 · 7z 格式，需 7-Zip / Bandizip 解压后运行 Steam++.exe</p>
+        <ul class="note">
+          <li><b>非本人作品</b> · 作者 BeyondDimension，开源项目</li>
+          <li><b>.exe 可执行文件</b> · 7z 格式，需 7-Zip / Bandizip 解压后运行 Steam++.exe</li>
+          <li><b>绿色版</b> · 解压即用，无需安装</li>
+        </ul>
       </article>
 
       <!-- 收录 3：Wireshark -->
@@ -330,7 +347,11 @@
           <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" target="_blank" rel="noopener">GitHub 下载</a>
           <a class="dl dl-sub" href="https://www.wireshark.org/" target="_blank" rel="noopener">官方网站</a>
         </div>
-        <p class="soon">非本人作品 · Wireshark Foundation · 需安装，抓包功能依赖 Npcap</p>
+        <ul class="note">
+          <li><b>非本人作品</b> · Wireshark Foundation，GPL-2.0 开源</li>
+          <li><b>.exe 可执行文件</b> · 为安装包，需安装后使用</li>
+          <li><b>抓包功能依赖 Npcap</b> · 安装时记得勾选 Npcap 驱动，否则抓不了包</li>
+        </ul>
       </article>
 
       <!-- 收录 4：Geek Uninstaller -->
@@ -348,7 +369,11 @@
           <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" target="_blank" rel="noopener">GitHub 下载</a>
           <a class="dl dl-sub" href="https://geekuninstaller.com/" target="_blank" rel="noopener">官方网站</a>
         </div>
-        <p class="soon">非本人作品 · 免费软件（非开源）· 双击即用，卸载系统组件前请谨慎</p>
+        <ul class="note">
+          <li><b>非本人作品</b> · 免费软件（非开源），版权归原作者</li>
+          <li><b>.exe 可执行文件</b> · 单文件，双击即用免安装</li>
+          <li><b>卸载系统组件前请谨慎清理</b> · 误删系统文件可能导致系统异常</li>
+        </ul>
       </article>
 
     </div>
