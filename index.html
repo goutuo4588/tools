@@ -227,6 +227,19 @@
   .stars span{cursor:pointer;color:#d9dde5;transition:.1s}
   .stars span.on{color:#f5a623}
 
+  /* ============ 站长后台 ============ */
+  .admin-wrap{max-width:760px;margin:30px auto 0}
+  .admin-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:14px;margin:14px 0 6px}
+  .admin-card{background:rgba(255,255,255,.72);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%)}
+  .admin-card b{display:block;font-size:26px;color:var(--ink)}
+  .admin-card span{font-size:13px;color:var(--ink-soft)}
+  .admin-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+  .admin-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:rgba(255,255,255,.72);border-radius:14px;padding:12px 14px;box-shadow:0 4px 18px rgba(35,37,43,.06)}
+  .admin-item .tx{font-size:14px;color:var(--ink-soft);margin-top:4px;word-break:break-word}
+  .admin-item .del{padding:7px 14px;border:0;border-radius:10px;background:#e0443e;color:#fff;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+  .admin-item .del:hover{background:#c83a35}
+  .admin-hint{font-size:13px;color:var(--ink-soft);margin:6px 0 0}
+
   /* ============ 响应式 ============ */
   @media(max-width:760px){
     .app{flex-direction:column}
@@ -504,6 +517,14 @@
           <div id="authBox"></div>
           <div id="mePanel" style="display:none"></div>
 
+          <div id="adminWrap" class="admin-wrap" style="margin-top:26px">
+            <div class="eyebrow">Admin</div>
+            <h2 class="title">站长后台</h2>
+            <div id="adminBox"></div>
+            <div id="adminPanel" style="display:none"></div>
+            <p class="admin-hint">仅站长可进入（密码由部署时设置）。</p>
+          </div>
+
           <div class="me-mail">
             <div class="eyebrow">联系我</div>
             <p class="lead" style="margin:0 auto">有任何想法、需求或想提的工具，随时发邮件给我。</p>
@@ -668,8 +689,8 @@
   });
 
   // =================== 后端接入（Cloudflare Workers） ===================
-  // TODO: wrangler deploy 后，把下面换成你的真实 Worker 地址
-  const API_BASE = 'https://tools-backend.<你的子域>.workers.dev';
+  // 已部署：Cloudflare Workers 后端
+  const API_BASE = 'https://tools-backend.goutuoshigesha.workers.dev';
   const TOKEN_KEY = 'tb_token', CONN_KEY = 'tb_conn';
   let token = localStorage.getItem(TOKEN_KEY) || '';
   let me = null;
@@ -818,6 +839,85 @@
     else alert((r.data && r.data.error) || '发表失败');
   }
 
+  // ---------- 站长后台 ----------
+  const ADMIN_KEY = 'tb_admin';
+  let adminToken = localStorage.getItem(ADMIN_KEY) || '';
+  const adminBox = document.getElementById('adminBox');
+  const adminPanel = document.getElementById('adminPanel');
+  function adminHeaders() { const h = { 'Content-Type': 'application/json' }; if (adminToken) h.Authorization = 'Bearer ' + adminToken; return h; }
+  async function adminApi(path, opts = {}) {
+    let res;
+    try { res = await fetch(API_BASE + path, Object.assign({ headers: adminHeaders() }, opts)); }
+    catch (e) { return { ok: false, status: 0, data: { error: '网络错误' } }; }
+    let data = {}; try { data = await res.json(); } catch (e) {}
+    if (res.status === 401) { adminToken = ''; localStorage.removeItem(ADMIN_KEY); }
+    return { ok: res.ok, status: res.status, data };
+  }
+  function aStat(label, val) { return '<div class="admin-card"><b>' + val + '</b><span>' + label + '</span></div>'; }
+  async function refreshAdmin() {
+    if (!adminToken) { adminBox.style.display = ''; adminPanel.style.display = 'none'; renderAdminLogin(); return; }
+    const r = await adminApi('/api/admin/overview');
+    if (r.ok) { adminBox.style.display = 'none'; adminPanel.style.display = ''; renderAdminPanel(r.data); }
+    else { adminBox.style.display = ''; adminPanel.style.display = 'none'; renderAdminLogin(); }
+  }
+  function renderAdminLogin() {
+    adminBox.innerHTML = '<div class="auth-wrap"><div class="field"><input id="aPwd" type="password" placeholder="站长密码" autocomplete="current-password"></div>' +
+      '<button class="auth-btn" id="aLogin">进入后台</button>' +
+      '<div class="auth-msg" id="aMsg"></div></div>';
+    adminBox.querySelector('#aLogin').onclick = async () => {
+      const pwd = adminBox.querySelector('#aPwd').value;
+      const msg = adminBox.querySelector('#aMsg'); msg.className = 'auth-msg'; msg.textContent = '';
+      if (!pwd) { msg.className = 'auth-msg err'; msg.textContent = '请输入密码'; return; }
+      const r = await adminApi('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: pwd }) });
+      if (r.ok) { adminToken = r.data.token; localStorage.setItem(ADMIN_KEY, adminToken); refreshAdmin(); }
+      else { msg.className = 'auth-msg err'; msg.textContent = (r.data && r.data.error) || '登录失败'; }
+    };
+  }
+  function renderAdminPanel(ov) {
+    adminPanel.innerHTML =
+      '<div class="admin-stat">' + aStat('注册用户', ov.users) + aStat('评论', ov.comments) + aStat('收藏', ov.favorites) +
+      aStat('在线', ov.online) + aStat('总浏览', ov.totalViews) + aStat('总下载', ov.totalDownloads) + '</div>' +
+      '<div style="margin:14px 0"><button class="auth-btn" id="aLogout" style="width:auto;padding:9px 18px">退出后台</button></div>' +
+      '<h3 style="margin-top:8px">注册用户</h3><div id="aUsers" class="admin-list"><span style="color:var(--ink-soft)">加载中…</span></div>' +
+      '<h3 style="margin-top:18px">全部评论</h3><div id="aComments" class="admin-list"><span style="color:var(--ink-soft)">加载中…</span></div>';
+    adminPanel.querySelector('#aLogout').onclick = () => { adminToken = ''; localStorage.removeItem(ADMIN_KEY); refreshAdmin(); };
+    loadAdminUsers(); loadAdminComments();
+  }
+  async function loadAdminUsers() {
+    const el = adminPanel.querySelector('#aUsers'); if (!el) return;
+    const r = await adminApi('/api/admin/users');
+    if (!r.ok) { el.innerHTML = '<span style="color:var(--ink-soft)">加载失败</span>'; return; }
+    const us = r.data.users || [];
+    el.innerHTML = us.length ? us.map(u => {
+      const ds = u.created_at ? new Date(u.created_at).toLocaleString('zh-CN') : '';
+      return '<div class="admin-item"><div><b>' + (u.nick_name || u.email) + '</b> <span style="color:var(--ink-soft)">' + u.email + '</span><br><small>' + ds + '</small></div>' +
+        '<button class="del" data-uid="' + u.id + '">删除</button></div>';
+    }).join('') : '<span style="color:var(--ink-soft)">暂无用户</span>';
+    el.querySelectorAll('.del').forEach(b => b.onclick = async () => {
+      if (!confirm('确定删除该用户？其评论与收藏也会一并删除。')) return;
+      const r2 = await adminApi('/api/admin/users/' + b.dataset.uid, { method: 'DELETE' });
+      if (r2.ok) loadAdminUsers(); else alert('删除失败');
+    });
+  }
+  async function loadAdminComments() {
+    const el = adminPanel.querySelector('#aComments'); if (!el) return;
+    const r = await adminApi('/api/admin/comments');
+    if (!r.ok) { el.innerHTML = '<span style="color:var(--ink-soft)">加载失败</span>'; return; }
+    const cs = r.data.comments || [];
+    el.innerHTML = cs.length ? cs.map(c => {
+      const ds = c.created_at ? new Date(c.created_at).toLocaleString('zh-CN') : '';
+      return '<div class="admin-item"><div><b>' + escapeHtml(c.nick_name) + '</b> <span style="color:var(--ink-soft)">' + escapeHtml(c.tool_slug) + '</span>' +
+        (c.rating ? ' <span style="color:#f5a623">' + '★'.repeat(c.rating) + '</span>' : '') +
+        '<br><small>' + ds + '</small><div class="tx">' + escapeHtml(c.content) + '</div></div>' +
+        '<button class="del" data-cid="' + c.id + '">删除</button></div>';
+    }).join('') : '<span style="color:var(--ink-soft)">暂无评论</span>';
+    el.querySelectorAll('.del').forEach(b => b.onclick = async () => {
+      if (!confirm('确定删除该评论？')) return;
+      const r2 = await adminApi('/api/admin/comments/' + b.dataset.cid, { method: 'DELETE' });
+      if (r2.ok) loadAdminComments(); else alert('删除失败');
+    });
+  }
+
   // 在线人数
   const onlineBadge = document.getElementById('onlineBadge');
   async function pingOnline() {
@@ -829,6 +929,7 @@
   // 初始化
   buildCardExtras();
   refreshMe();
+  refreshAdmin();
   pingOnline(); setInterval(pingOnline, 30000);
   const viewedOnce = new Set();
   const _showView = showView;
