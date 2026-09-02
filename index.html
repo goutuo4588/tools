@@ -38,29 +38,36 @@
   a{color:inherit;text-decoration:none}
   img{max-width:100%}
 
-  /* ============ 顶部导航 ============ */
-  .nav{
-    position:sticky;top:0;z-index:50;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:16px clamp(18px,5vw,48px);
-    background:rgba(255,253,249,.72);
+  /* ============ 整体布局：左栏 + 主区 ============ */
+  .app{display:flex;min-height:100vh}
+  .sidebar{
+    width:248px;flex-shrink:0;position:sticky;top:0;height:100vh;
+    background:rgba(255,253,249,.92);
     backdrop-filter:saturate(160%) blur(14px);
-    border-bottom:1px solid rgba(35,37,43,.06);
+    border-right:1px solid rgba(35,37,43,.07);
+    display:flex;flex-direction:column;padding:30px 18px;gap:8px;z-index:50;
   }
-  .brand{font-weight:800;font-size:20px;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
-  .brand .dot{width:12px;height:12px;border-radius:50%;
+  .side-brand{font-weight:800;font-size:21px;letter-spacing:.5px;display:flex;align-items:center;gap:10px;
+    margin-bottom:26px;padding-left:10px}
+  .side-brand .dot{width:14px;height:14px;border-radius:50%;
     background:linear-gradient(135deg,var(--accent),var(--accent-2))}
-  .nav-links{display:flex;gap:6px}
-  .nav-links a{
-    padding:8px 16px;border-radius:999px;font-size:15px;color:var(--ink-soft);
-    transition:.2s;
+  .nav-btn{
+    display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    padding:14px 16px;border-radius:14px;border:0;background:none;cursor:pointer;
+    font-size:16px;font-weight:600;color:var(--ink-soft);
+    font-family:inherit;transition:.18s;
   }
-  .nav-links a:hover{background:rgba(35,37,43,.06);color:var(--ink)}
-  .nav-toggle{display:none;background:none;border:0;font-size:24px;cursor:pointer}
+  .nav-btn .ic{font-size:20px;line-height:1}
+  .nav-btn:hover{background:rgba(35,37,43,.06);color:var(--ink)}
+  .nav-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff;box-shadow:var(--shadow)}
+  .side-foot{margin-top:auto;font-size:12px;color:var(--ink-soft);padding:14px 10px;line-height:1.7}
+  .main{flex:1;min-width:0}
+  .view{display:none}
+  .view.active{display:block}
 
   /* ============ 通用区块 ============ */
-  section{padding:clamp(64px,9vw,120px) clamp(18px,5vw,48px)}
-  .wrap{max-width:var(--maxw);margin:0 auto}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:clamp(40px,6vw,72px) clamp(18px,5vw,48px)}
   .eyebrow{font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
     opacity:.55;margin-bottom:14px}
   h2.title{font-size:clamp(28px,4.5vw,46px);font-weight:800;line-height:1.15;margin-bottom:18px}
@@ -72,7 +79,7 @@
     border-radius:0 0 var(--radius) var(--radius);
     position:relative;overflow:hidden;
   }
-  .hero .wrap{position:relative;z-index:2;padding-top:clamp(40px,7vw,90px);padding-bottom:clamp(40px,7vw,90px)}
+  .hero .wrap{position:relative;z-index:2;padding-top:clamp(50px,8vw,100px);padding-bottom:clamp(50px,8vw,100px)}
   .hero h1{font-size:clamp(34px,6vw,68px);font-weight:800;line-height:1.08;letter-spacing:-.5px}
   .hero h1 .hl{color:var(--accent)}
   .hero .lead{margin-top:22px;font-size:clamp(16px,2.2vw,21px)}
@@ -91,7 +98,7 @@
   .blob.b1{width:340px;height:340px;right:-80px;top:-60px;background:#ffd0bd}
   .blob.b2{width:220px;height:220px;right:140px;bottom:-90px;background:#fff0e6}
 
-  /* ============ 关于（大色块·薄荷） ============ */
+  /* ============ 关于 / 历史（大色块·薄荷） ============ */
   .about{background:var(--c-mint);border-radius:var(--radius);margin:clamp(20px,4vw,40px) clamp(10px,3vw,30px) 0}
   .about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center}
   .stat-row{display:flex;gap:18px;margin-top:30px;flex-wrap:wrap}
@@ -143,9 +150,9 @@
   .note li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent-2);opacity:.55}
   .note b{color:var(--ink);font-weight:700}
 
-  /* ============ 联系（大色块·天空） ============ */
-  .contact{background:var(--c-sky);border-radius:var(--radius);margin:clamp(20px,4vw,40px) clamp(10px,3vw,30px) 0}
-  .contact .wrap{text-align:center}
+  /* ============ 我的：邮箱 ============ */
+  .me-mail{text-align:center;margin-top:clamp(40px,6vw,72px);padding-top:clamp(30px,4vw,48px);
+    border-top:1px dashed rgba(35,37,43,.16)}
   .mail-pill{
     display:inline-flex;align-items:center;gap:12px;margin-top:26px;
     background:#fff;padding:16px 26px;border-radius:999px;box-shadow:var(--shadow);
@@ -160,7 +167,7 @@
   .socials a:hover{background:#fff}
 
   /* ============ 页脚 ============ */
-  footer{padding:40px 24px;text-align:center;color:var(--ink-soft);font-size:14px}
+  footer{padding:34px 24px;text-align:center;color:var(--ink-soft);font-size:14px}
   footer a{color:var(--accent-2);font-weight:600}
 
   /* ============ 入场动画 ============ */
@@ -171,274 +178,340 @@
   .ripple{position:absolute;border-radius:50%;background:rgba(35,37,43,.16);
     transform:scale(0);animation:ripple .6s linear;pointer-events:none}
   @keyframes ripple{to{transform:scale(2.6);opacity:0}}
-  .btn,.copy-btn,.dl,.nav-links a,.footer a{position:relative;overflow:hidden}
+  .btn,.copy-btn,.dl,.nav-btn{position:relative;overflow:hidden}
 
   /* ============ 响应式 ============ */
   @media(max-width:760px){
-    .nav-links{position:fixed;inset:64px 0 auto 0;flex-direction:column;gap:4px;
-      background:var(--paper);padding:18px 24px;box-shadow:var(--shadow);
-      transform:translateY(-130%);transition:.25s;border-bottom:1px solid rgba(35,37,43,.08)}
-    .nav-links.open{transform:none}
-    .nav-toggle{display:block}
+    .app{flex-direction:column}
+    .sidebar{width:auto;height:auto;position:static;flex-direction:row;align-items:center;
+      padding:12px 14px;border-right:0;border-bottom:1px solid rgba(35,37,43,.08);gap:6px}
+    .side-brand{margin:0 auto 0 6px;font-size:17px;padding:0}
+    .side-brand span.txt{display:none}
+    .nav-btn{flex:1;width:auto;justify-content:center;padding:11px 6px;font-size:15px;gap:6px}
+    .nav-btn .txt{display:none}
+    .side-foot{display:none}
     .about-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
 
-<!-- 顶部导航 -->
-<nav class="nav">
-  <div class="brand"><span class="dot"></span>工具铺</div>
-  <button class="nav-toggle" aria-label="菜单">☰</button>
-  <div class="nav-links">
-    <a href="#about">关于</a>
-    <a href="#tools">工具集合</a>
-    <a href="#contact">联系我</a>
-  </div>
-</nav>
+<div class="app">
 
-<!-- 封面 -->
-<section class="hero">
-  <span class="blob b1"></span>
-  <span class="blob b2"></span>
-  <div class="wrap">
-    <div class="eyebrow">Personal Tools · 免费分享</div>
-    <h1>我做的<span class="hl">实用小工具</span><br/>都在这儿了</h1>
-    <p class="lead">平时写点顺手的小程序，帮自己和朋友省时间。全部免费、自包含、零依赖，下载就能用。挑你需要的拿去。</p>
-    <div class="hero-cta">
-      <a href="#tools" class="btn btn-primary">浏览工具 →</a>
-      <a href="#contact" class="btn btn-ghost">联系我</a>
-    </div>
-  </div>
-</section>
+  <!-- 左侧导航 -->
+  <aside class="sidebar">
+    <div class="side-brand"><span class="dot"></span><span class="txt">工具铺</span></div>
+    <button class="nav-btn active" data-view="intro"><span class="ic">📖</span><span class="txt">简介</span></button>
+    <button class="nav-btn" data-view="tools"><span class="ic">🧰</span><span class="txt">工具</span></button>
+    <button class="nav-btn" data-view="me"><span class="ic">👤</span><span class="txt">我的</span></button>
+    <div class="side-foot">© <span id="year"></span> 工具铺<br/>由 狗托儿 用 ❤️ 与咖啡因驱动</div>
+  </aside>
 
-<!-- 关于 -->
-<section class="about reveal" id="about">
-  <div class="wrap about-grid">
-    <div>
-      <div class="eyebrow">About</div>
-      <h2 class="title">关于这个工具铺</h2>
-      <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这里集中放我自己写的小软件，也收录一些用着顺手的开源 / 免费工具——收录的部分都标了原作者和出处，方便朋友一站式下载。</p>
-      <div class="stat-row">
-        <div class="stat"><b>6</b><span>已收录工具</span></div>
-        <div class="stat"><b>0</b><span>运行依赖</span></div>
-        <div class="stat"><b>∞</b><span>免费使用</span></div>
+  <!-- 主内容区 -->
+  <main class="main">
+
+    <!-- ====== 视图一：简介 ====== -->
+    <section id="view-intro" class="view active">
+
+      <!-- 封面 -->
+      <div class="hero">
+        <span class="blob b1"></span>
+        <span class="blob b2"></span>
+        <div class="wrap">
+          <div class="eyebrow">Personal Tools · 免费分享</div>
+          <h1>我做的<span class="hl">实用小工具</span><br/>都在这儿了</h1>
+          <p class="lead">平时写点顺手的小程序，帮自己和朋友省时间。全部免费、自包含、零依赖，下载就能用。挑你需要的拿去。</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary" data-view="tools">浏览工具 →</button>
+            <button class="btn btn-ghost" data-view="me">联系我</button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="about-card">
-      <h3>为什么做这些</h3>
-      <p>电脑用久了总会遇到各种小痛点：C 盘爆满、重复的机械操作……与其每次手动来一遍，不如写个工具一键解决。做出来的东西，顺手就分享出来。</p>
-    </div>
-  </div>
-</section>
 
-<!-- 工具集合 -->
-<section class="tools reveal" id="tools">
-  <div class="wrap">
-    <div class="eyebrow">Toolbox</div>
-    <h2 class="title">工具集合</h2>
-    <p class="lead">分三个模块：电脑端工具、手机端工具、开源免费工具。点击下载会跳转到 GitHub 仓库的对应发布页。</p>
-
-    <!-- 模块一：电脑端工具 -->
-    <div class="subhead">
-      <span class="sub-dot" style="background:var(--c-lav)"></span>
-      <h3>💻 电脑端工具</h3>
-      <p>我自己写的 Windows 小工具，绿色免安装，源码都在仓库里。</p>
-    </div>
-
-    <div class="tool-grid">
-
-      <!-- 工具 1：抖音辅助器 -->
-      <article class="tool">
-        <div class="tool-icon" style="background:var(--c-peach)">🎬</div>
-        <h3>抖音辅助器</h3>
-        <div class="ver">电脑版 · v1.0</div>
-        <p>抖音电脑端的辅助小工具，把重复、机械的操作交给它，省时省力。内含「电脑版」与「标准版」两个可执行文件，按需取用。</p>
-        <div class="tags">
-          <span class="tag">Windows</span>
-          <span class="tag">自包含</span>
-          <span class="tag">免安装</span>
+      <!-- 关于 -->
+      <section class="about reveal">
+        <div class="wrap about-grid">
+          <div>
+            <div class="eyebrow">About</div>
+            <h2 class="title">关于这个工具铺</h2>
+            <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这里集中放我自己写的小软件，也收录一些用着顺手的开源 / 免费工具——收录的部分都标了原作者和出处，方便朋友一站式下载。</p>
+            <div class="stat-row">
+              <div class="stat"><b>6</b><span>已收录工具</span></div>
+              <div class="stat"><b>0</b><span>运行依赖</span></div>
+              <div class="stat"><b>∞</b><span>免费使用</span></div>
+            </div>
+          </div>
+          <div class="about-card">
+            <h3>为什么做这些</h3>
+            <p>电脑用久了总会遇到各种小痛点：C 盘爆满、重复的机械操作……与其每次手动来一遍，不如写个工具一键解决。做出来的东西，顺手就分享出来。</p>
+          </div>
         </div>
-        <div class="tool-links">
-          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
-          <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
+      </section>
+
+      <!-- 由来与历史 -->
+      <section class="about reveal" style="background:var(--c-butter)">
+        <div class="wrap about-grid" style="align-items:flex-start">
+          <div>
+            <div class="eyebrow">Origin &amp; History</div>
+            <h2 class="title">由来与历史</h2>
+            <p class="lead">工具铺不是一天搭起来的，下面是它一路过来的样子。</p>
+          </div>
+          <div class="about-card">
+            <h3>时间线</h3>
+            <p><b>2026 年 · 起点</b><br/>从给自己写的两个小工具开始：抖音辅助器（把重复的机械操作交给程序）和 CDriveCleanup（把微信、QQ 缓存安全搬出 C 盘）。</p>
+            <p style="margin-top:14px"><b>后来 · 收录扩张</b><br/>光自己写不够用，又顺手收录了一些用着顺手的开源 / 免费软件——游戏变速、卸载清理、抓包分析……并统一做了签名校验和分流下载。</p>
+            <p style="margin-top:14px"><b>现在 · 三个模块</b><br/>工具铺整理为电脑端工具、手机端工具、开源免费工具三大模块。手机端还在开发中，上架后会第一时间更新。</p>
+          </div>
         </div>
-        <ul class="note">
-          <li><b>本人作品</b> · 源码已开源在上方仓库</li>
-          <li><b>.exe 可执行文件</b> · 到 Releases 页面选取对应版本下载，双击即用</li>
-        </ul>
-      </article>
+      </section>
 
-      <!-- 工具 2：CDriveCleanup -->
-      <article class="tool">
-        <div class="tool-icon" style="background:var(--c-mint)">💾</div>
-        <h3>CDriveCleanup</h3>
-        <div class="ver">.NET 10 · 单文件版</div>
-        <p>把微信、QQ 等应用产生的缓存安全地迁移出 C 盘，给系统盘腾空间。自包含单文件发布，零依赖跨机运行；内置多重安全校验，避免误删系统文件。</p>
-        <div class="tags">
-          <span class="tag">C盘清理</span>
-          <span class="tag">缓存迁移</span>
-          <span class="tag">安全保护</span>
+    </section>
+
+    <!-- ====== 视图二：工具 ====== -->
+    <section id="view-tools" class="view">
+
+      <section class="tools reveal">
+        <div class="wrap">
+          <div class="eyebrow">Toolbox</div>
+          <h2 class="title">工具集合</h2>
+          <p class="lead">分三个模块：电脑端工具、手机端工具、开源免费工具。点击下载会跳转到 GitHub 仓库的对应发布页。</p>
+
+          <!-- 模块一：电脑端工具 -->
+          <div class="subhead">
+            <span class="sub-dot" style="background:var(--c-lav)"></span>
+            <h3>💻 电脑端工具</h3>
+            <p>我自己写的 Windows 小工具，绿色免安装，源码都在仓库里。</p>
+          </div>
+
+          <div class="tool-grid">
+
+            <!-- 工具 1：抖音辅助器 -->
+            <article class="tool">
+              <div class="tool-icon" style="background:var(--c-peach)">🎬</div>
+              <h3>抖音辅助器</h3>
+              <div class="ver">电脑版 · v1.0</div>
+              <p>抖音电脑端的辅助小工具，把重复、机械的操作交给它，省时省力。内含「电脑版」与「标准版」两个可执行文件，按需取用。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">自包含</span>
+                <span class="tag">免安装</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
+              </div>
+              <ul class="note">
+                <li><b>本人作品</b> · 源码已开源在上方仓库</li>
+                <li><b>.exe 可执行文件</b> · 到 Releases 页面选取对应版本下载，双击即用</li>
+              </ul>
+            </article>
+
+            <!-- 工具 2：CDriveCleanup -->
+            <article class="tool">
+              <div class="tool-icon" style="background:var(--c-mint)">💾</div>
+              <h3>CDriveCleanup</h3>
+              <div class="ver">.NET 10 · 单文件版</div>
+              <p>把微信、QQ 等应用产生的缓存安全地迁移出 C 盘，给系统盘腾空间。自包含单文件发布，零依赖跨机运行；内置多重安全校验，避免误删系统文件。</p>
+              <div class="tags">
+                <span class="tag">C盘清理</span>
+                <span class="tag">缓存迁移</span>
+                <span class="tag">安全保护</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
+              </div>
+              <ul class="note">
+                <li><b>本人作品</b> · 源码已开源在上方仓库</li>
+                <li><b>.exe 可执行文件</b> · 下载压缩包解压后运行主程序，无需安装</li>
+              </ul>
+            </article>
+
+          </div>
+
+          <!-- 模块二：手机端工具 -->
+          <div class="subhead">
+            <span class="sub-dot" style="background:var(--c-peach)"></span>
+            <h3>📱 手机端工具</h3>
+            <p>Android 端小工具，开发中。</p>
+          </div>
+
+          <div class="empty">
+            <div class="empty-ico">📱</div>
+            <b>暂无上架</b>
+            <span>手机端工具正在开发中，上架后会第一时间更新到这里。</span>
+          </div>
+
+          <!-- 模块三：开源免费工具 -->
+          <div class="subhead">
+            <span class="sub-dot" style="background:var(--c-teal)"></span>
+            <h3>🌐 开源免费工具</h3>
+            <p>必备匠心软件，来自各个大神的手笔，此处仅作快捷下载入口（非盈利）。</p>
+          </div>
+
+          <div class="tool-grid">
+
+            <!-- 收录 1：OpenSpeedy -->
+            <article class="tool">
+              <div class="tool-icon" style="background:var(--c-lav)">⏩</div>
+              <h3>OpenSpeedy</h3>
+              <div class="ver">游戏变速 · v3.3.8</div>
+              <p>开源免费的游戏变速工具，通过 Ring3 层 Hook 时间函数实现加速减速，不碰系统内核。突破单机游戏帧率限制，顺带对部分网盘下载也有加速效果。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">绿色便携</span>
+                <span class="tag">GPL-3.0</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://github.com/game1024/OpenSpeedy" target="_blank" rel="noopener">项目主页</a>
+              </div>
+              <ul class="note">
+                <li>作者 game1024，GPL-3.0 开源</li>
+                <li><b>.exe 可执行文件</b> · zip 解压后运行 openspeedy.exe，无需安装</li>
+              </ul>
+            </article>
+
+            <!-- 收录 2：Watt Toolkit -->
+            <article class="tool">
+              <div class="tool-icon" style="background:var(--c-butter)">⚡</div>
+              <h3>Watt Toolkit</h3>
+              <div class="ver">Steam 工具箱 · v3.1.0</div>
+              <p>原名 Steam++，开源的 Steam 多功能工具箱：游戏加速、库存管理、成就统计、本地存档托管等。解压即用，不用装。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">绿色版</span>
+                <span class="tag">开源</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://github.com/BeyondDimension/SteamTools" target="_blank" rel="noopener">项目主页</a>
+              </div>
+              <ul class="note">
+                <li>作者 BeyondDimension，开源项目</li>
+                <li><b>.exe 可执行文件</b> · 7z 格式，需 7-Zip / Bandizip 解压后运行 Steam++.exe</li>
+                <li><b>绿色版</b> · 解压即用，无需安装</li>
+              </ul>
+            </article>
+
+            <!-- 收录 3：Wireshark -->
+            <article class="tool">
+              <div class="tool-icon" style="background:var(--c-sky)">🦈</div>
+              <h3>Wireshark</h3>
+              <div class="ver">抓包分析 · v4.6.8</div>
+              <p>网络协议分析器的行业标准，看数据包、排查网络问题、分析游戏通信就靠它。安装包自带 Npcap 驱动，安装时记得勾选。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">安装包</span>
+                <span class="tag">GPL-2.0</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://www.wireshark.org/" target="_blank" rel="noopener">官方网站</a>
+              </div>
+              <ul class="note">
+                <li>Wireshark Foundation，GPL-2.0 开源</li>
+                <li><b>.exe 可执行文件</b> · 为安装包，需安装后使用</li>
+                <li><b>抓包功能依赖 Npcap</b> · 安装时记得勾选 Npcap 驱动，否则抓不了包</li>
+              </ul>
+            </article>
+
+            <!-- 收录 4：Geek Uninstaller -->
+            <article class="tool">
+              <div class="tool-icon" style="background:var(--c-teal)">🧹</div>
+              <h3>Geek Uninstaller</h3>
+              <div class="ver">卸载清理 · 便携版</div>
+              <p>单文件卸载工具，7 MB 不到。卸载软件后自动扫残留的文件和注册表项，比系统自带的「添加或删除程序」干净得多。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">单文件</span>
+                <span class="tag">免安装</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://geekuninstaller.com/" target="_blank" rel="noopener">官方网站</a>
+              </div>
+              <ul class="note">
+                <li>免费软件（非开源），版权归原作者</li>
+                <li><b>.exe 可执行文件</b> · 单文件，双击即用免安装</li>
+                <li><b>卸载系统组件前请谨慎清理</b> · 误删系统文件可能导致系统异常</li>
+              </ul>
+            </article>
+
+          </div>
+
         </div>
-        <div class="tool-links">
-          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
-          <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
+      </section>
+
+    </section>
+
+    <!-- ====== 视图三：我的 ====== -->
+    <section id="view-me" class="view">
+
+      <div class="about reveal">
+        <div class="wrap">
+          <div class="eyebrow">Profile</div>
+          <h2 class="title">我的</h2>
+          <div class="empty" style="margin-top:24px">
+            <div class="empty-ico">👤</div>
+            <b>个人中心开发中</b>
+            <span>以后这里会接入后端，支持用户登录、收藏自己常用的工具等。敬请期待。</span>
+          </div>
+
+          <div class="me-mail">
+            <div class="eyebrow">联系我</div>
+            <p class="lead" style="margin:0 auto">有任何想法、需求或想提的工具，随时发邮件给我。</p>
+            <div class="mail-pill">
+              <span class="ico">✉️</span>
+              <span id="mail">goutuoshigesha@163.com</span>
+            </div>
+            <div>
+              <button class="copy-btn" id="copyBtn">复制邮箱地址</button>
+            </div>
+            <div class="socials">
+              <a href="https://github.com/goutuo4588" target="_blank" rel="noopener">GitHub</a>
+              <a href="mailto:goutuoshigesha@163.com">发邮件</a>
+            </div>
+          </div>
         </div>
-        <ul class="note">
-          <li><b>本人作品</b> · 源码已开源在上方仓库</li>
-          <li><b>.exe 可执行文件</b> · 下载压缩包解压后运行主程序，无需安装</li>
-        </ul>
-      </article>
+      </div>
 
-    </div>
+    </section>
 
-    <!-- 模块二：手机端工具 -->
-    <div class="subhead">
-      <span class="sub-dot" style="background:var(--c-peach)"></span>
-      <h3>📱 手机端工具</h3>
-      <p>Android 端小工具，开发中。</p>
-    </div>
-
-    <div class="empty">
-      <div class="empty-ico">📱</div>
-      <b>暂无上架</b>
-      <span>手机端工具正在开发中，上架后会第一时间更新到这里。</span>
-    </div>
-
-    <!-- 模块三：开源免费工具 -->
-    <div class="subhead">
-      <span class="sub-dot" style="background:var(--c-teal)"></span>
-      <h3>🌐 开源免费工具</h3>
-      <p>必备匠心软件，来自各个大神的手笔，此处仅作快捷下载入口（非盈利）。</p>
-    </div>
-
-    <div class="tool-grid">
-
-      <!-- 收录 1：OpenSpeedy -->
-      <article class="tool">
-        <div class="tool-icon" style="background:var(--c-lav)">⏩</div>
-        <h3>OpenSpeedy</h3>
-        <div class="ver">游戏变速 · v3.3.8</div>
-        <p>开源免费的游戏变速工具，通过 Ring3 层 Hook 时间函数实现加速减速，不碰系统内核。突破单机游戏帧率限制，顺带对部分网盘下载也有加速效果。</p>
-        <div class="tags">
-          <span class="tag">Windows</span>
-          <span class="tag">绿色便携</span>
-          <span class="tag">GPL-3.0</span>
-        </div>
-        <div class="tool-links">
-          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" target="_blank" rel="noopener">GitHub 下载</a>
-          <a class="dl dl-sub" href="https://github.com/game1024/OpenSpeedy" target="_blank" rel="noopener">项目主页</a>
-        </div>
-        <ul class="note">
-          <li>作者 game1024，GPL-3.0 开源</li>
-          <li><b>.exe 可执行文件</b> · zip 解压后运行 openspeedy.exe，无需安装</li>
-        </ul>
-      </article>
-
-      <!-- 收录 2：Watt Toolkit -->
-      <article class="tool">
-        <h3>Watt Toolkit</h3>
-        <div class="ver">Steam 工具箱 · v3.1.0</div>
-        <p>原名 Steam++，开源的 Steam 多功能工具箱：游戏加速、库存管理、成就统计、本地存档托管等。解压即用，不用装。</p>
-        <div class="tags">
-          <span class="tag">Windows</span>
-          <span class="tag">绿色版</span>
-          <span class="tag">开源</span>
-        </div>
-        <div class="tool-links">
-          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" target="_blank" rel="noopener">GitHub 下载</a>
-          <a class="dl dl-sub" href="https://github.com/BeyondDimension/SteamTools" target="_blank" rel="noopener">项目主页</a>
-        </div>
-        <ul class="note">
-          <li>作者 BeyondDimension，开源项目</li>
-          <li><b>.exe 可执行文件</b> · 7z 格式，需 7-Zip / Bandizip 解压后运行 Steam++.exe</li>
-          <li><b>绿色版</b> · 解压即用，无需安装</li>
-        </ul>
-      </article>
-
-      <!-- 收录 3：Wireshark -->
-      <article class="tool">
-        <div class="tool-icon" style="background:var(--c-sky)">🦈</div>
-        <h3>Wireshark</h3>
-        <div class="ver">抓包分析 · v4.6.8</div>
-        <p>网络协议分析器的行业标准，看数据包、排查网络问题、分析游戏通信就靠它。安装包自带 Npcap 驱动，安装时记得勾选。</p>
-        <div class="tags">
-          <span class="tag">Windows</span>
-          <span class="tag">安装包</span>
-          <span class="tag">GPL-2.0</span>
-        </div>
-        <div class="tool-links">
-          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" target="_blank" rel="noopener">GitHub 下载</a>
-          <a class="dl dl-sub" href="https://www.wireshark.org/" target="_blank" rel="noopener">官方网站</a>
-        </div>
-        <ul class="note">
-          <li>Wireshark Foundation，GPL-2.0 开源</li>
-          <li><b>.exe 可执行文件</b> · 为安装包，需安装后使用</li>
-          <li><b>抓包功能依赖 Npcap</b> · 安装时记得勾选 Npcap 驱动，否则抓不了包</li>
-        </ul>
-      </article>
-
-      <!-- 收录 4：Geek Uninstaller -->
-      <article class="tool">
-        <div class="tool-icon" style="background:var(--c-teal)">🧹</div>
-        <h3>Geek Uninstaller</h3>
-        <div class="ver">卸载清理 · 便携版</div>
-        <p>单文件卸载工具，7 MB 不到。卸载软件后自动扫残留的文件和注册表项，比系统自带的「添加或删除程序」干净得多。</p>
-        <div class="tags">
-          <span class="tag">Windows</span>
-          <span class="tag">单文件</span>
-          <span class="tag">免安装</span>
-        </div>
-        <div class="tool-links">
-          <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" target="_blank" rel="noopener">GitHub 下载</a>
-          <a class="dl dl-sub" href="https://geekuninstaller.com/" target="_blank" rel="noopener">官方网站</a>
-        </div>
-        <ul class="note">
-          <li>免费软件（非开源），版权归原作者</li>
-          <li><b>.exe 可执行文件</b> · 单文件，双击即用免安装</li>
-          <li><b>卸载系统组件前请谨慎清理</b> · 误删系统文件可能导致系统异常</li>
-        </ul>
-      </article>
-
-    </div>
-
-  </div>
-</section>
-
-<!-- 联系 -->
-<section class="contact reveal" id="contact">
-  <div class="wrap">
-    <div class="eyebrow">Get in touch</div>
-    <h2 class="title">有问题 / 想要定制？</h2>
-    <p class="lead" style="margin:0 auto">随时给我发邮件，看到就会回。也欢迎提工具需求～</p>
-    <div class="mail-pill">
-      <span class="ico">✉️</span>
-      <span id="mail">goutuoshigesha@163.com</span>
-    </div>
-    <div>
-      <button class="copy-btn" id="copyBtn">复制邮箱地址</button>
-    </div>
-    <div class="socials">
-      <a href="https://github.com/goutuo4588" target="_blank" rel="noopener">GitHub</a>
-      <a href="mailto:goutuoshigesha@163.com">发邮件</a>
-    </div>
-  </div>
-</section>
+  </main>
+</div>
 
 <footer>
-  © <span id="year"></span> 工具铺 · 由 狗托儿 用 ❤️ 与咖啡因驱动 ·
-  <a href="#top">回到顶部</a>
+  © <span id="year">2026</span> 工具铺 · 由 狗托儿 用 ❤️ 与咖啡因驱动
 </footer>
 
 <script>
   // 年份
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // 移动端菜单
-  const toggle = document.querySelector('.nav-toggle');
-  const links = document.querySelector('.nav-links');
-  toggle?.addEventListener('click', () => links.classList.toggle('open'));
-  links?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+  // 视图切换
+  const views = {
+    intro: document.getElementById('view-intro'),
+    tools: document.getElementById('view-tools'),
+    me:    document.getElementById('view-me'),
+  };
+  const navBtns = document.querySelectorAll('.nav-btn');
+  function showView(name){
+    if(!views[name]) return;
+    Object.entries(views).forEach(([k,v])=> v.classList.toggle('active', k===name));
+    navBtns.forEach(b=> b.classList.toggle('active', b.dataset.view===name));
+    // 重新触发本视图内的入场动画
+    const act = views[name];
+    act.querySelectorAll('.reveal').forEach(el=>{
+      el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
+    });
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll('[data-view]').forEach(el=>{
+    el.addEventListener('click', ()=> showView(el.dataset.view));
+  });
+  // 首屏展示简介视图的动画
+  showView('intro');
 
   // 复制邮箱
   const copyBtn = document.getElementById('copyBtn');
@@ -448,12 +521,6 @@
     catch { copyBtn.textContent = mail; }
     setTimeout(() => copyBtn.textContent = '复制邮箱地址', 1800);
   });
-
-  // 滚动入场动画
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: .15 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
   // ---------- 清脆点击声效（Web Audio 合成，零依赖） ----------
   let audioCtx;
@@ -492,7 +559,7 @@
       setTimeout(()=>span.remove(), 600);
     });
   }
-  document.querySelectorAll('.btn,.copy-btn,.dl,.nav-links a,.footer a,.tool,.hero-cta a')
+  document.querySelectorAll('.btn,.copy-btn,.dl,.nav-btn,.tool')
     .forEach(el=>{
       if(el.classList.contains('dl-main')||el.classList.contains('dl-sub')) return; // 卡片内链接单独绑定
       attachRipple(el);
