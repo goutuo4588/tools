@@ -917,10 +917,56 @@
       loadAdminComments();document.querySelectorAll('.card-stats[data-slug="'+sl+'"]').forEach(x=>{const cc=(comments[sl]||[]).length;x.querySelector('.c').textContent=cc;});
     });
   }
-  function exportData(){
-    const data={profile,favs,comments,stats,exportedAt:new Date().toISOString()};
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='工具铺-本机数据.json';a.click();
+  function toolName(slug){const el=document.querySelector('.tool[data-slug="'+slug+'"] h3');return el?el.textContent:slug;}
+  function buildExportText(){
+    const L=[];
+    L.push('工具铺 · 本机数据导出');
+    L.push('导出时间：'+new Date().toLocaleString('zh-CN'));
+    L.push('================================');
+    L.push('');
+    L.push('【账号】');
+    if(profile) L.push('  昵称：'+profile.nickName+'    邮箱：'+profile.email);
+    else L.push('  （未登录 / 注册）');
+    L.push('');
+    L.push('【我的收藏】');
+    if(favs.length) favs.forEach(s=>L.push('  - '+toolName(s)));
+    else L.push('  （无）');
+    L.push('');
+    L.push('【工具统计】');
+    TOOL_SLUGS.forEach(s=>{
+      const st=stats[s]||{views:0,downloads:0};
+      L.push('  - '+toolName(s)+'：浏览 '+st.views+' / 下载 '+st.downloads);
+    });
+    L.push('');
+    L.push('【历史评论（本机）】');
+    let anyC=false;
+    Object.keys(comments).forEach(s=>{
+      (comments[s]||[]).forEach(c=>{
+        anyC=true;
+        L.push('  ['+toolName(s)+'] '+(c.nick||'匿名')+(c.rating?' '+('★'.repeat(c.rating)):''));
+        L.push('    '+c.content);
+        L.push('    '+new Date(c.ts).toLocaleString('zh-CN'));
+      });
+    });
+    if(!anyC) L.push('  （无）');
+    L.push('');
+    L.push('【说明】朋友的留言已迁移至 GitHub Discussions（仓库 goutuo4588/tools/discussions），不在本机数据中。');
+    return L.join('\n');
+  }
+  async function exportData(){
+    const text=buildExportText();
+    const fname='工具铺-本机数据.txt';
+    try{
+      if(window.showSaveFilePicker){
+        const handle=await window.showSaveFilePicker({suggestedName:fname,startIn:'desktop',types:[{description:'文本文档',accept:{'text/plain':['.txt']}}]});
+        const w=await handle.createWritable();
+        await w.write(text);
+        await w.close();
+        return;
+      }
+    }catch(e){ if(e && e.name==='AbortError') return; }
+    const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   }
 
