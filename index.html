@@ -423,6 +423,56 @@ window.startDl=startDl; window.closeDl=closeDl; window.openDl=openDl;
 window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 })();
 </script>
+<script>
+/* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
+(function(){
+  var SITE_VERSION='2026-09-03T15:20:22Z'; // 每次部署时同步更新
+  function showUpdateBanner(){
+    if(document.getElementById('updateBanner')) return;
+    var b=document.createElement('div');
+    b.id='updateBanner';
+    b.innerHTML='<div class="upd-inner"><span class="upd-emoji">🆕</span><span class="upd-msg">检测到站点有更新，点此一键刷新到最新版</span><button class="upd-btn" type="button">立即更新</button><button class="upd-x" type="button" aria-label="关闭">×</button></div>';
+    var s=b.style;
+    s.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:100000;background:linear-gradient(135deg,#fff5e6 0%,#ffe4b5 100%);color:#5a3e00;padding:10px 16px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);font:14px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;display:flex;align-items:center;gap:10px;border:1px solid rgba(0,0,0,.06);max-width:90vw;';
+    var inner=b.querySelector('.upd-inner'); inner.style.cssText='display:flex;align-items:center;gap:10px;';
+    b.querySelector('.upd-emoji').style.fontSize='18px';
+    b.querySelector('.upd-msg').style.fontWeight='600';
+    b.querySelector('.upd-btn').style.cssText='background:#5a3e00;color:#fff;border:0;padding:6px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;';
+    b.querySelector('.upd-btn').onmouseover=function(){this.style.background='#7a5500';};
+    b.querySelector('.upd-btn').onmouseout=function(){this.style.background='#5a3e00';};
+    b.querySelector('.upd-x').style.cssText='background:transparent;border:0;font-size:20px;line-height:1;cursor:pointer;color:#5a3e00;padding:0 4px;';
+    b.querySelector('.upd-btn').onclick=function(){
+      try{ localStorage.setItem('tp_update_dismissed', String(Date.now())); }catch(e){}
+      var u=location.href.split('#')[0];
+      location.replace(u+(u.indexOf('?')>=0?'&':'?')+'v='+Date.now());
+    };
+    b.querySelector('.upd-x').onclick=function(){ b.remove(); };
+    document.body.appendChild(b);
+  }
+  function checkVersion(){
+    var dismissed=0;
+    try{ dismissed=parseInt(localStorage.getItem('tp_update_dismissed')||'0',10); }catch(e){}
+    if(Date.now()-dismissed < 30*60*1000) return; // 30 分钟内关过提示
+    var probe='https://goutuo4588.github.io/tools/version.txt?t='+Date.now();
+    fetch(probe,{cache:'no-store'}).then(function(r){
+      if(!r.ok) return;
+      return r.text();
+    }).then(function(txt){
+      if(!txt) return;
+      var remote=String(txt).trim();
+      if(remote && remote!==SITE_VERSION){
+        showUpdateBanner();
+      }
+    }).catch(function(){});
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', checkVersion);
+  } else {
+    checkVersion();
+  }
+  setInterval(checkVersion, 90*1000);
+})();
+</script>
 
 <canvas id="liquid-bg"></canvas>
 
