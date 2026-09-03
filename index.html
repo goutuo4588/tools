@@ -1351,7 +1351,7 @@
   function msgErr(el, t){ if(el){ el.className='auth-msg'; el.textContent=t; } return false; }
   var regTimer=null;
   var authForce=false;
-  function closeAuth(){ if(authForce) return; var m=document.getElementById('authModal'); if(m) m.hidden=true; if(regTimer) clearInterval(regTimer); }
+  function closeAuth(){ if(authForce) return; var m=document.getElementById('authModal'); if(m) m.hidden=true; document.body.classList.remove('auth-locked'); if(regTimer) clearInterval(regTimer); }
   function openAuth(mode, force){
     if(!CB_ENABLED){ toast('后端未配置：站长尚未接入 CloudBase'); return; }
     authForce = !!force;
