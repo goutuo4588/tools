@@ -272,8 +272,21 @@
     .nav-btn{flex:1;width:auto;justify-content:center;padding:11px 6px;font-size:15px;gap:6px}
     .nav-btn .txt{display:none}
     .side-foot{display:none}
-    .about-grid{grid-template-columns:1fr}
-  }
+  .about-grid{grid-template-columns:1fr}
+}
+.dl-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1200;background:rgba(20,20,40,.42);backdrop-filter:blur(3px)}
+.dl-modal[hidden]{display:none}
+.dl-card{position:relative;width:min(430px,92vw);max-height:86vh;overflow:auto;background:#fff;border-radius:18px;padding:22px 22px 26px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+.dl-card h3{margin:0 0 6px;font-size:18px;color:#2d2a55}
+.dl-tip{margin:0 0 14px;font-size:13px;color:#7a7790;line-height:1.55}
+.dl-x{position:absolute;top:12px;right:14px;width:30px;height:30px;border:none;background:#f0eef7;border-radius:50%;font-size:18px;line-height:1;color:#7a7790;cursor:pointer}
+.dl-x:hover{background:#e3dff5}
+.dl-file{padding:12px 0;border-top:1px solid #f0eef7}
+.dl-file:first-child{border-top:none}
+.dl-fname{font-size:14px;font-weight:600;color:#3a3660;margin-bottom:9px}
+.dl-src{display:block;width:100%;margin:6px 0;padding:11px 12px;border:1px solid #e4e0f2;border-radius:11px;background:#faf9ff;color:#4a4775;font-size:14px;text-align:left;cursor:pointer;transition:.15s}
+.dl-src:hover{background:#6c5ce7;color:#fff;border-color:#6c5ce7}
+.dl-src.on{background:#6c5ce7;color:#fff;border-color:#6c5ce7}
 </style>
 </head>
 <body>
@@ -809,7 +822,7 @@
       const st=document.createElement('div');st.className='card-stats';st.dataset.slug=slug;
       st.innerHTML='<span>👁 <b class="v">0</b> 浏览</span><span>⬇ <b class="d">0</b> 下载</span><span>👍 <b class="k">0</b> 赞</span><span>🔗 <b class="sh">0</b> 分享</span>';
       card.appendChild(st);
-      const dl=card.querySelector('.dl-main');if(dl)dl.addEventListener('click',()=>{bumpStat(slug,'downloads');});
+      const dl=card.querySelector('.dl-main');if(dl)dl.addEventListener('click',e=>{ if(DL[slug]){ e.preventDefault(); bumpStat(slug,'downloads'); openDl(slug); } });
       acts.querySelector('.cm-btn').onclick=()=>openComments(slug);
       acts.querySelector('.fav-star').onclick=()=>toggleFav(slug);
       acts.querySelector('.like-btn').onclick=()=>toggleLike(slug);
@@ -1185,6 +1198,64 @@
       });
     }
   };
+
+  // ---------- 下载中心：多镜像加速兜底（国内陌生电脑点一下直接下） ----------
+  const MIRRORS=[
+    {name:'⚡ 高速源① gh-proxy', base:'https://gh-proxy.com/'},
+    {name:'⚡ 高速源② ghfast',   base:'https://ghfast.top/'},
+    {name:'⚡ 高速源③ xxooo',    base:'https://gh.xxooo.cf/'},
+    {name:'🐢 GitHub 官方（可能极慢/失败）', base:''}
+  ];
+  const REL='https://github.com/goutuo4588/tools/releases/download/';
+  const DL={
+    'douyin-helper':{name:'抖音辅助器',files:[
+      {label:'电脑版 · 111MB', url:REL+'douyin-helper-v1.0/'+encodeURIComponent('刷抖音辅助器(电脑版).exe')},
+      {label:'标准版 · 50MB',  url:REL+'douyin-helper-v1.0/douyin-standard.exe'}
+    ]},
+    'cdrivecleanup':{name:'CDriveCleanup',files:[
+      {label:'v1.0 压缩包 · 44MB', url:REL+'cdrivecleanup-v1.0/CDriveCleanup-v1.0.zip'}
+    ]},
+    'openspeedy':{name:'OpenSpeedy',files:[
+      {label:'v3.3.8 便携版 · 5MB', url:REL+'openspeedy-v3.3.8/OpenSpeedy-3.3.8-portable-signed.zip'}
+    ]},
+    'watt-toolkit':{name:'Watt Toolkit',files:[
+      {label:'Steam++ v3.1.0 绿色版 · 90MB', url:REL+'watt-toolkit-v3.1.0/Steam++_v3.1.0_win_x64.7z'}
+    ]},
+    'wireshark':{name:'Wireshark',files:[
+      {label:'v4.6.8 安装包 · 94MB', url:REL+'wireshark-v4.6.8/Wireshark-4.6.8-x64.exe'}
+    ]},
+    'geek':{name:'Geek Uninstaller',files:[
+      {label:'便携版 · 7MB', url:REL+'geek-uninstaller-portable/geek.exe'}
+    ]}
+  };
+  function mirUrl(base,url){ return base ? base+encodeURI(url) : url; }
+  function startDl(base,url){ window.location.href = mirUrl(base,url); }
+  function openDl(slug){
+    const d=DL[slug]; if(!d) return;
+    const body=document.getElementById('dlBody');
+    let h='';
+    d.files.forEach(f=>{
+      h+='<div class="dl-file"><div class="dl-fname">📦 '+f.label+'</div>';
+      MIRRORS.forEach((m,i)=>{
+        const b=m.base.replace(/'/g,'&#39;'), u=f.url.replace(/'/g,'&#39;');
+        h+='<button class="dl-src'+(i<3?' on':'')+'" onclick="startDl(\''+b+'\',\''+u+'\')">'+m.name+'</button>';
+      });
+      h+='</div>';
+    });
+    body.innerHTML=h;
+    document.getElementById('dlTitle').textContent=d.name+' · 下载中心';
+    document.getElementById('dlModal').hidden=false;
+  }
+  function closeDl(){ document.getElementById('dlModal').hidden=true; }
 </script>
+<div id="dlModal" class="dl-modal" hidden>
+  <div class="dl-backdrop" onclick="closeDl()"></div>
+  <div class="dl-card">
+    <button class="dl-x" onclick="closeDl()" aria-label="关闭">×</button>
+    <h3 id="dlTitle">下载中心</h3>
+    <p class="dl-tip">国内网络下请优先点「⚡ 高速源」。GitHub 官方源可能极慢或失败，高速源全部失败时可再尝试。</p>
+    <div id="dlBody"></div>
+  </div>
+</div>
 </body>
 </html>
