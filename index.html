@@ -314,6 +314,12 @@
   .auth-row{display:flex;gap:10px;align-items:flex-start}
   .auth-row .field{flex:1;margin-bottom:0}
   .auth-row .auth-btn{width:auto;white-space:nowrap;margin-top:0;padding:12px 16px}
+  .welcome-box{text-align:center;padding:6px 2px 2px}
+  .welcome-emoji{font-size:52px;line-height:1;margin-bottom:10px}
+  .welcome-box h3{margin:0 0 8px;font-size:20px;color:var(--ink)}
+  .welcome-tips{text-align:left;background:#f6f4fc;border-radius:12px;padding:12px 14px;margin:14px 0;font-size:14px;color:#555;line-height:1.7}
+  .welcome-tips p{margin:6px 0}
+  .welcome-tips b{color:var(--accent)}
   .auth-notice{font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.6}
   .cu-item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:rgba(255,255,255,.72);border-radius:14px;padding:12px 14px;box-shadow:0 4px 18px rgba(35,37,43,.06);margin-bottom:10px}
   .cu-item .info b{font-size:15px}
@@ -1350,6 +1356,34 @@
         '<div class="auth-msg" id="authMsg"></div>';
       document.getElementById('fgtBtn').onclick=doForgot;
       document.getElementById('toLg2').onclick=function(){ renderAuthView('login'); };
+    } else if(mode==='welcome'){
+      v.innerHTML='<div class="welcome-box">'+
+        '<div class="welcome-emoji">🎉</div>'+
+        '<h3>注册成功，欢迎加入工具铺！</h3>'+
+        '<p class="auth-sub">账号已创建并自动登录。你现在是本站注册用户，可畅享全部工具下载与互动功能。</p>'+
+        '<div class="welcome-tips">'+
+          '<p>✅ 登录状态已保存，下次访问自动识别</p>'+
+          '<p>📥 去首页挑个工具下载试试</p>'+
+          '<p>💬 遇到问题可随时在工具下留言</p>'+
+        '</div>'+
+        '<button class="auth-btn" id="welcomeBtn">进入工具铺</button>'+
+        '</div>';
+      document.getElementById('welcomeBtn').onclick=function(){ closeAuth(); renderUserPill(); };
+    } else if(mode==='forgotDone'){
+      v.innerHTML='<div class="welcome-box">'+
+        '<div class="welcome-emoji">📧</div>'+
+        '<h3>申请已提交给站长</h3>'+
+        '<p class="auth-sub">已通过邮件通知站长（goutuoshigesha@163.com）你的重置申请。</p>'+
+        '<div class="welcome-tips">'+
+          '<p><b>接下来：</b></p>'+
+          '<p>1️⃣ 站长会在后台看到你的申请</p>'+
+          '<p>2️⃣ 站长重置密码后，会通过你方便的方式把新密码告诉你</p>'+
+          '<p>3️⃣ 你用新密码回到登录页即可进入</p>'+
+        '</div>'+
+        '<p class="auth-sub" style="margin-top:10px">站长通常很快处理，请耐心等待～</p>'+
+        '<button class="auth-btn" id="fgtDoneBtn">返回登录</button>'+
+        '</div>';
+      document.getElementById('fgtDoneBtn').onclick=function(){ renderAuthView('login'); };
     } else {
       v.innerHTML='<h3>登录</h3><p class="auth-sub">使用注册时的邮箱登录</p>'+
         '<div class="field"><input id="lgEmail" type="email" placeholder="邮箱" autocomplete="username"></div>'+
@@ -1401,7 +1435,7 @@
     cbApi('verifyRegister', { email:email, code:code, password:pwd }).then(function(res){
       if(res.code!==0){ return msgErr(msg,'注册失败：'+(res.error||'未知错误')); }
       setCloudUser({ email: email, uid: res.uid||email });
-      closeAuth(); renderUserPill(); toast('注册成功，已自动登录');
+      renderUserPill(); renderAuthView('welcome');
     }).catch(function(e){ console.error('[signup]',e); msgErr(msg,'注册失败：'+errText(e)); });
   }
   function doLogin(){
@@ -1421,7 +1455,7 @@
     msg.className='auth-msg'; msg.textContent='提交中…';
     cbApi('requestPasswordHelp', { email: email }).then(function(res){
       if(res.code!==0){ return msgErr(msg,'提交失败：'+(res.error||'未知错误')); }
-      msg.className='auth-msg ok'; msg.textContent='已提交给站长，请耐心等待站长协助你重置密码。';
+      renderAuthView('forgotDone');
     }).catch(function(e){ console.error('[forgot]',e); msgErr(msg,'网络错误：'+errText(e)); });
   }
   function loadCloudUsers(){
