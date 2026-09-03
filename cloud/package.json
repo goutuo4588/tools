@@ -1,0 +1,13 @@
+{
+  "name": "tools-auth-cloud",
+  "version": "1.0.0",
+  "description": "工具铺后端云函数：找回密码邮件通知 + 注册用户管理 + 登录记录",
+  "main": "cloud.js",
+  "dependencies": {
+    "leancloud-storage": "^4.13.3",
+    "nodemailer": "^6.9.13"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
