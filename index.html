@@ -1367,6 +1367,14 @@
     }
   }
   function validEmail(e){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e); }
+  function errText(e){
+    if(!e) return '未知错误';
+    if(typeof e === 'string') return e;
+    if(e.errMsg && typeof e.errMsg === 'string') return e.errMsg;
+    if(e.message && typeof e.message === 'string') return e.message;
+    if(e.code) return '['+e.code+'] '+(e.errMsg||e.message||'');
+    try { var s = JSON.stringify(e); return s.length>500 ? s.slice(0,500)+'…' : s; } catch(_) { return String(e); }
+  }
   function doRequestCode(){
     var email=authEl('#regEmail').value.trim().toLowerCase();
     var btn=authEl('#regCodeBtn'); var msg=authEl('#authMsg');
@@ -1378,7 +1386,7 @@
       msg.className='auth-msg ok'; msg.textContent='验证码已发送到你的邮箱，请查收';
       var n=60; btn.textContent=n+'s 后重发';
       regTimer=setInterval(function(){ n--; if(n<=0){ clearInterval(regTimer); btn.disabled=false; btn.textContent='获取验证码'; } else btn.textContent=n+'s 后重发'; }, 1000);
-    }).catch(function(e){ btn.disabled=false; msgErr(msg,'发送失败：'+((e&&e.message)||e)); });
+    }).catch(function(e){ btn.disabled=false; console.error('[getVerification]',e); msgErr(msg,'发送失败：'+errText(e)); });
   }
   function doSignup(){
     var email=authEl('#regEmail').value.trim().toLowerCase();
@@ -1396,7 +1404,7 @@
       var uid=u&&u.uid; setCloudUser({ email: email, uid: uid });
       closeAuth(); renderUserPill(); toast('注册成功，已自动登录');
       cbCallFn('logLogin', { email: email });
-    }).catch(function(e){ msgErr(msg,'注册失败：'+((e&&e.message)||e)); });
+    }).catch(function(e){ console.error('[signup]',e); msgErr(msg,'注册失败：'+errText(e)); });
   }
   function doLogin(){
     var email=authEl('#lgEmail').value.trim().toLowerCase();
@@ -1408,7 +1416,7 @@
       var uid=u&&u.uid; setCloudUser({ email: email, uid: uid });
       closeAuth(); renderUserPill(); toast('登录成功');
       cbCallFn('logLogin', { email: email });
-    }).catch(function(e){ msgErr(msg,'登录失败：'+((e&&e.message)||'邮箱或密码错误')); });
+    }).catch(function(e){ console.error('[login]',e); msgErr(msg,'登录失败：'+errText(e)); });
   }
   function doForgot(){
     var email=authEl('#fgtEmail').value.trim().toLowerCase(); var msg=authEl('#authMsg');
