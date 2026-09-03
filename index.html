@@ -462,7 +462,7 @@
                 <span class="tag">免安装</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" target="_blank" rel="noopener" onclick="openDl('douyin-helper');return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
               </div>
               <ul class="note">
@@ -483,7 +483,7 @@
                 <span class="tag">安全保护</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" target="_blank" rel="noopener" onclick="openDl('cdrivecleanup');return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
               </div>
               <ul class="note">
@@ -528,7 +528,7 @@
                 <span class="tag">GPL-3.0</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" target="_blank" rel="noopener" onclick="openDl('openspeedy');return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/game1024/OpenSpeedy" target="_blank" rel="noopener">项目主页</a>
               </div>
               <ul class="note">
@@ -549,7 +549,7 @@
                 <span class="tag">开源</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" target="_blank" rel="noopener" onclick="openDl('watt-toolkit');return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/BeyondDimension/SteamTools" target="_blank" rel="noopener">项目主页</a>
               </div>
               <ul class="note">
@@ -571,7 +571,7 @@
                 <span class="tag">GPL-2.0</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" target="_blank" rel="noopener" onclick="openDl('wireshark');return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://www.wireshark.org/" target="_blank" rel="noopener">官方网站</a>
               </div>
               <ul class="note">
@@ -593,7 +593,7 @@
                 <span class="tag">免安装</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" target="_blank" rel="noopener">GitHub 下载</a>
+                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" target="_blank" rel="noopener" onclick="openDl('geek');return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://geekuninstaller.com/" target="_blank" rel="noopener">官方网站</a>
               </div>
               <ul class="note">
@@ -1336,7 +1336,7 @@
     document.getElementById('dlModal').hidden=false;
   }
   function closeDl(){ document.getElementById('dlModal').hidden=true; }
-  window.startDl=startDl; window.closeDl=closeDl;
+  window.startDl=startDl; window.closeDl=closeDl; window.openDl=openDl;
 
   // ---------- 网站账号（LeanCloud 云后端：短信注册 / 登录 / 找回密码） ----------
   function toast(msg){
