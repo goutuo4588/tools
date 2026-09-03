@@ -324,7 +324,7 @@
   .toast.show{opacity:1;top:34px}
 </style>
   <!-- CloudBase Web SDK（腾讯 CDN，国内访问快）。若加载失败，将账号体系降级为「后端未配置」提示。 -->
-  <script src="./cloudbase.full.js"></script>
+  <!-- CloudBase Web SDK 已弃用：账号体系改用云函数 HTTP 后端(cbApi) -->
 </head>
 <body>
 
@@ -786,7 +786,8 @@
   // 邮箱验证码注册/登录由 CloudBase 服务端完成，密码服务端哈希存储。
   // 还需在 CloudBase 部署 cloud/ 目录下的云函数（见仓库 cloud/ 文件夹）。
   const CB_ENV = 'toolshop-d0gez0cs3e2318df8';
-  const CB_ENABLED = !CB_ENV.startsWith('在此填');
+  const API_BASE = '在此填云函数HTTP访问地址，例如 https://xxxx.ap-shanghai.service.tcloudbase.com/toolshop';
+  const CB_ENABLED = !API_BASE.startsWith('在此填');
   const CLOUD_USER_KEY = 'tp_cloud_user';
   const TOOL_SLUGS=['douyin-helper','cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
@@ -1304,17 +1305,13 @@
     t.textContent=msg; t.classList.add('show');
     clearTimeout(t._tm); t._tm=setTimeout(function(){ t.classList.remove('show'); }, 2200);
   }
-  function cbApp(){
-    if(!window.cloudbase) return null;
-    if(!cbApp._a) cbApp._a = cloudbase.init({ env: CB_ENV, region: 'ap-shanghai' });
-    return cbApp._a;
-  }
-  function cbAuth(){ var a=cbApp(); return a? a.auth(): null; }
-  function cbCallFn(name, data){
-    var a=cbApp(); if(!a) return Promise.resolve({ok:false, err:'CloudBase SDK 未加载'});
-    return a.callFunction({ name:'toolshop', data: Object.assign({action:name}, data||{}) })
-      .then(function(r){ return {ok:true, j:r.result||{}}; })
-      .catch(function(e){ return {ok:false, err:(e&&e.message)||String(e)}; });
+  function cbApi(action, data){
+    if(API_BASE.startsWith('在此填')){ return Promise.reject(new Error('后端未配置：请在 index.html 填入云函数 HTTP 访问地址')); }
+    return fetch(API_BASE, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(Object.assign({action:action}, data||{}))
+    }).then(function(r){ return r.json(); }).then(function(j){ return j||{}; });
   }
   function getCloudUser(){ try{ return JSON.parse(localStorage.getItem(CLOUD_USER_KEY)||'null'); }catch(e){ return null; } }
   function setCloudUser(o){ localStorage.setItem(CLOUD_USER_KEY, JSON.stringify(o)); }
@@ -1324,7 +1321,7 @@
   }
   function authEl(sel){ return document.querySelector('#authModal '+sel); }
   function msgErr(el, t){ if(el){ el.className='auth-msg'; el.textContent=t; } return false; }
-  var regTimer=null, regVerif=null;
+  var regTimer=null;
   function closeAuth(){ var m=document.getElementById('authModal'); if(m) m.hidden=true; if(regTimer) clearInterval(regTimer); }
   function openAuth(mode){
     if(!CB_ENABLED){ toast('后端未配置：站长尚未接入 CloudBase'); return; }
@@ -1384,14 +1381,14 @@
     var email=authEl('#regEmail').value.trim().toLowerCase();
     var btn=authEl('#regCodeBtn'); var msg=authEl('#authMsg');
     if(!validEmail(email)){ return msgErr(msg,'请输入正确的邮箱'); }
-    var auth=cbAuth(); if(!auth){ return msgErr(msg,'CloudBase SDK 未加载，请刷新或检查网络'); }
     btn.disabled=true; msg.className='auth-msg'; msg.textContent='发送中…';
-    auth.getVerification({ email: email }).then(function(v){
-      regVerif=v;
-      msg.className='auth-msg ok'; msg.textContent='验证码已发送到你的邮箱，请查收';
-      var n=60; btn.textContent=n+'s 后重发';
-      regTimer=setInterval(function(){ n--; if(n<=0){ clearInterval(regTimer); btn.disabled=false; btn.textContent='获取验证码'; } else btn.textContent=n+'s 后重发'; }, 1000);
-    }).catch(function(e){ btn.disabled=false; console.error('[getVerification][diag2]',e); msgErr(msg,'发送失败[diag2]：'+errText(e)); });
+    cbApi('register', { email: email }).then(function(res){
+      if(res.code===0){
+        msg.className='auth-msg ok'; msg.textContent='验证码已发送到你的邮箱，请查收（5 分钟内有效）';
+        var n=60; btn.textContent=n+'s 后重发';
+        regTimer=setInterval(function(){ n--; if(n<=0){ clearInterval(regTimer); btn.disabled=false; btn.textContent='获取验证码'; } else btn.textContent=n+'s 后重发'; }, 1000);
+      } else { btn.disabled=false; msgErr(msg,'发送失败：'+(res.error||'未知错误')); }
+    }).catch(function(e){ btn.disabled=false; console.error('[register]',e); msgErr(msg,'发送失败：'+errText(e)); });
   }
   function doSignup(){
     var email=authEl('#regEmail').value.trim().toLowerCase();
@@ -1400,45 +1397,40 @@
     if(!validEmail(email)){ return msgErr(msg,'请输入正确的邮箱'); }
     if(!code){ return msgErr(msg,'请输入邮箱验证码'); }
     if(!/^(?=.*[a-zA-Z])(?=.*\d).{8,32}$/.test(pwd)){ return msgErr(msg,'密码需 8-32 位且同时含字母和数字'); }
-    if(!regVerif||!regVerif.verification_id){ return msgErr(msg,'请先获取邮箱验证码'); }
-    var auth=cbAuth(); if(!auth) return;
     msg.className='auth-msg'; msg.textContent='注册中…';
-    auth.verify({ verification_id: regVerif.verification_id, verification_code: code }).then(function(vt){
-      return auth.signUp({ email: email, verification_code: code, verification_token: vt.verification_token, password: pwd });
-    }).then(function(u){
-      var uid=u&&u.uid; setCloudUser({ email: email, uid: uid });
+    cbApi('verifyRegister', { email:email, code:code, password:pwd }).then(function(res){
+      if(res.code!==0){ return msgErr(msg,'注册失败：'+(res.error||'未知错误')); }
+      setCloudUser({ email: email, uid: res.uid||email });
       closeAuth(); renderUserPill(); toast('注册成功，已自动登录');
-      cbCallFn('logLogin', { email: email });
     }).catch(function(e){ console.error('[signup]',e); msgErr(msg,'注册失败：'+errText(e)); });
   }
   function doLogin(){
     var email=authEl('#lgEmail').value.trim().toLowerCase();
     var pwd=authEl('#lgPwd').value; var msg=authEl('#authMsg');
     if(!validEmail(email)||!pwd){ return msgErr(msg,'请输入邮箱和密码'); }
-    var auth=cbAuth(); if(!auth) return;
     msg.className='auth-msg'; msg.textContent='登录中…';
-    auth.signInWithEmailAndPassword(email, pwd).then(function(u){
-      var uid=u&&u.uid; setCloudUser({ email: email, uid: uid });
+    cbApi('login', { email:email, password:pwd }).then(function(res){
+      if(res.code!==0){ return msgErr(msg,'登录失败：'+(res.error||'邮箱或密码错误')); }
+      setCloudUser({ email: email, uid: res.uid||email });
       closeAuth(); renderUserPill(); toast('登录成功');
-      cbCallFn('logLogin', { email: email });
     }).catch(function(e){ console.error('[login]',e); msgErr(msg,'登录失败：'+errText(e)); });
   }
   function doForgot(){
     var email=authEl('#fgtEmail').value.trim().toLowerCase(); var msg=authEl('#authMsg');
     if(!validEmail(email)){ return msgErr(msg,'请输入正确的邮箱'); }
     msg.className='auth-msg'; msg.textContent='提交中…';
-    cbCallFn('requestPasswordHelp', { email: email }).then(function(res){
-      if(!res.ok || (res.j&&res.j.code)){ return msgErr(msg,'提交失败：'+((res.j&&res.j.error)||res.err||'未知错误')); }
+    cbApi('requestPasswordHelp', { email: email }).then(function(res){
+      if(res.code!==0){ return msgErr(msg,'提交失败：'+(res.error||'未知错误')); }
       msg.className='auth-msg ok'; msg.textContent='已提交给站长，请耐心等待站长协助你重置密码。';
-    }).catch(function(e){ msgErr(msg,'网络错误：'+e.err); });
+    }).catch(function(e){ console.error('[forgot]',e); msgErr(msg,'网络错误：'+errText(e)); });
   }
   function loadCloudUsers(){
     var el=document.getElementById('aCloudUsers'); if(!el) return;
-    if(!CB_ENABLED){ el.innerHTML='<span style="color:var(--ink-soft)">后端未配置：站长需在代码中填入 CloudBase 环境 ID，并在 CloudBase 部署 cloud/ 云函数。</span>'; return; }
+    if(!CB_ENABLED){ el.innerHTML='<span style="color:var(--ink-soft)">后端未配置：站长需在 index.html 填入云函数 HTTP 访问地址(API_BASE)，并在 CloudBase 部署 cloud/ 云函数。</span>'; return; }
     el.innerHTML='<span style="color:var(--ink-soft)">加载中…</span>';
-    cbCallFn('adminListUsers', { adminPwd: ADMIN_PWD }).then(function(res){
-      if(!res.ok || (res.j&&res.j.code)){ el.innerHTML='<span style="color:#e0443e">读取失败：'+((res.j&&res.j.error)||res.err||'无权限')+'</span>'; return; }
-      var list=(res.j&&res.j.result)||[];
+    cbApi('adminListUsers', { adminPwd: ADMIN_PWD }).then(function(res){
+      if(res.code!==0){ el.innerHTML='<span style="color:#e0443e">读取失败：'+(res.error||'无权限')+'</span>'; return; }
+      var list=res.result||[];
       if(!list.length){ el.innerHTML='<span style="color:var(--ink-soft)">暂无注册用户</span>'; return; }
       el.innerHTML=list.map(function(u){
         var reg=u.createdAt? new Date(u.createdAt).toLocaleString('zh-CN'):'';
@@ -1452,13 +1444,13 @@
           var un=b.getAttribute('data-u'); var np=prompt('为 '+un+' 设置新密码（8-32位，含字母和数字）：'); if(!np) return;
           if(!/^(?=.*[a-zA-Z])(?=.*\d).{8,32}$/.test(np)){ alert('密码需 8-32 位且同时含字母和数字'); return; }
           b.disabled=true;
-          cbCallFn('adminResetPassword', { adminPwd: ADMIN_PWD, email: un, newPwd: np }).then(function(r){
-            if(!r.ok || (r.j&&r.j.code)){ alert('重置失败：'+((r.j&&r.j.error)||r.err||'未知错误')); b.disabled=false; }
+          cbApi('adminResetPassword', { adminPwd: ADMIN_PWD, email: un, newPwd: np }).then(function(r){
+            if(r.code!==0){ alert('重置失败：'+(r.error||'未知错误')); b.disabled=false; }
             else { alert('已重置为：'+np+'\n请通过你方便的方式把这个新密码告诉该用户。'); loadCloudUsers(); }
-          }).catch(function(e){ alert('网络错误：'+e.err); b.disabled=false; });
+          }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
         };
       });
-    }).catch(function(e){ el.innerHTML='<span style="color:#e0443e">网络错误：'+e.err+'</span>'; });
+    }).catch(function(e){ el.innerHTML='<span style="color:#e0443e">网络错误：'+errText(e)+'</span>'; });
   }
   document.addEventListener('DOMContentLoaded', function(){
     var pill=document.getElementById('userPill');
