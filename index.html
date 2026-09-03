@@ -286,7 +286,42 @@
 .dl-fname{font-size:14px;font-weight:600;color:#3a3660;margin-bottom:9px}
 .dl-src{display:block;width:100%;margin:6px 0;padding:11px 12px;border:1px solid #e4e0f2;border-radius:11px;background:#faf9ff;color:#4a4775;font-size:14px;text-align:left;cursor:pointer;transition:.15s}
 .dl-src:hover{background:#6c5ce7;color:#fff;border-color:#6c5ce7}
-.dl-src.on{background:#6c5ce7;color:#fff;border-color:#6c5ce7}
+  .dl-src.on{background:#6c5ce7;color:#fff;border-color:#6c5ce7}
+
+  /* ============ 网站账号（云后端：LeanCloud） ============ */
+  .user-pill{position:fixed;right:22px;top:22px;z-index:60;display:flex;align-items:center;gap:8px;
+    padding:10px 16px;border:0;border-radius:40px;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;color:#fff;
+    background:rgba(35,37,43,.82);box-shadow:0 8px 24px rgba(35,37,43,.25);backdrop-filter:blur(8px)}
+  .user-pill:hover{background:rgba(35,37,43,.95)}
+  .user-pill .ic{font-size:16px;line-height:1}
+  @media(max-width:760px){.user-pill{right:14px;top:14px;padding:9px 13px;font-size:13px}}
+  .auth-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1300;background:rgba(20,20,40,.45);backdrop-filter:blur(3px)}
+  .auth-modal[hidden]{display:none}
+  .auth-card{position:relative;width:min(380px,92vw);max-height:88vh;overflow:auto;background:#fff;border-radius:20px;padding:24px 24px 26px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+  .auth-card h3{margin:0 0 4px;font-size:20px;color:#2d2a55}
+  .auth-sub{font-size:13px;color:#7a7790;margin:0 0 16px}
+  .auth-x{position:absolute;top:12px;right:14px;width:30px;height:30px;border:none;background:#f0eef7;border-radius:50%;font-size:18px;line-height:1;color:#7a7790;cursor:pointer}
+  .auth-x:hover{background:#e3dff5}
+  .field{margin-bottom:11px}
+  .field input{width:100%;padding:12px 13px;border:1px solid #e4e0f2;border-radius:12px;font-size:15px;font-family:inherit;box-sizing:border-box;background:#faf9ff}
+  .field input:focus{outline:none;border-color:#6c5ce7;background:#fff}
+  .auth-btn{width:100%;padding:12px 14px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-top:4px}
+  .auth-btn:disabled{opacity:.55;cursor:not-allowed}
+  .auth-link{display:block;text-align:center;margin-top:12px;font-size:13px;color:#6c5ce7;cursor:pointer;background:none;border:0;font-family:inherit}
+  .auth-link:hover{text-decoration:underline}
+  .auth-msg{font-size:13px;margin-top:10px;min-height:18px;color:#e0443e}
+  .auth-msg.ok{color:#1b9e6b}
+  .auth-row{display:flex;gap:10px;align-items:flex-start}
+  .auth-row .field{flex:1;margin-bottom:0}
+  .auth-row .auth-btn{width:auto;white-space:nowrap;margin-top:0;padding:12px 16px}
+  .auth-notice{font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.6}
+  .cu-item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:rgba(255,255,255,.72);border-radius:14px;padding:12px 14px;box-shadow:0 4px 18px rgba(35,37,43,.06);margin-bottom:10px}
+  .cu-item .info b{font-size:15px}
+  .cu-item .info small{display:block;color:var(--ink-soft);font-size:12px;margin-top:3px}
+  .cu-item .reset{padding:7px 14px;border:0;border-radius:10px;background:var(--accent-2);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+  .cu-item .reset:hover{filter:brightness(.94)}
+  .toast{position:fixed;left:50%;top:24px;transform:translateX(-50%);z-index:2000;background:rgba(35,37,43,.92);color:#fff;padding:11px 18px;border-radius:30px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transition:opacity .25s, top .25s;pointer-events:none}
+  .toast.show{opacity:1;top:34px}
 </style>
 </head>
 <body>
@@ -591,6 +626,7 @@
 </div>
 
 <div id="cmModal" class="modal-back" style="display:none"></div>
+<button id="userPill" class="user-pill" title="网站账号"><span class="ic">👤</span><span id="userPillTxt">登录 / 注册</span></button>
 <button id="adminFab" class="admin-fab" title="站长后台"><span class="ic">🔧</span><span>站长后台</span></button>
 <footer>
   © <span id="year">2026</span> 工具铺 · 由 狗托儿 用 ❤️ 与咖啡因驱动
@@ -740,6 +776,18 @@
   const PROFILE_KEY='tp_profile', FAV_KEY='tp_favs', CMT_KEY='tp_comments', STAT_KEY='tp_stats', ADMIN_KEY='tp_admin';
   const LIKE_KEY='tp_likes', LIKED_KEY='tp_liked', SHARE_KEY='tp_shares';
   const ADMIN_USER='admin', ADMIN_PWD='a9727d9752dadada';
+
+  // ====== LeanCloud 后端配置（站长填入后生效）======
+  // 控制台「设置 → 应用 Key」里拿 App ID / App Key；
+  // 「REST API 服务器地址」形如 https://xxxx.lc-cn-n1-shared.com （或 .api.lncldapi.com）
+  // 同时需在 LeanCloud 部署 cloud/ 目录下的云函数（见仓库 cloud/ 文件夹）。
+  const LC = {
+    appId: '在此填LeanCloud_App_ID',
+    appKey: '在此填LeanCloud_App_Key',
+    server: '在此填LeanCloud_API地址'
+  };
+  const LC_ENABLED = !LC.appId.startsWith('在此填');
+  const CLOUD_USER_KEY = 'tp_cloud_user';
   const TOOL_SLUGS=['douyin-helper','cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
   const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
@@ -959,11 +1007,12 @@
         '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a></div>'+
       '<h3 style="margin-top:8px">各工具互动明细</h3><div id="aInteract" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">本机账号</h3><div id="aUsers" class="admin-list"></div>'+
+      '<h3 style="margin-top:18px">网站注册用户（云端 · 短信注册）</h3><div id="aCloudUsers" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';localStorage.removeItem(ADMIN_KEY);refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
     adminPanel.querySelector('#aReport').onclick=openReport;
-    loadAdminInteract();loadAdminUsers();loadAdminComments();
+    loadAdminInteract();loadAdminUsers();loadAdminComments();loadCloudUsers();
   }
   function loadAdminInteract(){
     const el=adminPanel.querySelector('#aInteract');if(!el)return;
@@ -1247,6 +1296,154 @@
     document.getElementById('dlModal').hidden=false;
   }
   function closeDl(){ document.getElementById('dlModal').hidden=true; }
+
+  // ---------- 网站账号（LeanCloud 云后端：短信注册 / 登录 / 找回密码） ----------
+  function toast(msg){
+    var t=document.querySelector('.toast');
+    if(!t){ t=document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(t._tm); t._tm=setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+  function lcReq(path, body){
+    return fetch(LC.server.replace(/\/$/,'') + path, {
+      method:'POST',
+      headers:{ 'X-LC-Id': LC.appId, 'X-LC-Key': LC.appKey, 'Content-Type':'application/json' },
+      body: JSON.stringify(body||{})
+    }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+      .catch(function(e){ return {ok:false, err:e.message}; });
+  }
+  function getCloudUser(){ try{ return JSON.parse(localStorage.getItem(CLOUD_USER_KEY)||'null'); }catch(e){ return null; } }
+  function setCloudUser(o){ localStorage.setItem(CLOUD_USER_KEY, JSON.stringify(o)); }
+  function renderUserPill(){
+    var u=getCloudUser(); var t=document.getElementById('userPillTxt'); if(!t) return;
+    t.textContent = u ? (u.mobile||u.username) : '登录 / 注册';
+  }
+  function authEl(sel){ return document.querySelector('#authModal '+sel); }
+  function msgErr(el, t){ if(el){ el.className='auth-msg'; el.textContent=t; } return false; }
+  var smsTimer=null;
+  function closeAuth(){ var m=document.getElementById('authModal'); if(m) m.hidden=true; if(smsTimer) clearInterval(smsTimer); }
+  function openAuth(mode){
+    if(!LC_ENABLED){ toast('后端未配置：站长尚未接入 LeanCloud'); return; }
+    renderAuthView(mode||'login');
+    var m=document.getElementById('authModal'); if(m) m.hidden=false;
+  }
+  function renderAuthView(mode){
+    var v=document.getElementById('authView'); if(!v) return;
+    if(mode==='register'){
+      v.innerHTML='<h3>注册</h3><p class="auth-sub">手机验证码注册，密码仅用于登录本网站（服务端加密存储，站长也无法查看明文）</p>'+
+        '<div class="field"><input id="regPhone" type="tel" placeholder="手机号" autocomplete="tel"></div>'+
+        '<div class="auth-row"><div class="field"><input id="regCode" type="text" placeholder="短信验证码"></div>'+
+        '<button class="auth-btn" id="regSmsBtn">获取验证码</button></div>'+
+        '<div class="field"><input id="regPwd" type="password" placeholder="设置密码（至少6位）" autocomplete="new-password"></div>'+
+        '<button class="auth-btn" id="regBtn">注册并登录</button>'+
+        '<button class="auth-link" id="toLg">已有账号？去登录</button>'+
+        '<div class="auth-msg" id="authMsg"></div>';
+      document.getElementById('regBtn').onclick=doSignup;
+      document.getElementById('regSmsBtn').onclick=doRequestSms;
+      document.getElementById('toLg').onclick=function(){ renderAuthView('login'); };
+    } else if(mode==='forgot'){
+      v.innerHTML='<h3>忘记密码</h3><p class="auth-sub">输入你的账号或手机号，站长会收到申请并亲自帮你重置密码（不会发送你的旧密码）。</p>'+
+        '<div class="field"><input id="fgtId" type="text" placeholder="账号 或 手机号"></div>'+
+        '<button class="auth-btn" id="fgtBtn">提交申请</button>'+
+        '<button class="auth-link" id="toLg2">返回登录</button>'+
+        '<div class="auth-msg" id="authMsg"></div>';
+      document.getElementById('fgtBtn').onclick=doForgot;
+      document.getElementById('toLg2').onclick=function(){ renderAuthView('login'); };
+    } else {
+      v.innerHTML='<h3>登录</h3><p class="auth-sub">使用注册时的手机号登录</p>'+
+        '<div class="field"><input id="lgPhone" type="tel" placeholder="手机号" autocomplete="username"></div>'+
+        '<div class="field"><input id="lgPwd" type="password" placeholder="密码" autocomplete="current-password"></div>'+
+        '<button class="auth-btn" id="lgBtn">登录</button>'+
+        '<button class="auth-link" id="toReg">没有账号？去注册</button>'+
+        '<button class="auth-link" id="toFgt">忘记密码？</button>'+
+        '<div class="auth-msg" id="authMsg"></div>';
+      document.getElementById('lgBtn').onclick=doLogin;
+      document.getElementById('toReg').onclick=function(){ renderAuthView('register'); };
+      document.getElementById('toFgt').onclick=function(){ renderAuthView('forgot'); };
+    }
+  }
+  function doRequestSms(){
+    var phone=authEl('#regPhone').value.trim();
+    var btn=authEl('#regSmsBtn'); var msg=authEl('#authMsg');
+    if(!/^1\d{10}$/.test(phone)){ return msgErr(msg,'请输入正确的手机号'); }
+    btn.disabled=true;
+    lcReq('/1.1/requestSmsCode', { mobilePhoneNumber: phone, name:'工具铺', op:'注册' }).then(function(res){
+      if(res.j && res.j.code){ btn.disabled=false; return msgErr(msg,'发送失败：'+(res.j.error||'请稍后再试')); }
+      msg.className='auth-msg ok'; msg.textContent='验证码已发送，请查收短信';
+      var n=60; btn.textContent=n+'s 后重发';
+      smsTimer=setInterval(function(){ n--; if(n<=0){ clearInterval(smsTimer); btn.disabled=false; btn.textContent='获取验证码'; } else btn.textContent=n+'s 后重发'; }, 1000);
+    }).catch(function(e){ btn.disabled=false; msgErr(msg,'网络错误：'+e.err); });
+  }
+  function doSignup(){
+    var phone=authEl('#regPhone').value.trim();
+    var code=authEl('#regCode').value.trim();
+    var pwd=authEl('#regPwd').value; var msg=authEl('#authMsg');
+    if(!/^1\d{10}$/.test(phone)){ return msgErr(msg,'请输入正确的手机号'); }
+    if(!code){ return msgErr(msg,'请输入验证码'); }
+    if(pwd.length<6){ return msgErr(msg,'密码至少 6 位'); }
+    msg.className='auth-msg'; msg.textContent='注册中…';
+    lcReq('/1.1/users', { username: phone, mobilePhoneNumber: phone, password: pwd, smsCode: code }).then(function(res){
+      if(res.j && res.j.code){ return msgErr(msg,'注册失败：'+(res.j.error||'未知错误')); }
+      setCloudUser({ username: phone, mobile: phone, token: res.j.sessionToken });
+      closeAuth(); renderUserPill(); toast('注册成功，已自动登录');
+    }).catch(function(e){ msgErr(msg,'网络错误：'+e.err); });
+  }
+  function doLogin(){
+    var phone=authEl('#lgPhone').value.trim();
+    var pwd=authEl('#lgPwd').value; var msg=authEl('#authMsg');
+    if(!phone||!pwd){ return msgErr(msg,'请输入手机号和密码'); }
+    msg.className='auth-msg'; msg.textContent='登录中…';
+    lcReq('/1.1/login', { mobilePhoneNumber: phone, password: pwd }).then(function(res){
+      if(res.j && res.j.code){ return msgErr(msg,'登录失败：'+(res.j.error||'账号或密码错误')); }
+      setCloudUser({ username: res.j.username, mobile: res.j.mobilePhoneNumber||phone, token: res.j.sessionToken });
+      closeAuth(); renderUserPill(); toast('登录成功');
+      lcReq('/1.1/functions/logLogin', { username: res.j.username });
+    }).catch(function(e){ msgErr(msg,'网络错误：'+e.err); });
+  }
+  function doForgot(){
+    var id=authEl('#fgtId').value.trim(); var msg=authEl('#authMsg');
+    if(!id){ return msgErr(msg,'请输入账号或手机号'); }
+    msg.className='auth-msg'; msg.textContent='提交中…';
+    lcReq('/1.1/functions/requestPasswordHelp', { username: id }).then(function(res){
+      if(res.j && res.j.code){ return msgErr(msg,'提交失败：'+(res.j.error||'未知错误')); }
+      msg.className='auth-msg ok'; msg.textContent='已提交给站长，请耐心等待站长协助你重置密码。';
+    }).catch(function(e){ msgErr(msg,'网络错误：'+e.err); });
+  }
+  function loadCloudUsers(){
+    var el=document.getElementById('aCloudUsers'); if(!el) return;
+    if(!LC_ENABLED){ el.innerHTML='<span style="color:var(--ink-soft)">后端未配置：站长需在代码中填入 LeanCloud App ID/Key，并在 LeanCloud 部署 cloud/ 云函数。</span>'; return; }
+    el.innerHTML='<span style="color:var(--ink-soft)">加载中…</span>';
+    lcReq('/1.1/functions/adminListUsers', { adminPwd: ADMIN_PWD }).then(function(res){
+      if(res.j && res.j.code){ el.innerHTML='<span style="color:#e0443e">读取失败：'+(res.j.error||'无权限')+'</span>'; return; }
+      var list=(res.j&&res.j.result)||[];
+      if(!list.length){ el.innerHTML='<span style="color:var(--ink-soft)">暂无注册用户</span>'; return; }
+      el.innerHTML=list.map(function(u){
+        var reg=u.createdAt? new Date(u.createdAt).toLocaleString('zh-CN'):'';
+        var lg=u.lastLogin? new Date(u.lastLogin).toLocaleString('zh-CN'):'从未登录';
+        return '<div class="cu-item"><div class="info"><b>'+escapeHtml(u.username)+'</b>'+
+          '<small>手机：'+escapeHtml(u.mobile||'-')+' ｜ 注册：'+reg+' ｜ 最近登录：'+lg+'</small></div>'+
+          '<button class="reset" data-u="'+escapeHtml(u.username)+'">重置密码</button></div>';
+      }).join('');
+      el.querySelectorAll('.reset').forEach(function(b){
+        b.onclick=function(){
+          var un=b.getAttribute('data-u'); var np=prompt('为 '+un+' 设置新密码（至少6位）：'); if(!np) return;
+          if(np.length<6){ alert('密码至少 6 位'); return; }
+          b.disabled=true;
+          lcReq('/1.1/functions/adminResetPassword', { adminPwd: ADMIN_PWD, username: un, newPwd: np }).then(function(r){
+            if(r.j && r.j.code){ alert('重置失败：'+(r.j.error||'未知错误')); b.disabled=false; }
+            else { alert('已重置为：'+np+'\n请通过你方便的方式把这个新密码告诉该用户。'); loadCloudUsers(); }
+          }).catch(function(e){ alert('网络错误：'+e.err); b.disabled=false; });
+        };
+      });
+    }).catch(function(e){ el.innerHTML='<span style="color:#e0443e">网络错误：'+e.err+'</span>'; });
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var pill=document.getElementById('userPill');
+    if(pill){ pill.onclick=function(){ var u=getCloudUser(); if(u){ if(confirm('当前登录：'+(u.mobile||u.username)+'\n确定退出登录？')){ localStorage.removeItem(CLOUD_USER_KEY); renderUserPill(); toast('已退出'); } } else { openAuth('login'); } }; }
+    var ac=document.getElementById('authClose'); if(ac) ac.onclick=closeAuth;
+    var am=document.getElementById('authModal'); if(am) am.addEventListener('click', function(e){ if(e.target===am) closeAuth(); });
+    renderUserPill();
+  });
 </script>
 <div id="dlModal" class="dl-modal" hidden>
   <div class="dl-backdrop" onclick="closeDl()"></div>
@@ -1257,5 +1454,14 @@
     <div id="dlBody"></div>
   </div>
 </div>
+
+<!-- ====== 网站账号：登录 / 注册 / 忘记密码 ====== -->
+<div id="authModal" class="auth-modal" hidden>
+  <div class="auth-card">
+    <button class="auth-x" id="authClose" aria-label="关闭">×</button>
+    <div id="authView"></div>
+  </div>
+</div>
+
 </body>
 </html>
