@@ -426,26 +426,40 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-03T15:58:44Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-09-03T16:02:45Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
     b.id='updateBanner';
-    b.innerHTML='<div class="upd-inner"><span class="upd-emoji">🆕</span><span class="upd-msg">检测到站点有更新，点此一键刷新到最新版</span><button class="upd-btn" type="button">立即更新</button><button class="upd-x" type="button" aria-label="关闭">×</button></div>';
+    b.innerHTML='<div class="upd-inner"><span class="upd-emoji">🆕</span><span class="upd-msg">检测到新版，<b class="upd-sec">3</b> 秒后自动刷新</span><button class="upd-btn" type="button">立即刷新</button><button class="upd-x" type="button" aria-label="关闭">×</button></div>';
     var s=b.style;
     s.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:100000;background:linear-gradient(135deg,#fff5e6 0%,#ffe4b5 100%);color:#5a3e00;padding:10px 16px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);font:14px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;display:flex;align-items:center;gap:10px;border:1px solid rgba(0,0,0,.06);max-width:90vw;';
     var inner=b.querySelector('.upd-inner'); inner.style.cssText='display:flex;align-items:center;gap:10px;';
     b.querySelector('.upd-emoji').style.fontSize='18px';
     b.querySelector('.upd-msg').style.fontWeight='600';
+    b.querySelector('.upd-sec').style.cssText='display:inline-block;min-width:16px;text-align:center;';
     b.querySelector('.upd-btn').style.cssText='background:#5a3e00;color:#fff;border:0;padding:6px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;';
     b.querySelector('.upd-btn').onmouseover=function(){this.style.background='#7a5500';};
     b.querySelector('.upd-btn').onmouseout=function(){this.style.background='#5a3e00';};
     b.querySelector('.upd-x').style.cssText='background:transparent;border:0;font-size:20px;line-height:1;cursor:pointer;color:#5a3e00;padding:0 4px;';
+    var cancel=false, sec=3;
+    var secEl=b.querySelector('.upd-sec');
+    var timer=setInterval(function(){
+      if(cancel) return;
+      sec--;
+      if(secEl) secEl.textContent=String(sec);
+      if(sec<=0){
+        clearInterval(timer);
+        try{ localStorage.setItem('tp_update_dismissed', String(Date.now())); }catch(e){}
+        location.replace(location.pathname + '?v=' + Date.now());
+      }
+    },1000);
     b.querySelector('.upd-btn').onclick=function(){
+      clearInterval(timer); cancel=true;
       try{ localStorage.setItem('tp_update_dismissed', String(Date.now())); }catch(e){}
       location.replace(location.pathname + '?v=' + Date.now());
     };
-    b.querySelector('.upd-x').onclick=function(){ b.remove(); };
+    b.querySelector('.upd-x').onclick=function(){ clearInterval(timer); cancel=true; b.remove(); };
     document.body.appendChild(b);
   }
   function checkVersion(){
@@ -1667,4 +1681,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-03T15:58:44Z -->
+<!-- deploy cache-bust 2026-09-03T16:02:45Z -->
