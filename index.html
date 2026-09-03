@@ -1368,12 +1368,17 @@
   }
   function validEmail(e){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e); }
   function errText(e){
-    if(!e) return '未知错误';
+    if(e===null||e===undefined) return '未知错误(null)';
     if(typeof e === 'string') return e;
-    if(e.errMsg && typeof e.errMsg === 'string') return e.errMsg;
-    if(e.message && typeof e.message === 'string') return e.message;
-    if(e.code) return '['+e.code+'] '+(e.errMsg||e.message||'');
-    try { var s = JSON.stringify(e); return s.length>500 ? s.slice(0,500)+'…' : s; } catch(_) { return String(e); }
+    if(typeof e === 'number'||typeof e==='boolean') return String(e);
+    var msg = e.errMsg || e.message || (e.error&&(e.error.message||e.error.errMsg)) || '';
+    if(msg) return String(msg);
+    if(e.code) return '['+e.code+']';
+    try {
+      var name = (e.constructor && e.constructor.name) || Object.prototype.toString.call(e).slice(8,-1) || 'Object';
+      var keys = Object.keys(e).slice(0,15).join(',');
+      return name + (keys ? '{'+keys+'}' : '{}');
+    } catch(_) { return String(e); }
   }
   function doRequestCode(){
     var email=authEl('#regEmail').value.trim().toLowerCase();
@@ -1386,7 +1391,7 @@
       msg.className='auth-msg ok'; msg.textContent='验证码已发送到你的邮箱，请查收';
       var n=60; btn.textContent=n+'s 后重发';
       regTimer=setInterval(function(){ n--; if(n<=0){ clearInterval(regTimer); btn.disabled=false; btn.textContent='获取验证码'; } else btn.textContent=n+'s 后重发'; }, 1000);
-    }).catch(function(e){ btn.disabled=false; console.error('[getVerification]',e); msgErr(msg,'发送失败：'+errText(e)); });
+    }).catch(function(e){ btn.disabled=false; console.error('[getVerification][diag2]',e); msgErr(msg,'发送失败[diag2]：'+errText(e)); });
   }
   function doSignup(){
     var email=authEl('#regEmail').value.trim().toLowerCase();
