@@ -450,20 +450,33 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     document.body.appendChild(b);
   }
   function checkVersion(){
+    window._versionProbe={siteVersion:SITE_VERSION, fired:0, fetched:false, ok:false, matched:null, err:null};
+    window._versionProbe.fired++;
     var dismissed=0;
     try{ dismissed=parseInt(localStorage.getItem('tp_update_dismissed')||'0',10); }catch(e){}
-    if(Date.now()-dismissed < 30*60*1000) return; // 30 分钟内关过提示
+    if(Date.now()-dismissed < 30*60*1000) { window._versionProbe.skipped='dismissed'; return; }
     var probe='https://goutuo4588.github.io/tools/version.txt?t='+Date.now();
     fetch(probe,{cache:'no-store'}).then(function(r){
-      if(!r.ok) return;
+      window._versionProbe.fetched=true;
+      window._versionProbe.status=r.status;
+      if(!r.ok) { window._versionProbe.err='not_ok_'+r.status; return null; }
       return r.text();
     }).then(function(txt){
-      if(!txt) return;
+      if(txt==null) return;
+      window._versionProbe.ok=true;
       var remote=String(txt).trim();
-      if(remote && remote!==SITE_VERSION){
+      window._versionProbe.remote=remote;
+      var matched = (remote === SITE_VERSION);
+      window._versionProbe.matched=matched;
+      if(remote && !matched){
+        window._versionProbe.action='show_banner';
         showUpdateBanner();
+      } else {
+        window._versionProbe.action='skip_match';
       }
-    }).catch(function(){});
+    }).catch(function(e){
+      window._versionProbe.err=String(e);
+    });
   }
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded', checkVersion);
