@@ -426,7 +426,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-03T15:20:22Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-09-03T15:47:30Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -443,8 +443,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     b.querySelector('.upd-x').style.cssText='background:transparent;border:0;font-size:20px;line-height:1;cursor:pointer;color:#5a3e00;padding:0 4px;';
     b.querySelector('.upd-btn').onclick=function(){
       try{ localStorage.setItem('tp_update_dismissed', String(Date.now())); }catch(e){}
-      var u=location.href.split('#')[0];
-      location.replace(u+(u.indexOf('?')>=0?'&':'?')+'v='+Date.now());
+      location.replace(location.pathname + '?v=' + Date.now());
     };
     b.querySelector('.upd-x').onclick=function(){ b.remove(); };
     document.body.appendChild(b);
@@ -1668,4 +1667,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-03T15:20:22Z -->
+<!-- deploy cache-bust 2026-09-03T15:47:30Z -->
