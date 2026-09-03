@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>工具铺 · 我的小工具分享</title>
-<meta name="description" content="狗托儿的工具铺：自己写的实用小工具，外加一些收录的开源 / 免费软件。全部免费，欢迎自取。" />
+<title>具坊 · 我的小工具分享</title>
+<meta name="description" content="狗托儿的具坊：自己写的实用小工具，外加一些收录的开源 / 免费软件。全部免费，欢迎自取。" />
 <style>
   /* ============ 设计变量 ============ */
   :root{
@@ -363,11 +363,11 @@
 
   <!-- 左侧导航 -->
   <aside class="sidebar">
-    <div class="side-brand"><span class="dot"></span><span class="txt">工具铺</span></div>
+    <div class="side-brand"><span class="dot"></span><span class="txt">具坊</span></div>
     <button class="nav-btn active" data-view="intro"><span class="ic">📖</span><span class="txt">简介</span></button>
     <button class="nav-btn" data-view="tools"><span class="ic">🧰</span><span class="txt">工具</span></button>
     <button class="nav-btn" data-view="me"><span class="ic">👤</span><span class="txt">我的</span></button>
-    <div class="side-foot">© <span id="year"></span> 工具铺<br/>由 狗托儿 用 ❤️ 与咖啡因驱动<div class="online-badge" id="onlineBadge"><span class="dot"></span>当前在线 – 人</div></div>
+    <div class="side-foot">© <span id="year"></span> 具坊<br/>由 狗托儿 用 ❤️ 与咖啡因驱动<div class="online-badge" id="onlineBadge"><span class="dot"></span>当前在线 – 人</div></div>
   </aside>
 
   <!-- 主内容区 -->
@@ -396,7 +396,7 @@
         <div class="wrap about-grid">
           <div>
             <div class="eyebrow">About</div>
-            <h2 class="title">关于这个工具铺</h2>
+            <h2 class="title">关于这个具坊</h2>
             <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这里集中放我自己写的小软件，也收录一些用着顺手的开源 / 免费工具——收录的部分都标了原作者和出处，方便朋友一站式下载。</p>
             <div class="stat-row">
               <div class="stat"><b>6</b><span>已收录工具</span></div>
@@ -417,13 +417,13 @@
           <div>
             <div class="eyebrow">Origin &amp; History</div>
             <h2 class="title">由来与历史</h2>
-            <p class="lead">工具铺不是一天搭起来的，下面是它一路过来的样子。</p>
+            <p class="lead">具坊不是一天搭起来的，下面是它一路过来的样子。</p>
           </div>
           <div class="about-card">
             <h3>时间线</h3>
             <p><b>2026 年 · 起点</b><br/>从给自己写的两个小工具开始：抖音辅助器（把重复的机械操作交给程序）和 CDriveCleanup（把微信、QQ 缓存安全搬出 C 盘）。</p>
             <p style="margin-top:14px"><b>后来 · 收录扩张</b><br/>光自己写不够用，又顺手收录了一些用着顺手的开源 / 免费软件——游戏变速、卸载清理、抓包分析……并统一做了签名校验和分流下载。</p>
-            <p style="margin-top:14px"><b>现在 · 三个模块</b><br/>工具铺整理为电脑端工具、手机端工具、开源免费工具三大模块。手机端还在开发中，上架后会第一时间更新。</p>
+            <p style="margin-top:14px"><b>现在 · 三个模块</b><br/>具坊整理为电脑端工具、手机端工具、开源免费工具三大模块。手机端还在开发中，上架后会第一时间更新。</p>
           </div>
         </div>
       </section>
@@ -659,7 +659,7 @@
 <button id="userPill" class="user-pill" title="网站账号"><span class="ic">👤</span><span id="userPillTxt">登录 / 注册</span></button>
 <button id="adminFab" class="admin-fab" title="站长后台"><span class="ic">🔧</span><span>站长后台</span></button>
 <footer>
-  © <span id="year">2026</span> 工具铺 · 由 狗托儿 用 ❤️ 与咖啡因驱动
+  © <span id="year">2026</span> 具坊 · 由 狗托儿 用 ❤️ 与咖啡因驱动
 </footer>
 
 <script>
@@ -847,7 +847,7 @@
     var u=getCloudUser();
     if(!u){
       mePanel.innerHTML='<div class="me-card me-login-cta"><div class="big">👤</div>'+
-        '<h3>欢迎来到工具铺</h3>'+
+        '<h3>欢迎来到具坊</h3>'+
         '<p class="auth-sub">登录后即可收藏工具、同步你的互动记录，并在任意设备用同一账号进入。</p>'+
         '<button class="auth-btn" id="meLoginBtn" style="max-width:240px;margin:14px auto 0">登录 / 注册</button></div>';
       mePanel.querySelector('#meLoginBtn').onclick=function(){ openAuth('login', true); };
@@ -947,7 +947,7 @@
   function shareTool(slug){
     const name=toolName(slug);
     const link=location.origin+location.pathname+'#'+slug;
-    const text=name+' — 工具铺：'+link;
+    const text=name+' — 具坊：'+link;
     shares[slug]=(shares[slug]||0)+1;LS.set(SHARE_KEY,shares);loadStats(slug);
     popBtn('.share-btn[data-slug="'+slug+'"]');
     if(adminToken)refreshAdmin();
@@ -1087,7 +1087,7 @@
   function toolName(slug){const el=document.querySelector('.tool[data-slug="'+slug+'"] h3');return el?el.textContent:slug;}
   function buildExportText(){
     const L=[];
-    L.push('工具铺 · 本机数据导出');
+    L.push('具坊 · 本机数据导出');
     L.push('导出时间：'+new Date().toLocaleString('zh-CN'));
     L.push('================================');
     L.push('');
@@ -1135,7 +1135,7 @@
     const text=buildExportText();
     const d=new Date();
     const ymd=''+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-    const fname='工具铺-本机数据-'+ymd+'.txt';
+    const fname='具坊-本机数据-'+ymd+'.txt';
     try{
       if(window.showSaveFilePicker){
         const handle=await window.showSaveFilePicker({suggestedName:fname,startIn:'desktop',types:[{description:'文本文档',accept:{'text/plain':['.txt']}}]});
@@ -1226,11 +1226,11 @@
     const c5=svgHBar('各工具评论数',rows.map(r=>({l:r.name,v:r.comments})),'#0984e3');
     const c6=svgHBar('各工具收藏状态',rows.map(r=>({l:r.name,v:r.favs})),'#fdcb6e');
     const c7=svgLine('近7天评论趋势',labels,vals,'#e17055');
-    const summary='截至'+new Date().toLocaleString('zh-CN')+'，你的「工具铺」共上架 <b>'+slugs.length+'</b> 款工具；本机累计被浏览 <b>'+totalV+'</b> 次、下载 <b>'+totalD+'</b> 次，收到 <b>'+totalL+'</b> 次点赞、<b>'+totalS+'</b> 次分享；你收藏了 <b>'+totalF+'</b> 款，本机留下 <b>'+totalC+'</b> 条评论，'+(acc?'本机已登录 1 个账号。':'本机尚未登录账号。')+'浏览量最高的是「'+top.name+'」（'+top.views+' 次），下载最多的是「'+topD.name+'」（'+topD.downloads+' 次），最受欢迎（点赞最多）的是「'+topL.name+'」（'+topL.likes+' 赞）。朋友在 GitHub Discussions 的留言不计入本机统计，请到仓库 Discussions 查看。';
+    const summary='截至'+new Date().toLocaleString('zh-CN')+'，你的「具坊」共上架 <b>'+slugs.length+'</b> 款工具；本机累计被浏览 <b>'+totalV+'</b> 次、下载 <b>'+totalD+'</b> 次，收到 <b>'+totalL+'</b> 次点赞、<b>'+totalS+'</b> 次分享；你收藏了 <b>'+totalF+'</b> 款，本机留下 <b>'+totalC+'</b> 条评论，'+(acc?'本机已登录 1 个账号。':'本机尚未登录账号。')+'浏览量最高的是「'+top.name+'」（'+top.views+' 次），下载最多的是「'+topD.name+'」（'+topD.downloads+' 次），最受欢迎（点赞最多）的是「'+topL.name+'」（'+topL.likes+' 赞）。朋友在 GitHub Discussions 的留言不计入本机统计，请到仓库 Discussions 查看。';
     const thead='<tr><th>工具</th><th>浏览</th><th>下载</th><th>👍 点赞</th><th>🔗 分享</th><th>评论</th><th>⭐ 已收藏</th></tr>';
     const tbody=rows.map(r=>'<tr><td>'+r.name+'</td><td>'+r.views+'</td><td>'+r.downloads+'</td><td>'+r.likes+'</td><td>'+r.shares+'</td><td>'+r.comments+'</td><td>'+(r.favs?'是':'否')+'</td></tr>').join('');
     const table='<table class="rpt"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody><tfoot><tr><td>合计</td><td>'+totalV+'</td><td>'+totalD+'</td><td>'+totalL+'</td><td>'+totalS+'</td><td>'+totalC+'</td><td>'+totalF+'</td></tr></tfoot></table>';
-    const html='<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>工具铺 · 数据可视化报表</title>'
+    const html='<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>具坊 · 数据可视化报表</title>'
       +'<style>body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f6fa;color:#1f2430;margin:0;padding:28px}'
       +'.wrap{max-width:840px;margin:0 auto}.h1{font-size:22px;margin:0 0 4px}.sub{color:#888;font-size:13px;margin-bottom:18px}'
       +'.summary{background:#fff;border-left:4px solid #6c5ce7;border-radius:10px;padding:16px 18px;line-height:1.9;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,.05)}'
@@ -1238,7 +1238,7 @@
       +'.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}'
       +'.sec{font-size:17px;margin:26px 0 6px}.rpt{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-top:10px}'
       +'.rpt th,.rpt td{padding:10px 12px;text-align:center;border-bottom:1px solid #eee;font-size:14px}.rpt th{background:#6c5ce7;color:#fff}.rpt tfoot td{font-weight:700;background:#f0eeff}</style></head>'
-      +'<body><div class="wrap"><h1 class="h1">📊 工具铺 · 数据可视化报表</h1>'
+      +'<body><div class="wrap"><h1 class="h1">📊 具坊 · 数据可视化报表</h1>'
       +'<div class="sub">数据来源：本机浏览器（'+new Date().toLocaleString('zh-CN')+'）</div>'
       +'<div class="summary">'+summary+'</div>'
       +'<div class="grid"><div class="card">'+c1+'</div><div class="card">'+c2+'</div><div class="card">'+c3+'</div><div class="card">'+c4+'</div><div class="card">'+c5+'</div><div class="card">'+c6+'</div></div>'
@@ -1386,14 +1386,14 @@
     } else if(mode==='welcome'){
       v.innerHTML='<div class="welcome-box">'+
         '<div class="welcome-emoji">🎉</div>'+
-        '<h3>注册成功，欢迎加入工具铺！</h3>'+
+        '<h3>注册成功，欢迎加入具坊！</h3>'+
         '<p class="auth-sub">账号已创建并自动登录。你现在是本站注册用户，可畅享全部工具下载与互动功能。</p>'+
         '<div class="welcome-tips">'+
           '<p>✅ 登录状态已保存，下次访问自动识别</p>'+
           '<p>📥 去首页挑个工具下载试试</p>'+
           '<p>💬 遇到问题可随时在工具下留言</p>'+
         '</div>'+
-        '<button class="auth-btn" id="welcomeBtn">进入工具铺</button>'+
+        '<button class="auth-btn" id="welcomeBtn">进入具坊</button>'+
         '</div>';
       document.getElementById('welcomeBtn').onclick=function(){ authForce=false; closeAuth(); renderUserPill(); showView('intro'); };
     } else if(mode==='forgotDone'){
@@ -1558,9 +1558,9 @@
     for(i=0;i<N;i++) pts.push({x:window.innerWidth/2,y:window.innerHeight/2});
     var mx=window.innerWidth/2,my=window.innerHeight/2;
     var sparks=[];
-    var colors=['#7b5cff','#4ad6ff','#ff7bc6','#5cff9d','#ffd24a'];
+    var colors=['#ff4d6d','#ff9f1c','#ffd23f','#5cff9d','#2ec4ff','#7b5cff','#ff7bc6','#ff5ec4','#39e6c3','#b388ff'];
     function hexA(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
-    function spawn(){ if(sparks.length>140)return; var a=Math.random()*6.2832,s=Math.random()*1.6+0.3; sparks.push({x:mx,y:my,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,r:Math.random()*2.4+1.2}); }
+    function spawn(){ if(sparks.length>140)return; var a=Math.random()*6.2832,s=Math.random()*1.6+0.3,col=colors[(Math.random()*colors.length)|0]; sparks.push({x:mx,y:my,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,r:Math.random()*2.4+1.2,col:col}); }
     window.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;spawn();},{passive:true});
     window.addEventListener('touchmove',function(e){var t=e.touches[0];if(t){mx=t.clientX;my=t.clientY;spawn();}},{passive:true});
     function frame(){
@@ -1575,7 +1575,7 @@
       }
       for(var k=sparks.length-1;k>=0;k--){ var s=sparks[k]; s.x+=s.vx; s.y+=s.vy; s.vx*=0.95; s.vy*=0.95; s.life-=0.022;
         if(s.life<=0){sparks.splice(k,1);continue;}
-        var sg=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*3); sg.addColorStop(0,hexA('#ffffff',s.life*0.85)); sg.addColorStop(1,'rgba(0,0,0,0)');
+        var sg=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*3); sg.addColorStop(0,hexA(s.col,s.life*0.9)); sg.addColorStop(1,'rgba(0,0,0,0)');
         ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(s.x,s.y,s.r*3,0,6.2832); ctx.fill(); }
       ctx.globalCompositeOperation='source-over';
       requestAnimationFrame(frame);
