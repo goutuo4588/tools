@@ -732,7 +732,7 @@
     el.addEventListener('click', ()=> showView(el.dataset.view));
   });
   // 首屏展示简介视图的动画
-  showView('intro');
+  showView(getCloudUser() ? 'intro' : 'me');
 
   // 复制邮箱
   const copyBtn = document.getElementById('copyBtn');
@@ -1510,6 +1510,7 @@
     var ac=document.getElementById('authClose'); if(ac) ac.onclick=closeAuth;
     var am=document.getElementById('authModal'); if(am) am.addEventListener('click', function(e){ if(e.target===am) closeAuth(); });
     renderUserPill();
+    if(!getCloudUser()){ openAuth('login'); }
   });
 </script>
 <div id="dlModal" class="dl-modal" hidden>
