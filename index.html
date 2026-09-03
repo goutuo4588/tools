@@ -206,6 +206,25 @@
   .me-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
   .me-fav{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
   .me-fav .chip{background:var(--c-lav);padding:8px 14px;border-radius:999px;font-size:14px;font-weight:600}
+  /* ============ 我的：云端个人中心 ============ */
+  .me-user{display:flex;align-items:center;gap:18px;margin-top:6px}
+  .me-avatar{width:62px;height:62px;border-radius:50%;flex:0 0 62px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow)}
+  .me-user .info h3{font-size:20px;margin:0 0 4px}
+  .me-user .info .em{color:var(--ink-soft);font-size:14px;word-break:break-all}
+  .me-user .info .uid{color:var(--ink-soft);font-size:12px;opacity:.7;margin-top:3px}
+  .me-stat{display:flex;gap:12px;margin-top:18px}
+  .me-stat .box{flex:1;text-align:center;background:rgba(255,255,255,.5);border-radius:16px;padding:14px 6px}
+  .me-stat .box b{display:block;font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .me-stat .box span{font-size:13px;color:var(--ink-soft)}
+  .me-mod{margin-top:20px}
+  .me-mod h4{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .me-act{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .me-act .btn2{flex:1;min-width:140px;padding:13px;border:0;border-radius:14px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;background:var(--ink);color:#fff;transition:.15s}
+  .me-act .btn2.ghost{background:rgba(35,37,43,.06);color:var(--ink)}
+  .me-act .btn2:hover{transform:translateY(-2px)}
+  .me-empty{color:var(--ink-soft);font-size:14px}
+  .me-login-cta{text-align:center;padding:20px 0}
+  .me-login-cta .big{font-size:34px;margin-bottom:6px}
   .card-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
   .act-btn{flex:1;min-width:66px;display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 6px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;border:1px solid rgba(35,37,43,.12);background:rgba(255,255,255,.7);font-family:inherit;color:var(--ink);transition:transform .18s,box-shadow .18s,background .18s}
   .act-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(35,37,43,.12)}
@@ -592,8 +611,7 @@
         <div class="wrap">
           <div class="eyebrow">Profile</div>
           <h2 class="title">我的</h2>
-          <div id="authBox"></div>
-          <div id="mePanel" style="display:none"></div>
+          <div id="mePanel" class="me-panel"></div>
 
           <!-- 站长后台已移至独立视图 view-admin（右下角浮动按钮进入） -->
 
@@ -804,7 +822,7 @@
                'cdrivecleanup':[{nick:'小鹿',rating:5,content:'C盘一下空出 20 多 G，安全校验也放心。',ts:Date.now()-172800000}],
                'openspeedy':[{nick:'Leo',rating:4,content:'单机游戏变速好用，绿色版即开即用。',ts:Date.now()-259200000}] };
 
-  let profile = LS.get(PROFILE_KEY, null);
+  let profile = getCloudUser() || LS.get(PROFILE_KEY, null);
   let favs = LS.get(FAV_KEY, []);
   let comments = LS.get(CMT_KEY, null); if (comments===null){ comments=SEED; LS.set(CMT_KEY, comments); }
   let stats = LS.get(STAT_KEY, {});
@@ -813,52 +831,49 @@
   let shares = LS.get(SHARE_KEY, {});    // {slug: 分享次数}
 
   // ---------- 我的：本机账号（登录/注册均为本地，无服务器校验） ----------
-  const authBox=document.getElementById('authBox'), mePanel=document.getElementById('mePanel');
-  function renderAuthForm(){
-    authBox.innerHTML='<div class="auth-wrap"><div class="auth-tabs">'+
-      '<button id="tabLogin" class="on">登录</button><button id="tabReg">注册</button></div>'+
-      '<div class="field"><input id="fEmail" type="email" placeholder="邮箱" autocomplete="email"></div>'+
-      '<div class="field"><input id="fNick" type="text" placeholder="昵称（注册时填）" style="display:none"></div>'+
-      '<div class="field"><input id="fPwd" type="password" placeholder="密码（仅本机，不少于6位）" autocomplete="current-password"></div>'+
-      '<button class="auth-btn" id="authSubmit">登录</button>'+
-      '<div class="auth-msg" id="authMsg"></div>'+
-      '<div style="font-size:12px;color:var(--ink-soft);margin-top:10px">提示：本站为纯静态站点，无需联网，账号与收藏仅保存在你这台设备上。</div></div>';
-    let mode='login';
-    const tL=authBox.querySelector('#tabLogin'), tR=authBox.querySelector('#tabReg');
-    tL.onclick=()=>{mode='login';tL.classList.add('on');tR.classList.remove('on');authBox.querySelector('#fNick').style.display='none';authBox.querySelector('#authSubmit').textContent='登录';authBox.querySelector('#authMsg').textContent='';};
-    tR.onclick=()=>{mode='register';tR.classList.add('on');tL.classList.remove('on');authBox.querySelector('#fNick').style.display='';authBox.querySelector('#authSubmit').textContent='注册';authBox.querySelector('#authMsg').textContent='';};
-    authBox.querySelector('#authSubmit').onclick=()=>{
-      const email=authBox.querySelector('#fEmail').value.trim();
-      const pwd=authBox.querySelector('#fPwd').value;
-      const nick=authBox.querySelector('#fNick').value.trim();
-      const msg=authBox.querySelector('#authMsg'); msg.className='auth-msg'; msg.textContent='';
-      if(!email||!pwd){msg.className='auth-msg err';msg.textContent='邮箱和密码必填';return;}
-      if(pwd.length<6){msg.className='auth-msg err';msg.textContent='密码至少6位';return;}
-      const users=LS.get('tp_users',{});
-      if(mode==='register'){
-        if(users[email]){msg.className='auth-msg err';msg.textContent='该邮箱已注册，请直接登录';return;}
-        users[email]={email,password:pwd,nickName:nick||email.split('@')[0]}; LS.set('tp_users',users);
-      } else {
-        if(!users[email]||users[email].password!==pwd){msg.className='auth-msg err';msg.textContent='邮箱或密码不正确';return;}
-      }
-      profile={email, nickName:(users[email]&&users[email].nickName)||nick||email.split('@')[0]};
-      LS.set(PROFILE_KEY, profile); msg.className='auth-msg ok'; msg.textContent='成功！';
-      refreshMe();
-    };
-  }
+  const mePanel=document.getElementById('mePanel');
+  // （旧本机注册表单已废弃：登录/注册现统一走云端账号体系 authModal，见 doLogin/doSignup）
   function renderMeFavs(){
     const chips=(favs||[]).map(s=>{const el=document.querySelector('.tool[data-slug="'+s+'"] h3');return el?'<span class="chip">'+el.textContent+'</span>':'';}).join('');
     const box=document.getElementById('meFavs'); if(box) box.innerHTML=(chips||'<span style="color:var(--ink-soft);font-size:14px">还没有收藏任何工具</span>');
   }
   function refreshMe(){
-    if(!profile){authBox.style.display='';mePanel.style.display='none';renderAuthForm();return;}
-    authBox.style.display='none';mePanel.style.display='';
-    mePanel.innerHTML='<div class="me-card"><h3>👋 '+profile.nickName+'</h3>'+
-      '<p style="color:var(--ink-soft);font-size:14px">'+profile.email+'</p>'+
-      '<div class="row"><b style="font-size:16px">我的收藏</b>'+
-      '<button class="auth-btn" style="width:auto;padding:9px 18px" id="logoutBtn">退出登录</button></div>'+
-      '<div class="me-fav" id="meFavs"></div></div>';
-    mePanel.querySelector('#logoutBtn').onclick=()=>{profile=null;LS.set(PROFILE_KEY,null);refreshMe();syncStars();};
+    if(!mePanel) return;
+    var u=getCloudUser();
+    if(!u){
+      mePanel.innerHTML='<div class="me-card me-login-cta"><div class="big">👤</div>'+
+        '<h3>欢迎来到工具铺</h3>'+
+        '<p class="auth-sub">登录后即可收藏工具、同步你的互动记录，并在任意设备用同一账号进入。</p>'+
+        '<button class="auth-btn" id="meLoginBtn" style="max-width:240px;margin:14px auto 0">登录 / 注册</button></div>';
+      mePanel.querySelector('#meLoginBtn').onclick=function(){ openAuth('login'); };
+      return;
+    }
+    var email=u.email||u.username||'';
+    var nick=email.split('@')[0]||'用户';
+    var initial=(nick[0]||'U').toUpperCase();
+    var dlTotal=0; Object.keys(stats).forEach(function(k){ dlTotal+=(stats[k].downloads||0); });
+    mePanel.innerHTML='<div class="me-card">'+
+      '<div class="me-user"><div class="me-avatar">'+escapeHtml(initial)+'</div>'+
+      '<div class="info"><h3>'+escapeHtml(nick)+'</h3><div class="em">'+escapeHtml(email)+'</div><div class="uid">UID：'+escapeHtml(u.uid||email)+'</div></div></div>'+
+      '<div class="me-stat">'+
+        '<div class="box"><b>'+(favs.length)+'</b><span>我的收藏</span></div>'+
+        '<div class="box"><b>'+dlTotal+'</b><span>我的下载</span></div>'+
+        '<div class="box"><b>'+(liked.length)+'</b><span>我的点赞</span></div>'+
+      '</div>'+
+      '<div class="me-mod"><h4>⭐ 我的收藏</h4><div class="me-fav" id="meFavs"></div></div>'+
+      '<div class="me-mod"><h4>🔐 账号与安全</h4>'+
+        '<div class="me-act">'+
+        '<button class="btn2" id="mePwdBtn">修改密码</button>'+
+        '<button class="btn2 ghost" id="meLogoutBtn">退出登录</button>'+
+        '</div></div>'+
+      '</div>';
+    mePanel.querySelector('#mePwdBtn').onclick=function(){ openAuth('forgot'); };
+    mePanel.querySelector('#meLogoutBtn').onclick=function(){
+      if(confirm('确定退出登录？')){
+        localStorage.removeItem(CLOUD_USER_KEY); profile=null; LS.set(PROFILE_KEY,null);
+        renderUserPill(); refreshMe(); syncStars(); toast('已退出');
+      }
+    };
     renderMeFavs(); syncStars();
   }
 
@@ -1246,6 +1261,7 @@
   const _showView=showView;
   showView=function(name){
     _showView(name);
+    if(name==='me'){ refreshMe(); }
     if(name==='tools'){
       document.querySelectorAll('.tool[data-slug]').forEach(card=>{
         const slug=card.dataset.slug;
@@ -1435,6 +1451,7 @@
     cbApi('verifyRegister', { email:email, code:code, password:pwd }).then(function(res){
       if(res.code!==0){ return msgErr(msg,'注册失败：'+(res.error||'未知错误')); }
       setCloudUser({ email: email, uid: res.uid||email });
+      profile=getCloudUser();
       renderUserPill(); renderAuthView('welcome');
     }).catch(function(e){ console.error('[signup]',e); msgErr(msg,'注册失败：'+errText(e)); });
   }
@@ -1446,6 +1463,7 @@
     cbApi('login', { email:email, password:pwd }).then(function(res){
       if(res.code!==0){ return msgErr(msg,'登录失败：'+(res.error||'邮箱或密码错误')); }
       setCloudUser({ email: email, uid: res.uid||email });
+      profile=getCloudUser();
       closeAuth(); renderUserPill(); toast('登录成功');
     }).catch(function(e){ console.error('[login]',e); msgErr(msg,'登录失败：'+errText(e)); });
   }
@@ -1488,7 +1506,7 @@
   }
   document.addEventListener('DOMContentLoaded', function(){
     var pill=document.getElementById('userPill');
-    if(pill){ pill.onclick=function(){ var u=getCloudUser(); if(u){ if(confirm('当前登录：'+(u.email||u.username)+'\n确定退出登录？')){ localStorage.removeItem(CLOUD_USER_KEY); renderUserPill(); toast('已退出'); } } else { openAuth('login'); } }; }
+    if(pill){ pill.onclick=function(){ var u=getCloudUser(); if(u){ if(confirm('当前登录：'+(u.email||u.username)+'\n确定退出登录？')){ localStorage.removeItem(CLOUD_USER_KEY); profile=null; LS.set(PROFILE_KEY,null); renderUserPill(); refreshMe(); toast('已退出'); } } else { openAuth('login'); } }; }
     var ac=document.getElementById('authClose'); if(ac) ac.onclick=closeAuth;
     var am=document.getElementById('authModal'); if(am) am.addEventListener('click', function(e){ if(e.target===am) closeAuth(); });
     renderUserPill();
