@@ -358,6 +358,71 @@
   <!-- CloudBase Web SDK 已弃用：账号体系改用云函数 HTTP 后端(cbApi) -->
 </head>
 <body>
+<script>
+/* ===== 下载中心：置于 body 首位，完全自包含，不依赖任何后续脚本 ===== */
+(function(){
+var MIRRORS=[
+  {name:'🐢 GitHub 官方（直连 CDN）', base:''},
+  {name:'⚡ 高速源① gh-proxy', base:'https://gh-proxy.com/'},
+  {name:'⚡ 高速源② ghfast',   base:'https://ghfast.top/'},
+  {name:'⚡ 高速源③ xxooo',    base:'https://gh.xxooo.cf/'}
+];
+var REL='https://github.com/goutuo4588/tools/releases/download/';
+var DL={
+  'douyin-helper':{name:'抖音辅助器',files:[
+    {label:'电脑版 · 111MB', url:REL+'douyin-helper-v1.0/douyin-pc.exe'},
+    {label:'标准版 · 50MB',  url:REL+'douyin-helper-v1.0/douyin-standard.exe'}
+  ]},
+  'cdrivecleanup':{name:'CDriveCleanup',files:[
+    {label:'v1.0 压缩包 · 44MB', url:REL+'cdrivecleanup-v1.0/CDriveCleanup-v1.0.zip'}
+  ]},
+  'openspeedy':{name:'OpenSpeedy',files:[
+    {label:'v3.3.8 便携版 · 5MB', url:REL+'openspeedy-v3.3.8/OpenSpeedy-3.3.8-portable-signed.zip'}
+  ]},
+  'watt-toolkit':{name:'Watt Toolkit',files:[
+    {label:'Steam++ v3.1.0 绿色版 · 90MB', url:REL+'watt-toolkit-v3.1.0/Steam++_v3.1.0_win_x64.7z'}
+  ]},
+  'wireshark':{name:'Wireshark',files:[
+    {label:'v4.6.8 安装包 · 94MB', url:REL+'wireshark-v4.6.8/Wireshark-4.6.8-x64.exe'}
+  ]},
+  'geek':{name:'Geek Uninstaller',files:[
+    {label:'便携版 · 7MB', url:REL+'geek-uninstaller-portable/geek.exe'}
+  ]}
+};
+function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+function mirUrl(base,url){ return base ? base+encodeURI(url) : url; }
+function startDl(base,url){
+  var target=mirUrl(base,url);
+  var w=window.open(target,'_blank');
+  if(!w){ window.location.href=target; }
+}
+function openDl(slug){
+  var d=DL[slug];
+  var body=document.getElementById('dlBody');
+  var modal=document.getElementById('dlModal');
+  if(!d||!body||!modal){ alert('下载面板未就绪，请刷新页面重试'); return; }
+  var h='';
+  d.files.forEach(function(f){
+    var tag=f.url.slice(REL.length).split('/')[0];
+    var man='https://github.com/goutuo4588/tools/releases/tag/'+tag;
+    var u=esc(f.url);
+    h+='<div class="dl-file"><div class="dl-fname">📦 '+f.label+'</div>';
+    h+='<button class="dl-src on" onclick="startDl(\'\',\''+u+'\')">🐢 官方直连下载</button>';
+    MIRRORS.slice(1).forEach(function(m){
+      h+='<button class="dl-src" onclick="startDl(\''+esc(m.base)+'\',\''+u+'\')">'+m.name+'</button>';
+    });
+    h+='<a class="dl-man" href="'+man+'" target="_blank" rel="noopener">下载没反应？点此打开发布页手动下载 ↗</a>';
+    h+='</div>';
+  });
+  body.innerHTML=h;
+  var t=document.getElementById('dlTitle'); if(t) t.textContent=d.name+' · 下载中心';
+  modal.hidden=false;
+}
+function closeDl(){ var m=document.getElementById('dlModal'); if(m) m.hidden=true; }
+window.startDl=startDl; window.closeDl=closeDl; window.openDl=openDl;
+window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
+})();
+</script>
 
 <canvas id="liquid-bg"></canvas>
 
@@ -462,7 +527,7 @@
                 <span class="tag">免安装</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" target="_blank" rel="noopener" onclick="try{openDl('douyin-helper');}catch(e){}return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="douyin-helper" data-fallback="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('douyin-helper');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
               </div>
               <ul class="note">
@@ -483,7 +548,7 @@
                 <span class="tag">安全保护</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" target="_blank" rel="noopener" onclick="try{openDl('cdrivecleanup');}catch(e){}return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="cdrivecleanup" data-fallback="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdrivecleanup');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">查看仓库</a>
               </div>
               <ul class="note">
@@ -528,7 +593,7 @@
                 <span class="tag">GPL-3.0</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" target="_blank" rel="noopener" onclick="try{openDl('openspeedy');}catch(e){}return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="openspeedy" data-fallback="https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('openspeedy');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/openspeedy-v3.3.8','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/game1024/OpenSpeedy" target="_blank" rel="noopener">项目主页</a>
               </div>
               <ul class="note">
@@ -549,7 +614,7 @@
                 <span class="tag">开源</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" target="_blank" rel="noopener" onclick="try{openDl('watt-toolkit');}catch(e){}return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="watt-toolkit" data-fallback="https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('watt-toolkit');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/watt-toolkit-v3.1.0','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://github.com/BeyondDimension/SteamTools" target="_blank" rel="noopener">项目主页</a>
               </div>
               <ul class="note">
@@ -571,7 +636,7 @@
                 <span class="tag">GPL-2.0</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" target="_blank" rel="noopener" onclick="try{openDl('wireshark');}catch(e){}return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="wireshark" data-fallback="https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('wireshark');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/wireshark-v4.6.8','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://www.wireshark.org/" target="_blank" rel="noopener">官方网站</a>
               </div>
               <ul class="note">
@@ -593,7 +658,7 @@
                 <span class="tag">免安装</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" target="_blank" rel="noopener" onclick="try{openDl('geek');}catch(e){}return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="geek" data-fallback="https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('geek');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/geek-uninstaller-portable','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://geekuninstaller.com/" target="_blank" rel="noopener">官方网站</a>
               </div>
               <ul class="note">
@@ -900,7 +965,7 @@
       const st=document.createElement('div');st.className='card-stats';st.dataset.slug=slug;
       st.innerHTML='<span>👁 <b class="v">0</b> 浏览</span><span>⬇ <b class="d">0</b> 下载</span><span>👍 <b class="k">0</b> 赞</span><span>🔗 <b class="sh">0</b> 分享</span>';
       card.appendChild(st);
-      const dl=card.querySelector('.dl-main');if(dl)dl.addEventListener('click',e=>{ if(DL[slug]){ e.preventDefault(); bumpStat(slug,'downloads'); openDl(slug); } });
+      const dl=card.querySelector('.dl-main');if(dl)dl.addEventListener('click',e=>{ e.preventDefault(); bumpStat(slug,'downloads'); }); // 弹窗由内联 onclick + body 首位下载脚本负责
       acts.querySelector('.cm-btn').onclick=()=>openComments(slug);
       acts.querySelector('.fav-star').onclick=()=>toggleFav(slug);
       acts.querySelector('.like-btn').onclick=()=>toggleLike(slug);
@@ -1537,69 +1602,7 @@
   }catch(e){}
 })();
 </script>
-<script>
-/* ===== 下载中心：独立顶层脚本，全局可用，不依赖主 IIFE 是否报错 ===== */
-(function(){
-const MIRRORS=[
-  {name:'🐢 GitHub 官方（直连 CDN）', base:''},
-  {name:'⚡ 高速源① gh-proxy', base:'https://gh-proxy.com/'},
-  {name:'⚡ 高速源② ghfast',   base:'https://ghfast.top/'},
-  {name:'⚡ 高速源③ xxooo',    base:'https://gh.xxooo.cf/'}
-];
-const REL='https://github.com/goutuo4588/tools/releases/download/';
-const DL={
-  'douyin-helper':{name:'抖音辅助器',files:[
-    {label:'电脑版 · 111MB', url:REL+'douyin-helper-v1.0/douyin-pc.exe'},
-    {label:'标准版 · 50MB',  url:REL+'douyin-helper-v1.0/douyin-standard.exe'}
-  ]},
-  'cdrivecleanup':{name:'CDriveCleanup',files:[
-    {label:'v1.0 压缩包 · 44MB', url:REL+'cdrivecleanup-v1.0/CDriveCleanup-v1.0.zip'}
-  ]},
-  'openspeedy':{name:'OpenSpeedy',files:[
-    {label:'v3.3.8 便携版 · 5MB', url:REL+'openspeedy-v3.3.8/OpenSpeedy-3.3.8-portable-signed.zip'}
-  ]},
-  'watt-toolkit':{name:'Watt Toolkit',files:[
-    {label:'Steam++ v3.1.0 绿色版 · 90MB', url:REL+'watt-toolkit-v3.1.0/Steam++_v3.1.0_win_x64.7z'}
-  ]},
-  'wireshark':{name:'Wireshark',files:[
-    {label:'v4.6.8 安装包 · 94MB', url:REL+'wireshark-v4.6.8/Wireshark-4.6.8-x64.exe'}
-  ]},
-  'geek':{name:'Geek Uninstaller',files:[
-    {label:'便携版 · 7MB', url:REL+'geek-uninstaller-portable/geek.exe'}
-  ]}
-};
-function mirUrl(base,url){ return base ? base+encodeURI(url) : url; }
-function startDl(base,url){
-  const target=mirUrl(base,url);
-  const w=window.open(target,'_blank');
-  if(!w){ window.location.href=target; }
-}
-function openDl(slug){
-  const d=DL[slug]; if(!d) return;
-  const body=document.getElementById('dlBody');
-  let h='';
-  d.files.forEach(f=>{
-    const tag=f.url.slice(REL.length).split('/')[0];
-    const man='https://github.com/goutuo4588/tools/releases/tag/'+tag;
-    const u=f.url.replace(/'/g,'&#39;');
-    h+='<div class="dl-file"><div class="dl-fname">📦 '+f.label+'</div>';
-    h+='<button class="dl-src on" onclick="startDl(\'\',\''+u+'\')">🐢 官方直连下载</button>';
-    MIRRORS.slice(1).forEach(function(m){
-      const b=m.base.replace(/'/g,'&#39;');
-      h+='<button class="dl-src" onclick="startDl(\''+b+'\',\''+u+'\')">'+m.name+'</button>';
-    });
-    h+='<a class="dl-man" href="'+man+'" target="_blank" rel="noopener">下载没反应？点此打开发布页手动下载 ↗</a>';
-    h+='</div>';
-  });
-  body.innerHTML=h;
-  document.getElementById('dlTitle').textContent=d.name+' · 下载中心';
-  document.getElementById('dlModal').hidden=false;
-}
-function closeDl(){ document.getElementById('dlModal').hidden=true; }
-window.startDl=startDl; window.closeDl=closeDl; window.openDl=openDl;
-  window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
-})();
-</script>
+
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-03T20:05:40Z -->
+<!-- deploy cache-bust 2026-09-03T15:20:22Z -->
