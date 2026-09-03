@@ -306,6 +306,8 @@
 .dl-src{display:block;width:100%;margin:6px 0;padding:11px 12px;border:1px solid #e4e0f2;border-radius:11px;background:#faf9ff;color:#4a4775;font-size:14px;text-align:left;cursor:pointer;transition:.15s}
 .dl-src:hover{background:#6c5ce7;color:#fff;border-color:#6c5ce7}
   .dl-src.on{background:#6c5ce7;color:#fff;border-color:#6c5ce7}
+  .dl-man{display:inline-block;margin-top:8px;font-size:13px;color:#6c5ce7;text-decoration:none;font-weight:600}
+  .dl-man:hover{text-decoration:underline}
 
   /* ============ 网站账号（云后端：LeanCloud） ============ */
   .user-pill{position:fixed;right:22px;top:22px;z-index:60;display:flex;align-items:center;gap:8px;
@@ -1279,10 +1281,10 @@
 
   // ---------- 下载中心：多镜像加速兜底（国内陌生电脑点一下直接下） ----------
   const MIRRORS=[
+    {name:'🐢 GitHub 官方（直连 CDN）', base:''},
     {name:'⚡ 高速源① gh-proxy', base:'https://gh-proxy.com/'},
     {name:'⚡ 高速源② ghfast',   base:'https://ghfast.top/'},
-    {name:'⚡ 高速源③ xxooo',    base:'https://gh.xxooo.cf/'},
-    {name:'🐢 GitHub 官方（可能极慢/失败）', base:''}
+    {name:'⚡ 高速源③ xxooo',    base:'https://gh.xxooo.cf/'}
   ];
   const REL='https://github.com/goutuo4588/tools/releases/download/';
   const DL={
@@ -1307,17 +1309,26 @@
     ]}
   };
   function mirUrl(base,url){ return base ? base+encodeURI(url) : url; }
-  function startDl(base,url){ window.location.href = mirUrl(base,url); }
+  function startDl(base,url){
+    const target=mirUrl(base,url);
+    const w=window.open(target,'_blank');
+    if(!w){ window.location.href=target; }
+  }
   function openDl(slug){
     const d=DL[slug]; if(!d) return;
     const body=document.getElementById('dlBody');
     let h='';
     d.files.forEach(f=>{
+      const tag=f.url.slice(REL.length).split('/')[0];
+      const man='https://github.com/goutuo4588/tools/releases/tag/'+tag;
+      const u=f.url.replace(/'/g,'&#39;');
       h+='<div class="dl-file"><div class="dl-fname">📦 '+f.label+'</div>';
-      MIRRORS.forEach((m,i)=>{
-        const b=m.base.replace(/'/g,'&#39;'), u=f.url.replace(/'/g,'&#39;');
-        h+='<button class="dl-src'+(i<3?' on':'')+'" onclick="startDl(\''+b+'\',\''+u+'\')">'+m.name+'</button>';
+      h+='<button class="dl-src on" onclick="startDl(\'\',\''+u+'\')">🐢 官方直连下载</button>';
+      MIRRORS.slice(1).forEach(function(m){
+        const b=m.base.replace(/'/g,'&#39;');
+        h+='<button class="dl-src" onclick="startDl(\''+b+'\',\''+u+'\')">'+m.name+'</button>';
       });
+      h+='<a class="dl-man" href="'+man+'" target="_blank" rel="noopener">下载没反应？点此打开发布页手动下载 ↗</a>';
       h+='</div>';
     });
     body.innerHTML=h;
@@ -1325,6 +1336,7 @@
     document.getElementById('dlModal').hidden=false;
   }
   function closeDl(){ document.getElementById('dlModal').hidden=true; }
+  window.startDl=startDl; window.closeDl=closeDl;
 
   // ---------- 网站账号（LeanCloud 云后端：短信注册 / 登录 / 找回密码） ----------
   function toast(msg){
@@ -1529,7 +1541,7 @@
   <div class="dl-card">
     <button class="dl-x" onclick="closeDl()" aria-label="关闭">×</button>
     <h3 id="dlTitle">下载中心</h3>
-    <p class="dl-tip">国内网络下请优先点「⚡ 高速源」。GitHub 官方源可能极慢或失败，高速源全部失败时可再尝试。</p>
+    <p class="dl-tip">优先点「🐢 官方直连下载」；若速度慢或失败，可换下方「⚡ 高速源」镜像。仍无反应就点最下方的发布页手动下载 ↗</p>
     <div id="dlBody"></div>
   </div>
 </div>
