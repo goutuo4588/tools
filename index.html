@@ -434,7 +434,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-19T15:45:51Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-09-20T04:25:55Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -957,7 +957,11 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   };
   const PROFILE_KEY='tp_profile', FAV_KEY='tp_favs', CMT_KEY='tp_comments', STAT_KEY='tp_stats', ADMIN_KEY='tp_admin';
   const LIKE_KEY='tp_likes', LIKED_KEY='tp_liked', SHARE_KEY='tp_shares';
-  const ADMIN_USER='admin', ADMIN_PWD='a9727d9752dadada';
+  const ADMIN_USER='admin';
+  /* 安全修复：管理员口令绝不硬编码进源码（旧版明文写死，任何人 F12 即可拿到并调后端
+     列出全部注册用户邮箱 / 重置他人密码）。现在口令由站长在登录框输入，校验交给云函数
+     比对环境变量 ADMIN_PWD，前端只在 sessionStorage 暂存（关闭标签页即失效）。 */
+  var adminPwd=sessionStorage.getItem('tp_admin_pwd')||'';
 
   // ====== LeanCloud 后端配置（站长填入后生效）======
   // 控制台「设置 → 应用 Key」里拿 App ID / App Key；
@@ -1158,12 +1162,22 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       const pwd=adminBox.querySelector('#aPwd').value;
       const msg=adminBox.querySelector('#aMsg');msg.className='auth-msg';msg.textContent='';
       if(!user||!pwd){msg.className='auth-msg err';msg.textContent='请输入账号和密码';return;}
-      if(user===ADMIN_USER&&pwd===ADMIN_PWD){adminToken='1';localStorage.setItem(ADMIN_KEY,adminToken);refreshAdmin();}
-      else{msg.className='auth-msg err';msg.textContent='账号或密码错误';}
+      if(user!==ADMIN_USER){msg.className='auth-msg err';msg.textContent='账号或密码错误';return;}
+      // 口令交给云函数校验，前端不再持有明文
+      msg.className='auth-msg';msg.textContent='正在校验…';
+      cbApi('adminListUsers',{adminPwd:pwd}).then(function(res){
+        if(res && res.code!==401 && res.code!==403 && !res.error){
+          adminPwd=pwd; try{sessionStorage.setItem('tp_admin_pwd',pwd);}catch(e){}
+          adminToken='1'; localStorage.setItem(ADMIN_KEY,adminToken); refreshAdmin();
+        }else{ msg.className='auth-msg err'; msg.textContent='账号或密码错误'; }
+      }).catch(function(e){ msg.className='auth-msg err'; msg.textContent='校验失败：'+((e&&e.message)||'后端不可用'); });
     };
   }
   function refreshAdmin(){
-    if(!adminToken){adminBox.style.display='';adminPanel.style.display='none';renderAdminLogin();return;}
+    // 新标签页里 sessionStorage 没有口令 → 必须重新登录，避免"已登录但调不动后端"的半残状态
+    if(!adminToken||!adminPwd){adminToken='';adminPwd='';localStorage.removeItem(ADMIN_KEY);
+      try{sessionStorage.removeItem('tp_admin_pwd');}catch(e){}
+      adminBox.style.display='';adminPanel.style.display='none';renderAdminLogin();return;}
     adminBox.style.display='none';adminPanel.style.display='';
     const totalV=Object.values(stats).reduce((s,x)=>s+((x&&x.views)||0),0);
     const totalD=Object.values(stats).reduce((s,x)=>s+((x&&x.downloads)||0),0);
@@ -1188,7 +1202,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       '<h3 style="margin-top:18px">本机账号</h3><div id="aUsers" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">网站注册用户（云端 · 短信注册）</h3><div id="aCloudUsers" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
-    adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';localStorage.removeItem(ADMIN_KEY);refreshAdmin();};
+    adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';adminPwd='';localStorage.removeItem(ADMIN_KEY);try{sessionStorage.removeItem('tp_admin_pwd');}catch(e){}refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
     adminPanel.querySelector('#aReport').onclick=openReport;
     loadAdminInteract();loadAdminUsers();loadAdminComments();loadCloudUsers();
@@ -1594,7 +1608,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     var el=document.getElementById('aCloudUsers'); if(!el) return;
     if(!CB_ENABLED){ el.innerHTML='<span style="color:var(--ink-soft)">后端未配置：站长需在 index.html 填入云函数 HTTP 访问地址(API_BASE)，并在 CloudBase 部署 cloud/ 云函数。</span>'; return; }
     el.innerHTML='<span style="color:var(--ink-soft)">加载中…</span>';
-    cbApi('adminListUsers', { adminPwd: ADMIN_PWD }).then(function(res){
+    cbApi('adminListUsers', { adminPwd: adminPwd }).then(function(res){
       if(res.code!==0){ el.innerHTML='<span style="color:#e0443e">读取失败：'+(res.error||'无权限')+'</span>'; return; }
       var list=res.result||[];
       if(!list.length){ el.innerHTML='<span style="color:var(--ink-soft)">暂无注册用户</span>'; return; }
@@ -1610,7 +1624,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
           var un=b.getAttribute('data-u'); var np=prompt('为 '+un+' 设置新密码（8-32位，含字母和数字）：'); if(!np) return;
           if(!/^(?=.*[a-zA-Z])(?=.*\d).{8,32}$/.test(np)){ alert('密码需 8-32 位且同时含字母和数字'); return; }
           b.disabled=true;
-          cbApi('adminResetPassword', { adminPwd: ADMIN_PWD, email: un, newPwd: np }).then(function(r){
+          cbApi('adminResetPassword', { adminPwd: adminPwd, email: un, newPwd: np }).then(function(r){
             if(r.code!==0){ alert('重置失败：'+(r.error||'未知错误')); b.disabled=false; }
             else { alert('已重置为：'+np+'\n请通过你方便的方式把这个新密码告诉该用户。'); loadCloudUsers(); }
           }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
@@ -1741,4 +1755,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-19T15:45:51Z -->
+<!-- deploy cache-bust 2026-09-20T04:25:55Z -->
