@@ -149,6 +149,9 @@
     -webkit-backdrop-filter:blur(12px) saturate(150%);
   }
   .tool:hover{transform:translateY(-6px)}
+  .tool.coming-soon{opacity:.62;border-style:dashed}
+  .tool.coming-soon:hover{transform:none}
+  .tool.coming-soon .tool-icon{filter:grayscale(.3)}
   .tool-icon{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;
     font-size:30px;margin-bottom:18px}
   .tool h3{font-size:22px;font-weight:800;margin-bottom:6px}
@@ -625,6 +628,25 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
                 <li><b>本人作品</b> · 源码已开源在上方仓库</li>
                 <li><b>.exe 可执行文件</b> · 下载压缩包解压后运行主程序，无需安装</li>
               </ul>
+            </article>
+
+          </div>
+
+          <!-- 模块二：手机端工具（板块保留，工具下架中） -->
+          <div class="subhead">
+            <span class="sub-dot" style="background:var(--c-peach)"></span>
+            <h3>📱 手机端工具</h3>
+            <p>Android 端小工具，装上就能用。更多工具正在打磨，上架后第一时间更新。</p>
+          </div>
+
+          <div class="tool-grid">
+
+            <!-- 占位：手机端工具下架中 -->
+            <article class="tool coming-soon">
+              <div class="tool-icon" style="background:var(--c-peach)">🛠️</div>
+              <h3>敬请期待</h3>
+              <div class="ver">开发中</div>
+              <p>手机端工具正在完善中，重新上架后会在这里出现。先看看电脑端工具与开源免费工具吧～</p>
             </article>
 
           </div>
