@@ -132,6 +132,14 @@
   .subhead{display:flex;align-items:center;gap:12px;margin-top:54px;flex-wrap:wrap}
   .subhead h3{font-size:21px;font-weight:800;margin:0}
   .subhead p{margin:0;color:var(--ink-soft);font-size:14px}
+  /* 工具搜索 / 筛选 */
+  .tool-search{display:flex;align-items:center;gap:12px;margin-top:24px;flex-wrap:wrap}
+  .tool-search input{flex:1;min-width:240px;padding:12px 16px;border:1px solid rgba(35,37,43,.12);
+    border-radius:14px;background:rgba(255,255,255,.75);font-family:inherit;font-size:15px;
+    color:var(--ink);outline:none;transition:border-color .15s, box-shadow .15s}
+  .tool-search input:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(91,141,239,.15)}
+  .ts-count{font-size:13px;color:var(--ink-soft)}
+  .tool.hide{display:none !important}
   .sub-dot{width:12px;height:12px;border-radius:50%;display:inline-block}
   .tool{
     background:rgba(255,255,255,.72);border-radius:24px;padding:30px;box-shadow:var(--shadow);
@@ -437,7 +445,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-20T04:37:25Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-09-20T04:38:55Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -592,6 +600,11 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
           <div class="eyebrow">Toolbox</div>
           <h2 class="title">工具集合</h2>
           <p class="lead">分三个模块：电脑端工具、手机端工具、开源免费工具。点击下载会跳转到 GitHub 仓库的对应发布页。</p>
+
+          <div class="tool-search">
+            <input id="toolSearch" type="search" placeholder="搜索工具：名称 / 用途 / 标签，例如「C盘」「变速」「抖音」「抓包」" autocomplete="off">
+            <span id="toolSearchCount" class="ts-count"></span>
+          </div>
 
           <!-- 模块一：电脑端工具 -->
           <div class="subhead">
@@ -1683,6 +1696,36 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       });
     }).catch(function(e){ el.innerHTML='<span style="color:#e0443e">网络错误：'+errText(e)+'</span>'; });
   }
+  // ---------- 工具搜索 / 筛选（按名称、描述、标签匹配，实时隐藏不相关卡片） ----------
+  (function(){
+    var inp=document.getElementById('toolSearch');
+    var cnt=document.getElementById('toolSearchCount');
+    if(!inp) return;
+    function norm(s){ return String(s||'').toLowerCase(); }
+    function apply(){
+      var q=norm(inp.value.trim());
+      var cards=document.querySelectorAll('.tool[data-slug]');
+      var shown=0;
+      Array.prototype.forEach.call(cards,function(c){
+        var hit = !q || norm(c.textContent).indexOf(q)>=0;
+        c.classList.toggle('hide', !hit);
+        if(hit) shown++;
+      });
+      // 某个模块下全部不匹配时，连模块标题一起隐藏
+      Array.prototype.forEach.call(document.querySelectorAll('.subhead'), function(sh){
+        var g=sh.nextElementSibling;
+        if(!g||!g.classList.contains('tool-grid')) return;
+        var any=Array.prototype.some.call(g.querySelectorAll('.tool[data-slug]'),function(c){return !c.classList.contains('hide');});
+        var vis=(!q)||any;
+        sh.style.display=vis?'':'none';
+        g.style.display=vis?'':'none';
+      });
+      if(cnt) cnt.textContent = q ? ('匹配到 '+shown+' 个工具') : '';
+    }
+    inp.addEventListener('input', apply);
+    inp.addEventListener('keydown', function(e){ if(e.key==='Escape'){ inp.value=''; apply(); } });
+  })();
+
   document.addEventListener('DOMContentLoaded', function(){
     var pill=document.getElementById('userPill');
     if(pill){ pill.onclick=function(){ var u=getCloudUser(); if(u){ if(confirm('当前登录：'+(u.email||u.username)+'\n确定退出登录？')){ localStorage.removeItem(CLOUD_USER_KEY); profile=null; LS.set(PROFILE_KEY,null); renderUserPill(); refreshMe(); toast('已退出'); } } else { openAuth('login', true); } }; }
@@ -1807,4 +1850,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-20T04:37:25Z -->
+<!-- deploy cache-bust 2026-09-20T04:38:55Z -->
