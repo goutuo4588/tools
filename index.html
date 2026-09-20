@@ -437,7 +437,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-20T04:30:01Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-09-20T04:33:45Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1012,6 +1012,32 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   let liked = LS.get(LIKED_KEY, []);     // 本机已点赞的工具（可取消）
   let shares = LS.get(SHARE_KEY, {});    // {slug: 分享次数}
 
+  /* ===== 全站计数同步 =====
+     计数以服务端为准：任何访客点赞/浏览/下载都会累加到云端，所有人看到同一份数字。
+     后端还没部署 getCounts/bump 时会自动退回本机数据（静默，不报错、不影响使用）。 */
+  var countsCloud = false;
+  function applyCounts(res){
+    if(!res) return;
+    if(res.likes)  likes  = res.likes;
+    if(res.shares) shares = res.shares;
+    if(res.stats)  stats  = res.stats;
+    try{ LS.set(LIKE_KEY,likes); LS.set(SHARE_KEY,shares); LS.set(STAT_KEY,stats); }catch(e){}
+    TOOL_SLUGS.forEach(function(s){ try{ loadStats(s); }catch(e){} });
+    try{ syncLikes(); }catch(e){}
+  }
+  function cloudBump(slug, kind, delta){
+    if(!CB_ENABLED) return;
+    cbApi('bump',{slug:slug,kind:kind,delta:(delta===undefined?1:delta)}).then(function(r){
+      if(r && r.code===0){ countsCloud=true; applyCounts(r.result); }
+    }).catch(function(){});   // 后端暂不支持 → 静默保持本机计数
+  }
+  function cloudLoadCounts(){
+    if(!CB_ENABLED) return;
+    cbApi('getCounts',{}).then(function(r){
+      if(r && r.code===0){ countsCloud=true; applyCounts(r.result); }
+    }).catch(function(){});
+  }
+
   // ---------- 我的：本机账号（登录/注册均为本地，无服务器校验） ----------
   const mePanel=document.getElementById('mePanel');
   // （旧本机注册表单已废弃：登录/注册现统一走云端账号体系 authModal，见 doLogin/doSignup）
@@ -1083,7 +1109,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     });
   }
   function popBtn(sel){document.querySelectorAll(sel).forEach(b=>{b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');setTimeout(()=>b.classList.remove('pop'),400);});}
-  function bumpStat(slug,key){stats[slug]=stats[slug]||{views:0,downloads:0};stats[slug][key]=(stats[slug][key]||0)+1;LS.set(STAT_KEY,stats);loadStats(slug);}
+  function bumpStat(slug,key){stats[slug]=stats[slug]||{views:0,downloads:0};stats[slug][key]=(stats[slug][key]||0)+1;LS.set(STAT_KEY,stats);loadStats(slug);cloudBump(slug,key,1);}
   function loadStats(slug){
     const s=stats[slug]||{views:0,downloads:0};
     const el=document.querySelector('.card-stats[data-slug="'+slug+'"]');if(!el)return;
@@ -1119,6 +1145,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     else{liked.push(slug);likes[slug]=(likes[slug]||0)+1;}
     LS.set(LIKED_KEY,liked);LS.set(LIKE_KEY,likes);
     syncLikes();popBtn('.like-btn[data-slug="'+slug+'"]');
+    cloudBump(slug,'likes', i>=0 ? -1 : 1);   // 取消赞也同步到全站
     if(adminToken)refreshAdmin();
   }
   function shareTool(slug){
@@ -1126,6 +1153,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     const link=location.origin+location.pathname+'#'+slug;
     const text=name+' — 具坊：'+link;
     shares[slug]=(shares[slug]||0)+1;LS.set(SHARE_KEY,shares);loadStats(slug);
+    cloudBump(slug,'shares',1);
     popBtn('.share-btn[data-slug="'+slug+'"]');
     if(adminToken)refreshAdmin();
     const done=()=>{const b=document.querySelector('.share-btn[data-slug="'+slug+'"] .txt');if(b){b.textContent='已复制';setTimeout(()=>b.textContent='分享',1600);}};
@@ -1244,6 +1272,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       stats[s]={views:0,downloads:0};likes[s]=0;shares[s]=0;
       const i=liked.indexOf(s);if(i>=0)liked.splice(i,1);
       LS.set(STAT_KEY,stats);LS.set(LIKE_KEY,likes);LS.set(SHARE_KEY,shares);LS.set(LIKED_KEY,liked);
+      if(CB_ENABLED&&adminPwd){cbApi('adminResetCounts',{adminPwd:adminPwd,slug:s}).catch(function(){});}
       syncLikes();refreshAdmin();
     });
   }
@@ -1660,6 +1689,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     var ac=document.getElementById('authClose'); if(ac) ac.onclick=closeAuth;
     var am=document.getElementById('authModal'); if(am) am.addEventListener('click', function(e){ if(e.target===am) closeAuth(); });
     renderUserPill();
+    cloudLoadCounts();          // 拉取全站计数（后端未部署时静默退回本机数据）
     if(!getCloudUser()){ openAuth('login', true); }
   });
 </script>
@@ -1777,4 +1807,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-20T04:30:01Z -->
+<!-- deploy cache-bust 2026-09-20T04:33:45Z -->
