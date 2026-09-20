@@ -385,10 +385,6 @@ var MIRRORS=[
 ];
 var REL='https://github.com/goutuo4588/tools/releases/download/';
 var DL={
-  'douyin-helper':{name:'抖音辅助器',files:[
-    {label:'电脑版 · 111MB', url:REL+'douyin-helper-v1.0/douyin-pc.exe'},
-    {label:'标准版 · 50MB',  url:REL+'douyin-helper-v1.0/douyin-standard.exe'}
-  ]},
   'cdrivecleanup':{name:'CDriveCleanup',files:[
     {label:'v1.0 压缩包 · 44MB', url:REL+'cdrivecleanup-v1.0/CDriveCleanup-v1.0.zip'}
   ]},
@@ -403,9 +399,6 @@ var DL={
   ]},
   'geek':{name:'Geek Uninstaller',files:[
     {label:'便携版 · 7MB', url:REL+'geek-uninstaller-portable/geek.exe'}
-  ]},
-  'gesture-brush':{name:'手势刷',files:[
-    {label:'手机版 APK · 55MB（Android）', url:REL+'douyin-helper-android-v1.0/DouyinHelper.apk'}
   ]}
 };
 function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
@@ -445,7 +438,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-20T04:38:55Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-09-20T16:03:03Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -613,30 +606,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
             <p>我自己写的 Windows 小工具，绿色免安装，源码都在仓库里。</p>
           </div>
 
-          <div class="tool-grid">
-
-            <!-- 工具 1：抖音辅助器 -->
-            <article class="tool" data-slug="douyin-helper">
-              <div class="tool-icon" style="background:var(--c-peach)">🎬</div>
-              <h3>抖音辅助器</h3>
-              <div class="ver">电脑版 · v1.0</div>
-              <p>抖音电脑端的辅助小工具，把重复、机械的操作交给它，省时省力。内含「电脑版」与「标准版」两个可执行文件，按需取用。</p>
-              <div class="tags">
-                <span class="tag">Windows</span>
-                <span class="tag">自包含</span>
-                <span class="tag">免安装</span>
-              </div>
-              <div class="tool-links">
-                <a class="dl dl-main" href="javascript:void(0)" data-slug="douyin-helper" data-fallback="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('douyin-helper');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/douyin-helper-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
-                <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">源码 ↗</a>
-              </div>
-              <ul class="note">
-                <li><b>本人作品</b> · 源码已开源在上方仓库</li>
-                <li><b>.exe 可执行文件</b> · 到 Releases 页面选取对应版本下载，双击即用</li>
-              </ul>
-            </article>
-
-            <!-- 工具 2：CDriveCleanup -->
+          <div class="tool-grid"><!-- 工具 2：CDriveCleanup -->
             <article class="tool" data-slug="cdrivecleanup">
               <div class="tool-icon" style="background:var(--c-mint)">💾</div>
               <h3>CDriveCleanup</h3>
@@ -654,38 +624,6 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
               <ul class="note">
                 <li><b>本人作品</b> · 源码已开源在上方仓库</li>
                 <li><b>.exe 可执行文件</b> · 下载压缩包解压后运行主程序，无需安装</li>
-              </ul>
-            </article>
-
-          </div>
-
-          <!-- 模块二：手机端工具 -->
-          <div class="subhead">
-            <span class="sub-dot" style="background:var(--c-peach)"></span>
-            <h3>📱 手机端工具</h3>
-            <p>Android 端小工具，装上就能用。</p>
-          </div>
-
-          <div class="tool-grid">
-
-            <!-- 手机端：手势刷 -->
-            <article class="tool" data-slug="gesture-brush">
-              <div class="tool-icon" style="background:var(--c-butter)">📱</div>
-              <h3>手势刷</h3>
-              <div class="ver">Android · v1.0</div>
-              <p>手机上用手势自动刷抖音的辅助工具。装好后在系统设置里开启「无障碍服务」，即可自动滑动切换视频，彻底解放双手。仅支持 Android。</p>
-              <div class="tags">
-                <span class="tag">Android</span>
-                <span class="tag">手势操作</span>
-                <span class="tag">无障碍服务</span>
-              </div>
-              <div class="tool-links">
-                <a class="dl dl-main" href="javascript:void(0)" data-slug="gesture-brush" data-fallback="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-android-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('gesture-brush');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/douyin-helper-android-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
-                <a class="dl dl-sub" href="https://github.com/goutuo4588/tools/releases/tag/douyin-helper-android-v1.0" target="_blank" rel="noopener">发布页 ↗</a>
-              </div>
-              <ul class="note">
-                <li><b>本人作品</b> · 安卓安装包 APK（54.5MB）</li>
-                <li><b>安装提示</b> · 需允许「未知来源」安装，并在「设置 → 无障碍」中开启本服务</li>
               </ul>
             </article>
 
@@ -1008,12 +946,12 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   const API_BASE = 'https://toolshop-d0gez0cs3e2318df8-1466799812.ap-shanghai.app.tcloudbase.com/toolshop';
   const CB_ENABLED = !API_BASE.startsWith('在此填');
   const CLOUD_USER_KEY = 'tp_cloud_user';
-  const TOOL_SLUGS=['douyin-helper','cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek','gesture-brush'];
+  const TOOL_SLUGS=['cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
   const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
 
   // 种子评论：首次无数据时展示，避免空荡
-  const SEED={ 'douyin-helper':[{nick:'阿成',rating:5,content:'机械操作终于不用自己点了，省心！',ts:Date.now()-86400000}],
+  const SEED={
                'cdrivecleanup':[{nick:'小鹿',rating:5,content:'C盘一下空出 20 多 G，安全校验也放心。',ts:Date.now()-172800000}],
                'openspeedy':[{nick:'Leo',rating:4,content:'单机游戏变速好用，绿色版即开即用。',ts:Date.now()-259200000}] };
 
@@ -1850,4 +1788,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-20T04:38:55Z -->
+<!-- deploy cache-bust 2026-09-20T16:03:03Z -->
