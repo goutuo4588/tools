@@ -402,6 +402,9 @@ var DL={
   ]},
   'geek':{name:'Geek Uninstaller',files:[
     {label:'便携版 · 7MB', url:REL+'geek-uninstaller-portable/geek.exe'}
+  ]},
+  'tuban':{name:'图吧工具箱', files:[
+    {label:'2026.08 安装包 · 207MB', url:REL+'tuban-toolbox-2026.08/TubanToolbox-2026.08.exe'}
   ]}
 };
 function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
@@ -416,6 +419,16 @@ function openDl(slug){
   var body=document.getElementById('dlBody');
   var modal=document.getElementById('dlModal');
   if(!d||!body||!modal){ alert('下载面板未就绪，请刷新页面重试'); return; }
+  if(d.external){
+    var hu=esc(d.home||'https://www.tbtool.cn/');
+    var eh='<div class="dl-file"><div class="dl-fname">🔗 '+esc(d.name)+' · 官网下载</div>';
+    eh+='<a class="dl-src on" href="'+hu+'" target="_blank" rel="noopener">🌐 前往官网下载</a>';
+    eh+='<a class="dl-man" href="'+hu+'" target="_blank" rel="noopener">官网需人机验证后获取安装包（约 207MB），点此打开 ↗</a>';
+    eh+='</div>';
+    body.innerHTML=eh;
+    var ett=document.getElementById('dlTitle'); if(ett) ett.textContent=d.name+' · 下载';
+    modal.hidden=false; return;
+  }
   var h='';
   d.files.forEach(function(f){
     var tag=f.url.slice(REL.length).split('/')[0];
@@ -441,7 +454,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-20T16:03:48Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-09-23T12:30:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -743,7 +756,26 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
               <ul class="note">
                 <li>免费软件（非开源），版权归原作者</li>
                 <li><b>.exe 可执行文件</b> · 单文件，双击即用免安装</li>
-                <li><b>卸载系统组件前请谨慎清理</b> · 误删系统文件可能导致系统异常</li>
+            </article>
+
+            <!-- 收录 5：图吧工具箱 -->
+            <article class="tool" data-slug="tuban">
+              <div class="tool-icon" style="background:var(--c-sky)">🧰</div>
+              <h3>图吧工具箱</h3>
+              <div class="ver">硬件检测 · 2026.08</div>
+              <p>开源免费的硬件检测 / 跑分工具合集，专为 DIY 玩家与硬件极客打造。集成 CPU、内存、硬盘、显卡等常见检测与评分工具，绿色免安装、解压即用，无捆绑无广告。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">硬件检测</span>
+                <span class="tag">免费开源</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="tuban" data-fallback="https://www.tbtool.cn/" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('tuban');}catch(err){console.error(err);window.open('https://www.tbtool.cn/','_blank');}})(event);return false;">下载</a>
+                <a class="dl dl-sub" href="https://www.tbtool.cn/" target="_blank" rel="noopener" title="图吧工具箱官方网站">官方网站 ↗</a>
+              </div>
+              <ul class="note">
+                <li>图吧出品，免费开源，始于 2014</li>
+                <li><b>官方网址</b>：<a href="https://www.tbtool.cn/" target="_blank" rel="noopener">https://www.tbtool.cn/</a>（本安装包镜像自图吧官方 CDN，仅供方便下载，版权归图吧所有）</li>
               </ul>
             </article>
 
@@ -968,7 +1000,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   const API_BASE = 'https://toolshop-d0gez0cs3e2318df8-1466799812.ap-shanghai.app.tcloudbase.com/toolshop';
   const CB_ENABLED = !API_BASE.startsWith('在此填');
   const CLOUD_USER_KEY = 'tp_cloud_user';
-  const TOOL_SLUGS=['cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek'];
+  const TOOL_SLUGS=['cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek','tuban'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
   const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
 
