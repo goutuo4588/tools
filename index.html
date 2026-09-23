@@ -419,16 +419,6 @@ function openDl(slug){
   var body=document.getElementById('dlBody');
   var modal=document.getElementById('dlModal');
   if(!d||!body||!modal){ alert('下载面板未就绪，请刷新页面重试'); return; }
-  if(d.external){
-    var hu=esc(d.home||'https://www.tbtool.cn/');
-    var eh='<div class="dl-file"><div class="dl-fname">🔗 '+esc(d.name)+' · 官网下载</div>';
-    eh+='<a class="dl-src on" href="'+hu+'" target="_blank" rel="noopener">🌐 前往官网下载</a>';
-    eh+='<a class="dl-man" href="'+hu+'" target="_blank" rel="noopener">官网需人机验证后获取安装包（约 207MB），点此打开 ↗</a>';
-    eh+='</div>';
-    body.innerHTML=eh;
-    var ett=document.getElementById('dlTitle'); if(ett) ett.textContent=d.name+' · 下载';
-    modal.hidden=false; return;
-  }
   var h='';
   d.files.forEach(function(f){
     var tag=f.url.slice(REL.length).split('/')[0];
