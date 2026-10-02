@@ -388,9 +388,6 @@ var MIRRORS=[
 ];
 var REL='https://github.com/goutuo4588/tools/releases/download/';
 var DL={
-  'cdrivecleanup':{name:'CDriveCleanup',files:[
-    {label:'v1.0 压缩包 · 44MB', url:REL+'cdrivecleanup-v1.0/CDriveCleanup-v1.0.zip'}
-  ]},
   'openspeedy':{name:'OpenSpeedy',files:[
     {label:'v3.3.8 便携版 · 5MB', url:REL+'openspeedy-v3.3.8/OpenSpeedy-3.3.8-portable-signed.zip'}
   ]},
@@ -444,7 +441,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-09-23T12:30:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-02T17:23:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -560,7 +557,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
             <h2 class="title">关于这个具坊</h2>
             <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这里集中放我自己写的小软件，也收录一些用着顺手的开源 / 免费工具——收录的部分都标了原作者和出处，方便朋友一站式下载。</p>
             <div class="stat-row">
-              <div class="stat"><b>6</b><span>已收录工具</span></div>
+              <div class="stat"><b>5</b><span>已收录工具</span></div>
               <div class="stat"><b>0</b><span>运行依赖</span></div>
               <div class="stat"><b>∞</b><span>免费使用</span></div>
             </div>
@@ -612,30 +609,19 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
             <p>我自己写的 Windows 小工具，绿色免安装，源码都在仓库里。</p>
           </div>
 
-          <div class="tool-grid"><!-- 工具 2：CDriveCleanup -->
-            <article class="tool" data-slug="cdrivecleanup">
-              <div class="tool-icon" style="background:var(--c-mint)">💾</div>
-              <h3>CDriveCleanup</h3>
-              <div class="ver">.NET 10 · 单文件版</div>
-              <p>把微信、QQ 等应用产生的缓存安全地迁移出 C 盘，给系统盘腾空间。自包含单文件发布，零依赖跨机运行；内置多重安全校验，避免误删系统文件。</p>
-              <div class="tags">
-                <span class="tag">C盘清理</span>
-                <span class="tag">缓存迁移</span>
-                <span class="tag">安全保护</span>
-              </div>
-              <div class="tool-links">
-                <a class="dl dl-main" href="javascript:void(0)" data-slug="cdrivecleanup" data-fallback="https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdrivecleanup');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
-                <a class="dl dl-sub" href="https://github.com/goutuo4588/tools" target="_blank" rel="noopener">源码 ↗</a>
-              </div>
-              <ul class="note">
-                <li><b>本人作品</b> · 源码已开源在上方仓库</li>
-                <li><b>.exe 可执行文件</b> · 下载压缩包解压后运行主程序，无需安装</li>
-              </ul>
+          <div class="tool-grid">
+
+            <!-- 占位：电脑端工具下架中 -->
+            <article class="tool coming-soon">
+              <div class="tool-icon" style="background:var(--c-lav)">💻</div>
+              <h3>敬请期待</h3>
+              <div class="ver">开发中</div>
+              <p>电脑端工具正在打磨中，重新上架后会在这里出现。先看看开源免费工具吧～</p>
             </article>
 
           </div>
 
-          <!-- 模块二：手机端工具（板块保留，工具下架中） -->
+                    <!-- 模块二：手机端工具（板块保留，工具下架中） -->
           <div class="subhead">
             <span class="sub-dot" style="background:var(--c-peach)"></span>
             <h3>📱 手机端工具</h3>
@@ -990,13 +976,12 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   const API_BASE = 'https://toolshop-d0gez0cs3e2318df8-1466799812.ap-shanghai.app.tcloudbase.com/toolshop';
   const CB_ENABLED = !API_BASE.startsWith('在此填');
   const CLOUD_USER_KEY = 'tp_cloud_user';
-  const TOOL_SLUGS=['cdrivecleanup','openspeedy','watt-toolkit','wireshark','geek','tuban'];
+  const TOOL_SLUGS=['openspeedy','watt-toolkit','wireshark','geek','tuban'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
   const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
 
   // 种子评论：首次无数据时展示，避免空荡
   const SEED={
-               'cdrivecleanup':[{nick:'小鹿',rating:5,content:'C盘一下空出 20 多 G，安全校验也放心。',ts:Date.now()-172800000}],
                'openspeedy':[{nick:'Leo',rating:4,content:'单机游戏变速好用，绿色版即开即用。',ts:Date.now()-259200000}] };
 
   let profile = getCloudUser() || LS.get(PROFILE_KEY, null);
