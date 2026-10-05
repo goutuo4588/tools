@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>具坊 · 站长后台</title>
+<style>
+  :root{
+    --ink:#23252b;
+    --ink-soft:#5b6170;
+    --accent:#ff7a59;
+    --accent-2:#5b8def;
+    --shadow:0 18px 50px -22px rgba(35,37,43,.45);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(135deg,#f6f2ff 0%,#eafbff 40%,#fff3f8 75%,#f0fff7 100%);
+    min-height:100vh;
+  }
+  .wrap{max-width:1020px;margin:0 auto;padding:26px 16px 60px}
+
+  /* ---------- 顶栏 ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800}
+  .brand .ic{
+    width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+    border-radius:12px;font-size:20px;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    box-shadow:0 8px 20px rgba(91,141,239,.35)
+  }
+  .topbar .sub{font-size:13px;color:var(--ink-soft);margin-top:2px}
+
+  /* ---------- 登录卡 ---------- */
+  .login-card{
+    max-width:420px;margin:8vh auto 0;
+    background:rgba(255,255,255,.82);border-radius:22px;padding:30px 28px 32px;
+    box-shadow:var(--shadow);backdrop-filter:blur(14px) saturate(150%);
+    -webkit-backdrop-filter:blur(14px) saturate(150%);text-align:center
+  }
+  .login-card .lic{font-size:44px;margin-bottom:6px}
+  .login-card h1{margin:0 0 4px;font-size:22px}
+  .login-card .tip{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+  .field{margin-bottom:12px}
+  .field input{
+    width:100%;padding:13px 14px;border:1px solid rgba(35,37,43,.14);
+    border-radius:12px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)
+  }
+  .field input:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(91,141,239,.15)}
+  .auth-btn{
+    width:100%;padding:13px 18px;border:0;border-radius:12px;cursor:pointer;
+    font-family:inherit;font-weight:700;font-size:15px;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    box-shadow:0 10px 24px -10px rgba(91,141,239,.6)
+  }
+  .auth-btn:hover{filter:brightness(1.05)}
+  .auth-btn:disabled{opacity:.6;cursor:default}
+  .auth-msg{font-size:13px;margin-top:12px;min-height:18px}
+  .auth-msg.err{color:#e0443e}
+
+  /* ---------- 监控台 ---------- */
+  .admin-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:14px;margin:14px 0 6px}
+  .admin-card{
+    background:rgba(255,255,255,.72);border-radius:18px;padding:16px;text-align:center;
+    box-shadow:var(--shadow);backdrop-filter:blur(12px) saturate(150%);
+    -webkit-backdrop-filter:blur(12px) saturate(150%)
+  }
+  .admin-card b{display:block;font-size:26px;color:var(--ink)}
+  .admin-card span{font-size:13px;color:var(--ink-soft)}
+  .admin-hint{font-size:13px;color:var(--ink-soft);margin:6px 0 0}
+
+  .cloud-monitor{
+    margin-top:18px;background:rgba(255,255,255,.72);border-radius:18px;padding:18px;
+    box-shadow:var(--shadow);backdrop-filter:blur(12px) saturate(150%);
+    -webkit-backdrop-filter:blur(12px) saturate(150%)
+  }
+  .cm-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .cm-head h3{margin:0;font-size:18px}
+  .cm-live{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#1f9d55;font-weight:700}
+  .cm-live .dot{
+    width:8px;height:8px;border-radius:50%;background:#1f9d55;
+    box-shadow:0 0 0 3px rgba(31,157,85,.25);animation:pulse 1.6s infinite
+  }
+  @keyframes pulse{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
+  .cm-btn{
+    padding:6px 14px;border:0;border-radius:9px;cursor:pointer;font-family:inherit;
+    font-size:13px;font-weight:700;color:#fff;background:var(--accent-2)
+  }
+  .cm-btn:hover{filter:brightness(1.05)}
+
+  .cloud-table-wrap{max-height:380px;overflow:auto;margin-top:12px;border-radius:12px;border:1px solid rgba(35,37,43,.08)}
+  .cloud-table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+  .cloud-table th,.cloud-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #eee;vertical-align:middle}
+  .cloud-table th{position:sticky;top:0;background:#6c5ce7;color:#fff;font-weight:700;z-index:1}
+  .cloud-table tbody tr:hover{background:rgba(108,92,231,.05)}
+  .cloud-table .cu-mail{font-weight:700;word-break:break-all}
+  .cu-act{display:flex;gap:8px;flex-wrap:wrap}
+  .cu-btn{
+    padding:6px 12px;border:0;border-radius:9px;cursor:pointer;font-family:inherit;
+    font-size:13px;font-weight:700;color:#fff;background:var(--accent);flex-shrink:0
+  }
+  .cu-btn:hover{filter:brightness(1.05)}
+  .cu-btn.reset-manual{background:#0a8f6b}
+  .cu-btn.cu-del{background:#e0443e}
+  .cu-btn.cu-del:hover{background:#c83a35}
+  .cu-btn:disabled{opacity:.55;cursor:default}
+
+  .cu-item{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    background:rgba(255,255,255,.72);border-radius:14px;padding:12px 14px;
+    box-shadow:0 4px 18px rgba(35,37,43,.06);margin-bottom:10px
+  }
+  .cu-item .info b{font-size:15px}
+  .cu-item .info small{display:block;color:var(--ink-soft);font-size:12px;margin-top:3px}
+  .cu-item .reset{
+    padding:7px 14px;border:0;border-radius:10px;background:var(--accent-2);
+    color:#fff;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0
+  }
+  .cu-item .reset.auto{background:#16a34a}
+
+  .sec{margin-top:20px}
+  .sec h3{margin:0 0 10px;font-size:17px}
+  .empty{color:var(--ink-soft);font-size:14px}
+  .errbox{color:#e0443e;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <div>
+      <div class="brand"><span class="ic">🔧</span><span>具坊 · 站长后台</span></div>
+      <div class="sub" id="hdrSub">云端用户监控 · 数据来自 CloudBase</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="cm-btn" id="btnRefresh" style="display:none">🔄 刷新</button>
+      <button class="cm-btn" id="btnLogout" style="display:none;background:#e0443e">退出后台</button>
+    </div>
+  </div>
+
+  <!-- 登录卡 -->
+  <div class="login-card" id="loginBox">
+    <div class="lic">🔧</div>
+    <h1>站长后台</h1>
+    <p class="tip">请输入站长账号和密码进入。口令仅在本标签页临时保存，关闭即失效。</p>
+    <div class="field"><input id="aUser" type="text" placeholder="账号" autocomplete="username"></div>
+    <div class="field"><input id="aPwd" type="password" placeholder="密码" autocomplete="current-password"></div>
+    <button class="auth-btn" id="aLogin">进入后台</button>
+    <div class="auth-msg" id="aMsg"></div>
+    <p style="font-size:12px;color:var(--ink-soft);margin:14px 0 0">
+      本页独立于主站，仅站长使用。普通用户的登录 / 注册界面在主站保持原样。
+    </p>
+  </div>
+
+  <!-- 后台面板 -->
+  <div id="panel" style="display:none">
+    <div class="admin-stat" id="cloudStat">
+      <div class="admin-card"><b id="stTotal">-</b><span>总注册人数</span></div>
+      <div class="admin-card"><b id="stLogin">-</b><span>已登录人数</span></div>
+      <div class="admin-card"><b id="stLogins">-</b><span>累计登录次数</span></div>
+      <div class="admin-card"><b id="stReg7">-</b><span>近 7 天注册</span></div>
+      <div class="admin-card"><b id="stLogin7">-</b><span>近 7 天登录</span></div>
+      <div class="admin-card"><b id="stPending">-</b><span>待处理找回</span></div>
+    </div>
+
+    <div class="cloud-monitor">
+      <div class="cm-head">
+        <h3>🌐 云端用户监控台</h3>
+        <span class="cm-live"><span class="dot"></span>实时监测中</span>
+      </div>
+      <p class="admin-hint">
+        数据来自 CloudBase 云端，本页打开后每 30 秒自动刷新。
+        用户密码采用 scrypt 加盐哈希存储、明文不入库，站长也无法查看原密码；
+        可用「重置并查看」生成新密码并查看 / 下发给用户。
+      </p>
+      <div class="cloud-table-wrap">
+        <table class="cloud-table">
+          <thead>
+            <tr><th>#</th><th>账号（邮箱）</th><th>注册时间</th><th>最近登录</th><th>登录次数</th><th>操作</th></tr>
+          </thead>
+          <tbody id="cloudUsersBody">
+            <tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">加载中…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h3>🔑 找回密码申请（待处理）</h3>
+      <div id="aResets"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var API_BASE = 'https://toolshop-d0gez0cs3e2318df8-1466799812.ap-shanghai.app.tcloudbase.com/toolshop';
+  var ADMIN_USER = 'admin';
+  var PWD_KEY = 'tp_admin_pwd';
+
+  var adminPwd = '';
+  try { adminPwd = sessionStorage.getItem(PWD_KEY) || ''; } catch(e){ adminPwd=''; }
+
+  var el = function(id){ return document.getElementById(id); };
+
+  function escapeHtml(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function errText(e){
+    if(e===null||e===undefined) return '未知错误';
+    if(typeof e === 'string') return e;
+    var msg = e.errMsg || e.message || (e.error && (e.error.message||e.error.errMsg)) || '';
+    if(msg) return String(msg);
+    if(e.code) return '['+e.code+']';
+    try { return Object.prototype.toString.call(e).slice(8,-1); } catch(_) { return '未知错误'; }
+  }
+  function cbApi(action, data){
+    return fetch(API_BASE, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(Object.assign({action:action}, data||{}))
+    }).then(function(r){ return r.json(); }).then(function(j){ return j||{}; });
+  }
+
+  /* ---------- 视图切换 ---------- */
+  function showLogin(msg){
+    el('loginBox').style.display='';
+    el('panel').style.display='none';
+    el('btnRefresh').style.display='none';
+    el('btnLogout').style.display='none';
+    var m=el('aMsg'); if(m){ m.className='auth-msg'+(msg?' err':''); m.textContent=msg||''; }
+  }
+  function showPanel(){
+    el('loginBox').style.display='none';
+    el('panel').style.display='';
+    el('btnRefresh').style.display='';
+    el('btnLogout').style.display='';
+    loadStats(); loadUsers(); loadResets();
+    startAutoRefresh();
+  }
+
+  /* ---------- 登录 ---------- */
+  el('aLogin').onclick = function(){
+    var user = el('aUser').value.trim();
+    var pwd  = el('aPwd').value;
+    var msg  = el('aMsg');
+    msg.className='auth-msg'; msg.textContent='';
+    if(!user || !pwd){ msg.className='auth-msg err'; msg.textContent='请输入账号和密码'; return; }
+    if(user !== ADMIN_USER){ msg.className='auth-msg err'; msg.textContent='账号或密码错误'; return; }
+    msg.className='auth-msg'; msg.textContent='正在校验…';
+    this.disabled=true;
+    var btn=this;
+    cbApi('adminListUsers', { adminPwd: pwd }).then(function(res){
+      btn.disabled=false;
+      // 口令由云函数比对环境变量 ADMIN_PWD，前端不持有明文
+      if(res && res.code!==401 && res.code!==403 && !res.error){
+        adminPwd = pwd;
+        try { sessionStorage.setItem(PWD_KEY, pwd); } catch(e){}
+        el('aPwd').value='';
+        showPanel();
+      } else {
+        msg.className='auth-msg err'; msg.textContent='账号或密码错误';
+      }
+    }).catch(function(e){
+      btn.disabled=false;
+      msg.className='auth-msg err'; msg.textContent='校验失败：'+errText(e)+'（请确认云函数已部署且网络可达）';
+    });
+  };
+  el('aPwd').addEventListener('keydown', function(e){ if(e.key==='Enter') el('aLogin').click(); });
+  el('aUser').addEventListener('keydown', function(e){ if(e.key==='Enter') el('aPwd').focus(); });
+
+  /* ---------- 退出 ---------- */
+  el('btnLogout').onclick = function(){
+    adminPwd='';
+    try { sessionStorage.removeItem(PWD_KEY); } catch(e){}
+    stopAutoRefresh();
+    showLogin();
+  };
+  el('btnRefresh').onclick = function(){ loadStats(); loadUsers(); loadResets(); };
+
+  /* ---------- 统计卡 ---------- */
+  function loadStats(){
+    var ids=['stTotal','stLogin','stLogins','stReg7','stLogin7','stPending'];
+    ids.forEach(function(i){ var n=el(i); if(n) n.textContent='…'; });
+    cbApi('adminStats', { adminPwd: adminPwd }).then(function(res){
+      if(res.code!==0){
+        ids.forEach(function(i){ var n=el(i); if(n) n.textContent='!'; });
+        if(res.code===401||res.code===403) kickOut();
+        return;
+      }
+      var s = res.stats || {};
+      var set=function(i,v){ var n=el(i); if(n) n.textContent=(v||0); };
+      set('stTotal', s.totalUsers); set('stLogin', s.everLoggedIn); set('stLogins', s.totalLogins);
+      set('stReg7', s.reg7); set('stLogin7', s.login7); set('stPending', s.pending);
+    }).catch(function(){
+      ids.forEach(function(i){ var n=el(i); if(n) n.textContent='!'; });
+    });
+  }
+
+  /* ---------- 用户监控表格 ---------- */
+  function loadUsers(){
+    var body = el('cloudUsersBody'); if(!body) return;
+    body.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">加载中…</td></tr>';
+    cbApi('adminListUsers', { adminPwd: adminPwd }).then(function(res){
+      if(res.code!==0){
+        body.innerHTML='<tr><td colspan="6" class="errbox" style="text-align:center">读取失败：'+escapeHtml(res.error||'无权限')+'</td></tr>';
+        if(res.code===401||res.code===403) kickOut();
+        return;
+      }
+      var list = res.result || [];
+      if(!list.length){
+        body.innerHTML='<tr><td colspan="6" class="empty" style="text-align:center">暂无注册用户</td></tr>';
+        return;
+      }
+      body.innerHTML = list.map(function(u, idx){
+        var reg = u.createdAt ? new Date(u.createdAt).toLocaleString('zh-CN') : '—';
+        var lg  = u.lastLogin ? new Date(u.lastLogin).toLocaleString('zh-CN') : '从未登录';
+        var lc  = u.loginCount || 0;
+        var mail = escapeHtml(u.email||'');
+        return '<tr><td>'+(idx+1)+'</td>'+
+          '<td class="cu-mail">'+mail+'</td>'+
+          '<td>'+reg+'</td><td>'+lg+'</td><td>'+lc+'</td>'+
+          '<td class="cu-act">'+
+            '<button class="cu-btn reset-auto" data-u="'+mail+'">重置并查看</button>'+
+            '<button class="cu-btn reset-manual" data-u="'+mail+'">自定义密码</button>'+
+            '<button class="cu-btn cu-del" data-u="'+mail+'">删除账号</button>'+
+          '</td></tr>';
+      }).join('');
+
+      // 重置并查看（随机 12 位 + 163 发信）
+      body.querySelectorAll('.reset-auto').forEach(function(b){
+        b.onclick=function(){
+          var un = b.getAttribute('data-u');
+          if(!confirm('将 '+un+' 的密码重置为随机 12 位，并自动通过 163 邮箱发送给该用户。\n\n继续？')) return;
+          b.disabled=true;
+          cbApi('adminResetAuto', { adminPwd: adminPwd, email: un }).then(function(r){
+            b.disabled=false;
+            if(r.code!==0){ alert('重置失败：'+(r.error||'未知')); }
+            else { alert('✅ 已生成随机密码并通过 163 邮箱发送给 '+un+'。\n\n新密码：'+r.newPwd+'\n\n（请留存一份备查；原密码因哈希存储无法查看）'); loadStats(); loadUsers(); loadResets(); }
+          }).catch(function(e){ b.disabled=false; alert('网络错误：'+errText(e)); });
+        };
+      });
+      // 自定义密码
+      body.querySelectorAll('.reset-manual').forEach(function(b){
+        b.onclick=function(){
+          var un = b.getAttribute('data-u');
+          var np = prompt('为 '+un+' 设置新密码（8-32 位，含字母和数字）：');
+          if(!np) return;
+          if(!/^(?=.*[a-zA-Z])(?=.*\d).{8,32}$/.test(np)){ alert('密码需 8-32 位且同时含字母和数字'); return; }
+          b.disabled=true;
+          cbApi('adminResetPassword', { adminPwd: adminPwd, email: un, newPwd: np }).then(function(r){
+            b.disabled=false;
+            if(r.code!==0){ alert('重置失败：'+(r.error||'未知')); }
+            else { alert('✅ 已将 '+un+' 的密码重置为：\n\n'+np+'\n\n请通过你方便的方式告知该用户。'); loadUsers(); }
+          }).catch(function(e){ b.disabled=false; alert('网络错误：'+errText(e)); });
+        };
+      });
+      // 删除账号
+      body.querySelectorAll('.cu-del').forEach(function(b){
+        b.onclick=function(){
+          var un = b.getAttribute('data-u');
+          if(!confirm('⚠️ 确定删除账号 '+un+' ？\n该用户的注册记录和密码将永久清除，且无法恢复！')) return;
+          b.disabled=true;
+          cbApi('adminDeleteUser', { adminPwd: adminPwd, email: un }).then(function(r){
+            b.disabled=false;
+            if(r.code!==0){ alert('删除失败：'+(r.error||'未知')); }
+            else { alert('已删除账号 '+un); loadStats(); loadUsers(); loadResets(); }
+          }).catch(function(e){ b.disabled=false; alert('网络错误：'+errText(e)); });
+        };
+      });
+    }).catch(function(e){
+      body.innerHTML='<tr><td colspan="6" class="errbox" style="text-align:center">网络错误：'+escapeHtml(errText(e))+'</td></tr>';
+    });
+  }
+
+  /* ---------- 找回密码申请 ---------- */
+  function loadResets(){
+    var box = el('aResets'); if(!box) return;
+    box.innerHTML='<span class="empty">加载中…</span>';
+    cbApi('adminListResets', { adminPwd: adminPwd }).then(function(res){
+      if(res.code!==0){
+        box.innerHTML='<span class="errbox">读取失败：'+escapeHtml(res.error||'无权限')+'</span>';
+        if(res.code===401||res.code===403) kickOut();
+        return;
+      }
+      var list = res.result || [];
+      if(!list.length){ box.innerHTML='<span class="empty">暂无待处理申请 🎉</span>'; return; }
+      box.innerHTML = list.map(function(r){
+        var t = r.createdAt ? new Date(r.createdAt).toLocaleString('zh-CN') : '';
+        var ex = r.exists ? '' : ' <span style="color:#e0443e">（该邮箱未注册）</span>';
+        var mail = escapeHtml(r.email);
+        return '<div class="cu-item"><div class="info"><b>'+mail+'</b>'+ex+
+          '<small>申请时间：'+t+'</small></div>'+
+          '<button class="reset auto" data-u="'+mail+'">一键重置并发送</button></div>';
+      }).join('');
+      box.querySelectorAll('.reset.auto').forEach(function(b){
+        b.onclick=function(){
+          var un = b.getAttribute('data-u');
+          if(!confirm('将 '+un+' 的密码重置为随机 12 位，并通过 163 邮箱发送给该用户？')) return;
+          b.disabled=true;
+          cbApi('adminResetAuto', { adminPwd: adminPwd, email: un }).then(function(r){
+            b.disabled=false;
+            if(r.code!==0){ alert('重置失败：'+(r.error||'未知')); }
+            else { alert('✅ 已生成随机密码并发送给 '+un+'。\n\n新密码：'+r.newPwd); loadStats(); loadUsers(); loadResets(); }
+          }).catch(function(e){ b.disabled=false; alert('网络错误：'+errText(e)); });
+        };
+      });
+    }).catch(function(e){
+      box.innerHTML='<span class="errbox">网络错误：'+escapeHtml(errText(e))+'</span>';
+    });
+  }
+
+  /* ---------- 口令失效 → 退回登录 ---------- */
+  function kickOut(){
+    adminPwd='';
+    try { sessionStorage.removeItem(PWD_KEY); } catch(e){}
+    stopAutoRefresh();
+    showLogin('登录已失效，请重新输入站长密码');
+  }
+
+  /* ---------- 30 秒自动刷新 ---------- */
+  var timer=null;
+  function startAutoRefresh(){
+    stopAutoRefresh();
+    timer = setInterval(function(){
+      if(el('panel').style.display !== 'none'){ loadStats(); loadUsers(); loadResets(); }
+    }, 30000);
+  }
+  function stopAutoRefresh(){ if(timer){ clearInterval(timer); timer=null; } }
+
+  /* ---------- 启动：已有口令则直接进后台 ---------- */
+  if(adminPwd){ showPanel(); } else { showLogin(); }
+})();
+</script>
+</body>
+</html>
