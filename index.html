@@ -335,6 +335,27 @@
   .admin-sec-btn.sec-inline{width:auto;margin-top:0;padding:9px 18px;font-size:15px;font-weight:700;border-radius:12px;box-shadow:none}
   .admin-sec-body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
   .admin-sec-body.hide{display:none}
+  /* 云端用户监控台 */
+  .cloud-monitor{margin-top:18px;background:rgba(255,255,255,.72);border-radius:18px;padding:18px;box-shadow:var(--shadow);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%)}
+  .cm-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .cm-head h3{margin:0;font-size:18px}
+  .cm-live{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#1f9d55;font-weight:700}
+  .cm-live .dot{width:8px;height:8px;border-radius:50%;background:#1f9d55;box-shadow:0 0 0 3px rgba(31,157,85,.25);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
+  .cm-head #aCloudRefresh{margin-left:auto}
+  .cloud-table-wrap{max-height:360px;overflow:auto;margin-top:12px;border-radius:12px;border:1px solid rgba(35,37,43,.08)}
+  .cloud-table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+  .cloud-table th,.cloud-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #eee;vertical-align:middle}
+  .cloud-table th{position:sticky;top:0;background:#6c5ce7;color:#fff;font-weight:700;z-index:1}
+  .cloud-table tbody tr:hover{background:rgba(108,92,231,.05)}
+  .cloud-table .cu-mail{font-weight:700;word-break:break-all}
+  .cloud-table .cu-act{display:flex;gap:6px;flex-wrap:wrap}
+  .cu-btn{padding:6px 12px;border:0;border-radius:9px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--accent);flex-shrink:0}
+  .cu-btn:hover{filter:brightness(1.05)}
+  .cu-btn.reset-manual{background:#0a8f6b}
+  .cu-btn.cu-del{background:#e0443e}
+  .cu-btn.cu-del:hover{background:#c83a35}
+  .cu-btn:disabled{opacity:.5;cursor:default}
 
   /* 右下角浮动按钮 */
   .admin-fab{position:fixed;right:22px;bottom:22px;z-index:1400;display:flex;align-items:center;gap:8px;
@@ -499,7 +520,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T17:41:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T17:50:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1259,17 +1280,30 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
         '<button class="auth-btn" id="aReport" style="width:auto;padding:9px 18px;background:#5b3cc4">📊 数据可视化报表（新窗口）</button>'+
         '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a>'+
         '<button type="button" class="admin-sec-btn sec-inline" data-sec="aUsers">本机账号 <span class="ar">▾</span></button>'+
-        '<button type="button" class="admin-sec-btn sec-inline" data-sec="aCloudUsers">网站注册用户（云端） <span class="ar">▾</span></button>'+
         '<button type="button" class="admin-sec-btn sec-inline" data-sec="aResets">🔑 找回密码申请 <span class="ar">▾</span></button></div>'+
-      '<h3 style="margin-top:8px">各工具互动明细</h3><div id="aInteract" class="admin-list"></div>'+
+      '<div class="cloud-monitor">'+
+        '<div class="cm-head"><h3>🌐 云端用户监控台</h3><span class="cm-live"><span class="dot"></span>实时监测中</span><button class="auth-btn" id="aCloudRefresh" style="width:auto;padding:6px 14px;font-size:13px;background:var(--accent-2)">🔄 刷新</button></div>'+
+        '<div class="admin-stat" id="cloudStat">'+
+          '<div class="admin-card"><b id="stTotal">-</b><span>总注册人数</span></div>'+
+          '<div class="admin-card"><b id="stLogin">-</b><span>已登录人数</span></div>'+
+          '<div class="admin-card"><b id="stLogins">-</b><span>累计登录次数</span></div>'+
+          '<div class="admin-card"><b id="stReg7">-</b><span>近 7 天注册</span></div>'+
+          '<div class="admin-card"><b id="stLogin7">-</b><span>近 7 天登录</span></div>'+
+          '<div class="admin-card"><b id="stPending">-</b><span>待处理找回</span></div>'+
+        '</div>'+
+        '<div class="admin-hint">数据来自 CloudBase 云端，后台打开后每 30 秒自动刷新。密码采用 scrypt 加盐哈希存储，明文不入库，站长也无法查看原密码；可用「重置并查看」生成新密码并查看 / 下发给用户。</div>'+
+        '<div class="cloud-table-wrap"><table class="cloud-table"><thead><tr><th>#</th><th>账号（邮箱）</th><th>注册时间</th><th>最近登录</th><th>登录次数</th><th>操作</th></tr></thead>'+
+        '<tbody id="cloudUsersBody"><tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">加载中…</td></tr></tbody></table></div>'+
+      '</div>'+
+      '<h3 style="margin-top:18px">各工具互动明细（本机）</h3><div id="aInteract" class="admin-list"></div>'+
       '<div id="aUsers" class="admin-sec-body"></div>'+
-      '<div id="aCloudUsers" class="admin-sec-body"></div>'+
       '<div id="aResets" class="admin-sec-body"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';adminPwd='';localStorage.removeItem(ADMIN_KEY);try{sessionStorage.removeItem('tp_admin_pwd');}catch(e){}refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
     adminPanel.querySelector('#aReport').onclick=openReport;
-    loadAdminInteract();loadAdminUsers();loadAdminComments();loadCloudUsers();loadResets();
+    var rf=adminPanel.querySelector('#aCloudRefresh'); if(rf) rf.onclick=function(){ loadCloudStats(); loadCloudUsersTable(); };
+    loadAdminInteract();loadAdminUsers();loadAdminComments();loadResets();loadCloudStats();loadCloudUsersTable();
     // 模块折叠按钮：点击展开/收起对应内容
     adminPanel.querySelectorAll('.admin-sec-btn').forEach(function(b){
       b.onclick=function(){
@@ -1279,6 +1313,11 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
         b.classList.toggle('collapsed', hidden);
       };
     });
+    // 云端监控：后台打开期间每 30 秒自动刷新一次
+    if(adminRefreshTimer) clearInterval(adminRefreshTimer);
+    adminRefreshTimer=setInterval(function(){
+      if(adminPanel && adminPanel.style.display!=='none'){ loadCloudStats(); loadCloudUsersTable(); }
+    }, 30000);
   }
   function loadAdminInteract(){
     const el=adminPanel.querySelector('#aInteract');if(!el)return;
@@ -1541,6 +1580,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   function authEl(sel){ return document.querySelector('#authModal '+sel); }
   function msgErr(el, t){ if(el){ el.className='auth-msg'; el.textContent=t; } return false; }
   var regTimer=null;
+  var adminRefreshTimer=null;
   var authForce=false;
   function closeAuth(){ var m=document.getElementById('authModal'); if(m) m.hidden=true; document.body.classList.remove('auth-locked'); if(regTimer) clearInterval(regTimer); }
   function openAuth(mode, force){
@@ -1678,24 +1718,70 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       renderAuthView('forgotDone');
     }).catch(function(e){ console.error('[forgot]',e); msgErr(msg,'网络错误：'+errText(e)); });
   }
-  function loadCloudUsers(){
-    var el=document.getElementById('aCloudUsers'); if(!el) return;
-    if(!CB_ENABLED){ el.innerHTML='<span style="color:var(--ink-soft)">后端未配置：站长需在 index.html 填入云函数 HTTP 访问地址(API_BASE)，并在 CloudBase 部署 cloud/ 云函数。</span>'; return; }
-    el.innerHTML='<span style="color:var(--ink-soft)">加载中…</span>';
+  // 站长后台：云端监测统计（注册 / 登录人数、次数、近 7 天、待处理找回）
+  function loadCloudStats(){
+    var ids=['stTotal','stLogin','stLogins','stReg7','stLogin7','stPending'];
+    ids.forEach(function(i){ var el=document.getElementById(i); if(el) el.textContent='…'; });
+    if(!CB_ENABLED){ ids.forEach(function(i){ var el=document.getElementById(i); if(el) el.textContent='未配置'; }); return; }
+    cbApi('adminStats', { adminPwd: adminPwd }).then(function(res){
+      if(res.code!==0){ ids.forEach(function(i){ var el=document.getElementById(i); if(el) el.textContent='!'; }); return; }
+      var s=res.stats||{};
+      var set=function(i,v){ var el=document.getElementById(i); if(el) el.textContent=(v||0); };
+      set('stTotal', s.totalUsers); set('stLogin', s.everLoggedIn); set('stLogins', s.totalLogins);
+      set('stReg7', s.reg7); set('stLogin7', s.login7); set('stPending', s.pending);
+    }).catch(function(e){ ids.forEach(function(i){ var el=document.getElementById(i); if(el) el.textContent='!'; }); });
+  }
+  // 站长后台：云端注册用户监控表格（账号 / 注册时间 / 最近登录 / 登录次数 / 操作）
+  function loadCloudUsersTable(){
+    var body=document.getElementById('cloudUsersBody'); if(!body) return;
+    if(!CB_ENABLED){ body.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">后端未配置：请在 index.html 填入 API_BASE 并在 CloudBase 部署 cloud/ 云函数</td></tr>'; return; }
+    body.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">加载中…</td></tr>';
     cbApi('adminListUsers', { adminPwd: adminPwd }).then(function(res){
-      if(res.code!==0){ el.innerHTML='<span style="color:#e0443e">读取失败：'+(res.error||'无权限')+'</span>'; return; }
+      if(res.code!==0){ body.innerHTML='<tr><td colspan="6" style="text-align:center;color:#e0443e">读取失败：'+(res.error||'无权限')+'</td></tr>'; return; }
       var list=res.result||[];
-      if(!list.length){ el.innerHTML='<span style="color:var(--ink-soft)">暂无注册用户</span>'; return; }
-      el.innerHTML=list.map(function(u){
-        var reg=u.createdAt? new Date(u.createdAt).toLocaleString('zh-CN'):'';
+      if(!list.length){ body.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">暂无注册用户</td></tr>'; return; }
+      body.innerHTML=list.map(function(u,idx){
+        var reg=u.createdAt? new Date(u.createdAt).toLocaleString('zh-CN'):'—';
         var lg=u.lastLogin? new Date(u.lastLogin).toLocaleString('zh-CN'):'从未登录';
-        return '<div class="cu-item"><div class="info"><b>'+escapeHtml(u.email||u.username)+'</b>'+
-          '<small>注册：'+reg+' ｜ 最近登录：'+lg+'</small></div>'+
-          '<div style="display:flex;gap:8px;flex-shrink:0"><button class="reset auto" data-u="'+escapeHtml(u.email||u.username)+'">一键重置</button>'+
-          '<button class="reset manual" data-u="'+escapeHtml(u.email||u.username)+'">手动</button></div></div>';
+        var lc=u.loginCount||0;
+        return '<tr><td>'+(idx+1)+'</td>'+
+          '<td class="cu-mail">'+escapeHtml(u.email||'')+'</td>'+
+          '<td>'+reg+'</td><td>'+lg+'</td><td>'+lc+'</td>'+
+          '<td class="cu-act">'+
+            '<button class="cu-btn reset-auto" data-u="'+escapeHtml(u.email||'')+'">重置并查看</button>'+
+            '<button class="cu-btn reset-manual" data-u="'+escapeHtml(u.email||'')+'">自定义密码</button>'+
+            '<button class="cu-btn cu-del" data-u="'+escapeHtml(u.email||'')+'">删除账号</button>'+
+          '</td></tr>';
       }).join('');
-      bindResetButtons(el);
-    }).catch(function(e){ el.innerHTML='<span style="color:#e0443e">网络错误：'+errText(e)+'</span>'; });
+      body.querySelectorAll('.reset-auto').forEach(function(b){ b.onclick=function(){
+        var un=b.getAttribute('data-u');
+        if(!confirm('将 '+un+' 的密码重置为随机 12 位，并自动通过 163 邮箱发送给该用户。\n\n继续？')) return;
+        b.disabled=true;
+        cbApi('adminResetAuto', { adminPwd: adminPwd, email: un }).then(function(r){
+          if(r.code!==0){ alert('重置失败：'+(r.error||'未知')); b.disabled=false; }
+          else { alert('✅ 已生成随机密码并通过 163 邮箱发送给 '+un+'。\n\n新密码：'+r.newPwd+'\n\n（请也留存一份备查；原密码因哈希存储无法查看）'); loadCloudStats(); loadCloudUsersTable(); loadResets(); }
+        }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
+      };});
+      body.querySelectorAll('.reset-manual').forEach(function(b){ b.onclick=function(){
+        var un=b.getAttribute('data-u');
+        var np=prompt('为 '+un+' 设置新密码（8-32 位，含字母和数字）：'); if(!np) return;
+        if(!/^(?=.*[a-zA-Z])(?=.*\d).{8,32}$/.test(np)){ alert('密码需 8-32 位且同时含字母和数字'); return; }
+        b.disabled=true;
+        cbApi('adminResetPassword', { adminPwd: adminPwd, email: un, newPwd: np }).then(function(r){
+          if(r.code!==0){ alert('重置失败：'+(r.error||'未知')); b.disabled=false; }
+          else { alert('✅ 已将 '+un+' 的密码重置为：\n\n'+np+'\n\n请通过你方便的方式告知该用户。（原密码因哈希存储无法查看）'); loadCloudUsersTable(); }
+        }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
+      };});
+      body.querySelectorAll('.cu-del').forEach(function(b){ b.onclick=function(){
+        var un=b.getAttribute('data-u');
+        if(!confirm('⚠️ 确定删除账号 '+un+' ？\n该用户的注册记录和密码将永久清除，且无法恢复！')) return;
+        b.disabled=true;
+        cbApi('adminDeleteUser', { adminPwd: adminPwd, email: un }).then(function(r){
+          if(r.code!==0){ alert('删除失败：'+(r.error||'未知')); b.disabled=false; }
+          else { alert('已删除账号 '+un); loadCloudStats(); loadCloudUsersTable(); loadResets(); }
+        }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
+      };});
+    }).catch(function(e){ body.innerHTML='<tr><td colspan="6" style="text-align:center;color:#e0443e">网络错误：'+errText(e)+'</td></tr>'; });
   }
   // 站长重置按钮绑定：.auto=一键随机12位+163发信；.manual=手填密码
   function bindResetButtons(scope){
@@ -1707,7 +1793,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
           b.disabled=true;
           cbApi('adminResetAuto', { adminPwd: adminPwd, email: un }).then(function(r){
             if(r.code!==0){ alert('重置失败：'+(r.error||'未知错误')); b.disabled=false; }
-            else { alert('✅ 已生成随机密码并通过 163 邮箱发送给 '+un+'。\n\n新密码：'+r.newPwd+'\n（请也留存一份备查）'); loadCloudUsers(); loadResets(); }
+            else { alert('✅ 已生成随机密码并通过 163 邮箱发送给 '+un+'。\n\n新密码：'+r.newPwd+'\n（请也留存一份备查）'); loadCloudStats(); loadCloudUsersTable(); loadResets(); }
           }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
         } else {
           var np=prompt('为 '+un+' 设置新密码（8-32位，含字母和数字）：'); if(!np) return;
@@ -1715,7 +1801,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
           b.disabled=true;
           cbApi('adminResetPassword', { adminPwd: adminPwd, email: un, newPwd: np }).then(function(r){
             if(r.code!==0){ alert('重置失败：'+(r.error||'未知错误')); b.disabled=false; }
-            else { alert('已重置为：'+np+'\n请通过你方便的方式把这个新密码告诉该用户。'); loadCloudUsers(); }
+            else { alert('已重置为：'+np+'\n请通过你方便的方式把这个新密码告诉该用户。'); loadCloudStats(); loadCloudUsersTable(); }
           }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
         }
       };
@@ -1802,4 +1888,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T17:41:00Z -->
+<!-- deploy cache-bust 2026-10-05T17:50:00Z -->
