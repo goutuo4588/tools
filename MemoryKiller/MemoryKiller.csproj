@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>MemoryKiller</AssemblyName>
+    <RootNamespace>MemoryKiller</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>embedded</DebugType>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!--
+    System.Management 提供 WMI (Win32_Processor / Win32_VideoController / Win32_PhysicalMemory) 查询。
+    相比 Microsoft.Windows.Compatibility 大包，本包传递依赖极少（不会带出 sni.dll 等原生 DLL）。
+    首次构建会自动从 NuGet 还原，需要联网一次。
+  -->
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
