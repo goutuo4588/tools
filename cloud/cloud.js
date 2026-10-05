@@ -14,6 +14,7 @@ const crypto = require('crypto');
 
 const app = cloudbase.init({});
 const db = app.database();
+const _ = db.command;
 
 const ALLOW_ORIGIN = 'https://goutuo4588.github.io';
 const CORS = {
@@ -133,7 +134,7 @@ exports.main = async (event) => {
       const rec = u.data && u.data[0];
       if (!rec) return ok({ code: 401, error: '邮箱或密码错误' });
       if (!verifyPassword(pwd, rec.salt, rec.passwordHash)) return ok({ code: 401, error: '邮箱或密码错误' });
-      await db.collection('tp_users').doc(rec._id).update({ lastLogin: Date.now() }).catch(function () {});
+      await db.collection('tp_users').doc(rec._id).update({ lastLogin: Date.now(), loginCount: _.inc(1) }).catch(function () {});
       return ok({ code: 0, uid: email });
     } catch (e) { return ok({ code: 500, error: '登录失败：' + (e.message || String(e)) }); }
   }
@@ -171,7 +172,7 @@ exports.main = async (event) => {
     try {
       const res = await db.collection('tp_users').limit(1000).get();
       return ok({ code: 0, result: (res.data || []).map(function (u) {
-        return { email: u.email, createdAt: u.createdAt, lastLogin: u.lastLogin };
+        return { email: u.email, createdAt: u.createdAt, lastLogin: u.lastLogin, loginCount: u.loginCount || 0 };
       }) });
     } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
   }
@@ -235,6 +236,36 @@ exports.main = async (event) => {
       return ok({ code: 0, result: (res.data || []).map(function (r) {
         return { email: r.email, createdAt: r.createdAt, exists: r.exists };
       }) });
+    } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
+  }
+
+  // 站长：云端监测统计（注册人数 / 已登录人数 / 累计登录次数 / 近7天注册 / 近7天登录 / 待处理找回）
+  if (action === 'adminStats') {
+    if (payload.adminPwd !== process.env.ADMIN_PWD) return ok({ code: 401, error: '无权限' });
+    try {
+      const res = await db.collection('tp_users').limit(1000).get();
+      const users = res.data || [];
+      const now = Date.now();
+      const D7 = 7 * 24 * 3600 * 1000;
+      const totalUsers = users.length;
+      const everLoggedIn = users.filter(function (u) { return u.lastLogin; }).length;
+      const totalLogins = users.reduce(function (s, u) { return s + (u.loginCount || 0); }, 0);
+      const reg7 = users.filter(function (u) { return u.createdAt && (now - u.createdAt) <= D7; }).length;
+      const login7 = users.filter(function (u) { return u.lastLogin && (now - u.lastLogin) <= D7; }).length;
+      const rres = await db.collection('tp_resets').where({ done: false }).limit(200).get();
+      const pending = (rres.data || []).length;
+      return ok({ code: 0, stats: { totalUsers: totalUsers, everLoggedIn: everLoggedIn, totalLogins: totalLogins, reg7: reg7, login7: login7, pending: pending } });
+    } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
+  }
+
+  // 站长：删除某用户账号（注册记录 + 密码一并清除，不可恢复）
+  if (action === 'adminDeleteUser') {
+    if (payload.adminPwd !== process.env.ADMIN_PWD) return ok({ code: 401, error: '无权限' });
+    const email = (payload.email || '').trim().toLowerCase();
+    if (!email) return ok({ code: 400, error: '参数缺失' });
+    try {
+      await db.collection('tp_users').where({ email: email }).remove();
+      return ok({ code: 0, message: 'ok' });
     } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
   }
 
