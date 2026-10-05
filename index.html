@@ -520,7 +520,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T17:50:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T18:35:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1266,7 +1266,6 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     const totalS=TOOL_SLUGS.reduce((s,x)=>s+(shares[x]||0),0);
     adminPanel.innerHTML=
       '<div class="admin-stat">'+
-        '<div class="admin-card"><b>'+(profile?'1':'0')+'</b><span>本机账号</span></div>'+
         '<div class="admin-card"><b>'+totalL+'</b><span>👍 点赞</span></div>'+
         '<div class="admin-card"><b>'+favs.length+'</b><span>⭐ 收藏</span></div>'+
         '<div class="admin-card"><b>'+totalS+'</b><span>🔗 分享</span></div>'+
@@ -1279,7 +1278,6 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
         '<button class="auth-btn" id="aExport" style="width:auto;padding:9px 18px;background:var(--accent-2)">导出本机数据</button>'+
         '<button class="auth-btn" id="aReport" style="width:auto;padding:9px 18px;background:#5b3cc4">📊 数据可视化报表（新窗口）</button>'+
         '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a>'+
-        '<button type="button" class="admin-sec-btn sec-inline" data-sec="aUsers">本机账号 <span class="ar">▾</span></button>'+
         '<button type="button" class="admin-sec-btn sec-inline" data-sec="aResets">🔑 找回密码申请 <span class="ar">▾</span></button></div>'+
       '<div class="cloud-monitor">'+
         '<div class="cm-head"><h3>🌐 云端用户监控台</h3><span class="cm-live"><span class="dot"></span>实时监测中</span><button class="auth-btn" id="aCloudRefresh" style="width:auto;padding:6px 14px;font-size:13px;background:var(--accent-2)">🔄 刷新</button></div>'+
@@ -1296,14 +1294,13 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
         '<tbody id="cloudUsersBody"><tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">加载中…</td></tr></tbody></table></div>'+
       '</div>'+
       '<h3 style="margin-top:18px">各工具互动明细（本机）</h3><div id="aInteract" class="admin-list"></div>'+
-      '<div id="aUsers" class="admin-sec-body"></div>'+
       '<div id="aResets" class="admin-sec-body"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';adminPwd='';localStorage.removeItem(ADMIN_KEY);try{sessionStorage.removeItem('tp_admin_pwd');}catch(e){}refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
     adminPanel.querySelector('#aReport').onclick=openReport;
     var rf=adminPanel.querySelector('#aCloudRefresh'); if(rf) rf.onclick=function(){ loadCloudStats(); loadCloudUsersTable(); };
-    loadAdminInteract();loadAdminUsers();loadAdminComments();loadResets();loadCloudStats();loadCloudUsersTable();
+    loadAdminInteract();loadAdminComments();loadResets();loadCloudStats();loadCloudUsersTable();
     // 模块折叠按钮：点击展开/收起对应内容
     adminPanel.querySelectorAll('.admin-sec-btn').forEach(function(b){
       b.onclick=function(){
@@ -1337,10 +1334,6 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       if(CB_ENABLED&&adminPwd){cbApi('adminResetCounts',{adminPwd:adminPwd,slug:s}).catch(function(){});}
       syncLikes();refreshAdmin();
     });
-  }
-  function loadAdminUsers(){
-    const el=adminPanel.querySelector('#aUsers');if(!el)return;
-    el.innerHTML=profile?('<div class="admin-item"><div><b>'+escapeHtml(profile.nickName)+'</b> <span style="color:var(--ink-soft)">'+escapeHtml(profile.email)+'</span></div></div>'):'<span style="color:var(--ink-soft)">本机尚未登录账号</span>';
   }
   function loadAdminComments(){
     const el=adminPanel.querySelector('#aComments');if(!el)return;
@@ -1888,4 +1881,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T17:50:00Z -->
+<!-- deploy cache-bust 2026-10-05T18:35:00Z -->
