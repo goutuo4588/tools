@@ -332,6 +332,7 @@
   .admin-sec-btn:hover{filter:brightness(1.05)}
   .admin-sec-btn .ar{transition:transform .2s ease;font-size:14px;opacity:.9;flex-shrink:0}
   .admin-sec-btn.collapsed .ar{transform:rotate(-90deg)}
+  .admin-sec-btn.sec-inline{width:auto;margin-top:0;padding:9px 18px;font-size:15px;font-weight:700;border-radius:12px;box-shadow:none}
   .admin-sec-body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
   .admin-sec-body.hide{display:none}
 
@@ -498,7 +499,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T17:36:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T17:41:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1256,11 +1257,14 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
         '<button class="auth-btn" id="aLogout" style="width:auto;padding:9px 18px">退出后台</button>'+
         '<button class="auth-btn" id="aExport" style="width:auto;padding:9px 18px;background:var(--accent-2)">导出本机数据</button>'+
         '<button class="auth-btn" id="aReport" style="width:auto;padding:9px 18px;background:#5b3cc4">📊 数据可视化报表（新窗口）</button>'+
-        '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a></div>'+
+        '<a class="auth-btn" id="aDiscuss" style="width:auto;padding:9px 18px;background:var(--accent);text-decoration:none" href="https://github.com/goutuo4588/tools/discussions" target="_blank" rel="noopener">查看全部留言 ↗</a>'+
+        '<button type="button" class="admin-sec-btn sec-inline" data-sec="aUsers">本机账号 <span class="ar">▾</span></button>'+
+        '<button type="button" class="admin-sec-btn sec-inline" data-sec="aCloudUsers">网站注册用户（云端） <span class="ar">▾</span></button>'+
+        '<button type="button" class="admin-sec-btn sec-inline" data-sec="aResets">🔑 找回密码申请 <span class="ar">▾</span></button></div>'+
       '<h3 style="margin-top:8px">各工具互动明细</h3><div id="aInteract" class="admin-list"></div>'+
-      '<button type="button" class="admin-sec-btn" data-sec="aUsers">本机账号 <span class="ar">▾</span></button><div id="aUsers" class="admin-sec-body"></div>'+
-      '<button type="button" class="admin-sec-btn" data-sec="aCloudUsers">网站注册用户（云端 · 短信注册） <span class="ar">▾</span></button><div id="aCloudUsers" class="admin-sec-body"></div>'+
-      '<button type="button" class="admin-sec-btn" data-sec="aResets">🔑 找回密码申请（待处理） <span class="ar">▾</span></button><div id="aResets" class="admin-sec-body"></div>'+
+      '<div id="aUsers" class="admin-sec-body"></div>'+
+      '<div id="aCloudUsers" class="admin-sec-body"></div>'+
+      '<div id="aResets" class="admin-sec-body"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';adminPwd='';localStorage.removeItem(ADMIN_KEY);try{sessionStorage.removeItem('tp_admin_pwd');}catch(e){}refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
@@ -1798,4 +1802,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T17:36:00Z -->
+<!-- deploy cache-bust 2026-10-05T17:41:00Z -->
