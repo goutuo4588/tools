@@ -520,7 +520,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T19:35:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T19:45:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1071,6 +1071,35 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
   // ---------- 我的：本机账号（登录/注册均为本地，无服务器校验） ----------
   const mePanel=document.getElementById('mePanel');
+
+  // 「重置密码」说明弹窗：仅展示文案告知，关闭后不影响页面其他操作（移动端可滚动，不会被截断）
+  function showResetNotice(onClose){
+    var old=document.getElementById('resetNoticeModal'); if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.id='resetNoticeModal';
+    wrap.setAttribute('role','dialog');
+    wrap.setAttribute('aria-modal','true');
+    wrap.style.cssText='position:fixed;inset:0;z-index:1500;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(20,22,28,.5)';
+    wrap.innerHTML=
+      '<div style="width:100%;max-width:440px;max-height:82vh;overflow:auto;-webkit-overflow-scrolling:touch;'+
+        'background:#fffdf9;border-radius:20px;box-shadow:0 18px 50px -22px rgba(35,37,43,.45);padding:22px 20px 18px">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'+
+          '<span style="font-size:22px;line-height:1">🔑</span>'+
+          '<h3 style="font-size:18px;font-weight:700;color:#23252b">重置密码说明</h3>'+
+        '</div>'+
+        '<div style="font-size:15px;line-height:1.9;color:#23252b">'+
+          '<p style="margin:0 0 10px">如果你忘记了密码，可以填写注册或登录时使用的邮箱，来获取系统自动生成的随机强密码；系统会通过邮件的方式，将该密码发送给你。</p>'+
+          '<p style="margin:0 0 10px">使用该方式后，你将无法再自行修改密码。</p>'+
+          '<p style="margin:0">为避免忘记账号或密码，建议你将账号和该密码妥善保存在手机或电脑中。感谢你的理解与合作！</p>'+
+        '</div>'+
+        '<button type="button" id="resetNoticeOk" style="margin-top:18px;width:100%;border:0;border-radius:14px;'+
+          'padding:12px 16px;font-size:15px;font-weight:600;color:#fff;background:#ff7a59;cursor:pointer">我知道了</button>'+
+      '</div>';
+    document.body.appendChild(wrap);
+    function close(){ wrap.remove(); if(typeof onClose==='function') onClose(); }
+    var okBtn=wrap.querySelector('#resetNoticeOk'); if(okBtn) okBtn.onclick=close;
+    wrap.addEventListener('click', function(e){ if(e.target===wrap) close(); });
+  }
   // （旧本机注册表单已废弃：登录/注册现统一走云端账号体系 authModal，见 doLogin/doSignup）
   function renderMeFavs(){
     const chips=(favs||[]).map(s=>{const el=document.querySelector('.tool[data-slug="'+s+'"] h3');return el?'<span class="chip">'+el.textContent+'</span>':'';}).join('');
@@ -1102,11 +1131,11 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       '<div class="me-mod"><h4>⭐ 我的收藏</h4><div class="me-fav" id="meFavs"></div></div>'+
       '<div class="me-mod"><h4>🔐 账号与安全</h4>'+
         '<div class="me-act">'+
-        '<button class="btn2" id="mePwdBtn">修改密码</button>'+
+        '<button class="btn2" id="mePwdBtn">重置密码</button>'+
         '<button class="btn2 ghost" id="meLogoutBtn">退出登录</button>'+
         '</div></div>'+
       '</div>';
-    mePanel.querySelector('#mePwdBtn').onclick=function(){ openAuth('forgot'); };
+    mePanel.querySelector('#mePwdBtn').onclick=function(){ showResetNotice(function(){ openAuth('forgot'); }); };
     mePanel.querySelector('#meLogoutBtn').onclick=function(){
       if(confirm('确定退出登录？')){
         localStorage.removeItem(CLOUD_USER_KEY); profile=null; LS.set(PROFILE_KEY,null);
@@ -1605,7 +1634,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       document.getElementById('regCodeBtn').onclick=doRequestCode;
       document.getElementById('toLg').onclick=function(){ renderAuthView('login'); };
     } else if(mode==='forgot'){
-      v.innerHTML='<h3>忘记密码</h3><p class="auth-sub">输入你的注册邮箱，站长会收到申请并亲自帮你重置密码（不会发送你的旧密码）。</p>'+
+      v.innerHTML='<h3>重置密码</h3><p class="auth-sub">输入你注册或登录时使用的邮箱，系统将生成随机强密码并通过邮件发送给你。</p>'+
         '<div class="field"><input id="fgtEmail" type="email" placeholder="注册邮箱"></div>'+
         '<button class="auth-btn" id="fgtBtn">提交申请</button>'+
         '<button class="auth-link" id="toLg2">返回登录</button>'+
@@ -1889,4 +1918,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T19:35:00Z -->
+<!-- deploy cache-bust 2026-10-05T19:45:00Z -->
