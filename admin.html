@@ -138,6 +138,7 @@
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="cm-btn" id="btnRefresh" style="display:none">🔄 刷新</button>
+      <button class="cm-btn" id="btnInitDb" style="display:none;background:#5b3cc4">🛠 初始化数据库</button>
       <button class="cm-btn" id="btnLogout" style="display:none;background:#e0443e">退出后台</button>
     </div>
   </div>
@@ -234,6 +235,7 @@
     el('loginBox').style.display='';
     el('panel').style.display='none';
     el('btnRefresh').style.display='none';
+    el('btnInitDb').style.display='none';
     el('btnLogout').style.display='none';
     var m=el('aMsg'); if(m){ m.className='auth-msg'+(msg?' err':''); m.textContent=msg||''; }
   }
@@ -241,6 +243,7 @@
     el('loginBox').style.display='none';
     el('panel').style.display='';
     el('btnRefresh').style.display='';
+    el('btnInitDb').style.display='';
     el('btnLogout').style.display='';
     loadStats(); loadUsers(); loadResets();
     startAutoRefresh();
@@ -284,6 +287,31 @@
     showLogin();
   };
   el('btnRefresh').onclick = function(){ loadStats(); loadUsers(); loadResets(); };
+
+  /* ---------- 一键初始化数据库集合（补建缺失的 tp_* 集合） ---------- */
+  el('btnInitDb').onclick = function(){
+    var b = el('btnInitDb'); b.disabled = true;
+    cbApi('adminInitDb', { adminPwd: adminPwd }).then(function(r){
+      b.disabled = false;
+      if(r.code !== 0){ alert('初始化失败：' + (r.error || '未知错误')); return; }
+      var init = r.init || {}, check = r.check || {};
+      var lines = ['数据库集合检查结果：'];
+      ['tp_users','tp_codes','tp_resets'].forEach(function(n){
+        lines.push('  · ' + n + '：' + (check[n] === 'ok' ? '✅ 可用' : '❌ 缺失'));
+      });
+      if(init.created && init.created.length) lines.push('本次新建：' + init.created.join('、'));
+      var missing = Object.keys(check).filter(function(k){ return check[k] !== 'ok'; });
+      if(!init.supported && missing.length){
+        lines.push('', '当前云函数 SDK 不支持自动建集合，请手动在 CloudBase 控制台新建：',
+                   '控制台 → 数据库 → 新建集合 → 名称填 ' + missing.join('、'));
+      }
+      alert(lines.join('\n'));
+      loadStats(); loadUsers(); loadResets();
+    }).catch(function(e){
+      b.disabled = false;
+      alert('网络错误：' + errText(e));
+    });
+  };
 
   /* ---------- 统计卡 ---------- */
   function loadStats(){
@@ -391,7 +419,12 @@
         return;
       }
       var list = res.result || [];
-      if(!list.length){ box.innerHTML='<span class="empty">暂无待处理申请 🎉</span>'; return; }
+      if(!list.length){
+        box.innerHTML = res.note
+          ? '<span class="empty">暂无待处理申请 🎉</span><div style="margin-top:8px;font-size:13px;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 12px">⚠️ '+escapeHtml(res.note)+'</div>'
+          : '<span class="empty">暂无待处理申请 🎉</span>';
+        return;
+      }
       box.innerHTML = list.map(function(r){
         var t = r.createdAt ? new Date(r.createdAt).toLocaleString('zh-CN') : '';
         var ex = r.exists ? '' : ' <span style="color:#e0443e">（该邮箱未注册）</span>';
