@@ -512,6 +512,11 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       if(secEl) secEl.textContent=String(sec);
       if(sec<=0){
         clearInterval(timer);
+        // 安全护栏：绝不在登录弹窗打开时自动刷新，避免打断登录形成"无限循环登录"
+        var am=document.getElementById('authModal');
+        if(am && !am.hidden) return;            // 等用户登录完成后再手动刷新即可
+        if(window._updateReloaded) return;      // 同一会话只自动刷新一次，防止重复触发
+        window._updateReloaded=true;
         try{ localStorage.setItem('tp_update_dismissed', String(Date.now())); }catch(e){}
         location.replace(location.pathname + '?v=' + Date.now());
       }
@@ -1773,4 +1778,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-09-20T16:03:48Z -->
+<!-- deploy cache-bust 2026-10-02T17:23:00Z -->
