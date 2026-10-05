@@ -20,6 +20,13 @@
 - 下载 `CDriveCleanup-v1.0.zip`，解压后运行其中的 `CDriveCleanup.exe`
 - 下载见 Release：[cdrivecleanup-v1.0](https://github.com/goutuo4588/tools/releases/tag/cdrivecleanup-v1.0)
 
+### 3. 内存杀手 MemBoost（电脑端）
+面向 Windows 的系统性能优化工具，通过系统公开内存管理接口安全释放内存、降低 CPU 负载、缓解 GPU 共享内存占用，全程不终止任何进程。
+- .NET 10 单文件发布，零依赖跨机运行
+- 内置系统进程黑名单与 UAC 提权隔离，默认拒绝风险操作
+- 下载 `MemoryKiller.exe`，右键以管理员身份运行
+- 下载见 Release：[memorykiller-v1.0](https://github.com/goutuo4588/tools/releases/tag/memorykiller-v1.0)
+
 ## 📱 手机端工具
 
 Android 端小工具，开发中，暂无上架。
