@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://goutuo4588.github.io/tools/sitemap.xml
