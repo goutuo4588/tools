@@ -6,7 +6,8 @@
 //   SMTP_PASS    163 邮箱 SMTP 授权码（不是登录密码）
 //   OWNER_EMAIL  接收找回密码申请的邮箱，默认 goutuoshigesha@163.com
 //   ADMIN_PWD    站长后台密码（与前端 index.html 里的 ADMIN_PWD 一致）
-// 数据库集合：tp_users（账号）、tp_codes（邮箱验证码，5 分钟过期）
+// 数据库集合：tp_users（账号）、tp_codes（邮箱验证码，5 分钟过期）、tp_resets（找回密码申请）
+// 集合缺失会自动尝试创建（需云函数 SDK 支持 createCollection）；缺失时查询按空结果处理，不报错。
 
 const cloudbase = require('@cloudbase/node-sdk');
 const nodemailer = require('nodemailer');
@@ -96,11 +97,70 @@ function parsePayload(event) {
   return body || {};
 }
 
+// ---------- 集合自动初始化 ----------
+// CloudBase 数据库集合必须存在才能读写，否则报 DATABASE_COLLECTION_NOT_EXIST。
+// 这里在云函数首次被触发时尝试把需要的集合全部建好（已存在会失败，忽略即可）。
+const NEED_COLLECTIONS = ['tp_users', 'tp_codes', 'tp_resets'];
+let __dbInitPromise = null;
+function ensureCollections() {
+  if (!__dbInitPromise) {
+    __dbInitPromise = (async function () {
+      if (typeof db.createCollection !== 'function') return { supported: false, created: [] };
+      const created = [];
+      for (let i = 0; i < NEED_COLLECTIONS.length; i++) {
+        try { await db.createCollection(NEED_COLLECTIONS[i]); created.push(NEED_COLLECTIONS[i]); } catch (e) { /* 已存在或无权限，忽略 */ }
+      }
+      return { supported: true, created: created };
+    })().catch(function () { return { supported: false, created: [] }; });
+  }
+  return __dbInitPromise;
+}
+
+// 安全查询：集合不存在或查询失败时返回空数组，绝不让后台因缺表而报错
+async function safeFind(colName, where, order, limit) {
+  try {
+    let q = db.collection(colName);
+    if (where) q = q.where(where);
+    if (order) q = q.orderBy(order.field, order.dir || 'desc');
+    if (limit) q = q.limit(limit);
+    const res = await q.get();
+    return { data: res.data || [], missing: false };
+  } catch (e) {
+    const msg = e && (e.message || String(e));
+    const missing = !!msg && (msg.indexOf('COLLECTION_NOT_EXIST') >= 0 || msg.indexOf('not exist') >= 0 || msg.indexOf('Db or Table not exist') >= 0);
+    return { data: [], missing: missing, error: msg };
+  }
+}
+
 exports.main = async (event) => {
   const payload = parsePayload(event);
   if (payload && payload.__preflight) return preflight();
   const action = payload && payload.action;
   const now = Date.now();
+
+  // 首次触发时确保集合存在（后台异步，不阻塞；失败也不影响主流程）
+  await ensureCollections();
+
+  // 站长：手动初始化数据库集合（返回创建结果，便于排查）
+  if (action === 'adminInitDb') {
+    if (payload.adminPwd !== process.env.ADMIN_PWD) return ok({ code: 401, error: '无权限' });
+    const r = await (async function () {
+      if (typeof db.createCollection !== 'function') return { supported: false, created: [] };
+      const created = [];
+      const failed = [];
+      for (let i = 0; i < NEED_COLLECTIONS.length; i++) {
+        try { await db.createCollection(NEED_COLLECTIONS[i]); created.push(NEED_COLLECTIONS[i]); }
+        catch (e) { failed.push(NEED_COLLECTIONS[i] + ':' + (e && e.message ? e.message : String(e))); }
+      }
+      return { supported: true, created: created, failed: failed };
+    })();
+    const check = {};
+    for (let i = 0; i < NEED_COLLECTIONS.length; i++) {
+      const f = await safeFind(NEED_COLLECTIONS[i], null, null, 1);
+      check[NEED_COLLECTIONS[i]] = f.missing ? 'missing' : 'ok';
+    }
+    return ok({ code: 0, init: r, check: check });
+  }
 
   // 注册：发送邮箱验证码
   if (action === 'register') {
@@ -158,6 +218,11 @@ exports.main = async (event) => {
     try { const u = await db.collection('tp_users').where({ email }).get(); exists = !!(u.data && u.data.length); } catch (e) {}
     // 写入/刷新找回申请队列（同一邮箱未处理的合并为一条）
     try {
+      // 集合若缺失，先补建，避免申请记录写不进去
+      const probe = await safeFind('tp_resets', { email: email, done: false }, null, 1);
+      if (probe.missing && typeof db.createCollection === 'function') {
+        try { await db.createCollection('tp_resets'); } catch (e) {}
+      }
       const ex = await db.collection('tp_resets').where({ email: email, done: false }).get();
       if (ex.data && ex.data.length) {
         await db.collection('tp_resets').doc(ex.data[0]._id).update({ createdAt: now, exists: exists }).catch(function () {});
@@ -242,12 +307,14 @@ exports.main = async (event) => {
   // 站长：列出待处理的找回密码申请
   if (action === 'adminListResets') {
     if (payload.adminPwd !== process.env.ADMIN_PWD) return ok({ code: 401, error: '无权限' });
-    try {
-      const res = await db.collection('tp_resets').where({ done: false }).orderBy('createdAt', 'desc').limit(200).get();
-      return ok({ code: 0, result: (res.data || []).map(function (r) {
-        return { email: r.email, createdAt: r.createdAt, exists: r.exists };
-      }) });
-    } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
+    const f = await safeFind('tp_resets', { done: false }, { field: 'createdAt', dir: 'desc' }, 200);
+    if (f.missing) {
+      return ok({ code: 0, result: [], note: '集合 tp_resets 尚未创建：请在 CloudBase 控制台「数据库」新建该集合，或点后台「初始化数据库」按钮。' });
+    }
+    if (f.error) return ok({ code: 500, error: f.error });
+    return ok({ code: 0, result: f.data.map(function (r) {
+      return { email: r.email, createdAt: r.createdAt, exists: r.exists };
+    }) });
   }
 
   // 站长：云端监测统计（注册人数 / 已登录人数 / 累计登录次数 / 近7天注册 / 近7天登录 / 待处理找回）
@@ -263,8 +330,8 @@ exports.main = async (event) => {
       const totalLogins = users.reduce(function (s, u) { return s + (u.loginCount || 0); }, 0);
       const reg7 = users.filter(function (u) { return u.createdAt && (now - u.createdAt) <= D7; }).length;
       const login7 = users.filter(function (u) { return u.lastLogin && (now - u.lastLogin) <= D7; }).length;
-      const rres = await db.collection('tp_resets').where({ done: false }).limit(200).get();
-      const pending = (rres.data || []).length;
+      const rf = await safeFind('tp_resets', { done: false }, null, 200);
+      const pending = rf.data.length;
       return ok({ code: 0, stats: { totalUsers: totalUsers, everLoggedIn: everLoggedIn, totalLogins: totalLogins, reg7: reg7, login7: login7, pending: pending } });
     } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
   }
