@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>具坊 · 注册</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>📝 注册账号</h1>
+    <p class="sub">创建您的账户。注册后若忘记密码，可在密码找回页申请重置。</p>
+    <form id="f">
+      <label>用户名（3-20 位字母/数字/下划线）
+        <input name="username" required autocomplete="username" placeholder="例如 dogtuo">
+      </label>
+      <label>邮箱
+        <input name="email" type="email" required autocomplete="email" placeholder="name@example.com">
+      </label>
+      <label>密码（至少 6 位）
+        <input name="password" type="password" required autocomplete="new-password">
+      </label>
+      <label>确认密码
+        <input name="confirm" type="password" required autocomplete="new-password">
+      </label>
+      <button class="btn" type="submit">注册</button>
+    </form>
+    <div id="msg"></div>
+    <a class="link" href="/">已有账号？去找回密码</a>
+  </div>
+</div>
+<script>
+  document.getElementById('f').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const b = Object.fromEntries(fd.entries());
+    const m = document.getElementById('msg');
+    if (b.password !== b.confirm) { m.textContent = '两次密码不一致'; m.className = 'err'; return; }
+    delete b.confirm;
+    const r = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(b)
+    });
+    const j = await r.json();
+    m.textContent = j.msg || j.error || '注册失败';
+    m.className = j.ok ? 'ok' : 'err';
+    if (j.ok) { e.target.reset(); setTimeout(() => location.href = '/', 1200); }
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>具坊 · 管理员后台</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <!-- 登录框 -->
+  <div class="card" id="loginBox">
+    <h1>🔐 管理员登录</h1>
+    <p class="sub">请输入管理密码进入后台。</p>
+    <form id="loginForm">
+      <label>管理密码
+        <input type="password" name="password" required autocomplete="current-password">
+      </label>
+      <button class="btn" type="submit">登录</button>
+    </form>
+    <div id="loginMsg"></div>
+  </div>
+
+  <!-- 后台 -->
+  <div class="card hidden" id="dash">
+    <h1>📋 密码重置申请</h1>
+    <p class="sub">点击「重置并发送」将生成 12 位随机密码（大小写字母+数字），通过 163 邮箱发给客户，并标记完成。密码仅经邮件送达，不会显示在页面上。</p>
+    <h3>待处理</h3>
+    <div id="pending"></div>
+    <h3>已处理（最近 20 条）</h3>
+    <div id="done"></div>
+    <button class="btn ghost" id="logout">退出登录</button>
+  </div>
+</div>
+<script>
+  const loginBox = document.getElementById('loginBox');
+  const dash = document.getElementById('dash');
+
+  async function load() {
+    const r = await fetch('/api/admin/requests');
+    if (!r.ok) { location.reload(); return; }
+    const j = await r.json();
+    const pe = document.getElementById('pending');
+    if (!j.pending.length) pe.innerHTML = '<div class="empty">暂无待处理申请</div>';
+    else pe.innerHTML = j.pending.map(it => `
+      <div class="req-item">
+        <div class="meta"><b>${esc(it.username)}</b> · ${esc(it.email)}<br>申请时间：${new Date(it.createdAt).toLocaleString('zh-CN')}</div>
+        <button class="btn small" onclick="resetOne('${it.id}')">重置并发送邮件</button>
+      </div>`).join('');
+    const de = document.getElementById('done');
+    if (!j.done.length) de.innerHTML = '<div class="empty">暂无已处理记录</div>';
+    else de.innerHTML = j.done.map(it => `
+      <div class="req-item">
+        <div class="meta"><b>${esc(it.username)}</b> · ${esc(it.email)}<br>处理时间：${new Date(it.resetAt || it.createdAt).toLocaleString('zh-CN')}</div>
+        <span class="tag done">已发送</span>
+      </div>`).join('');
+  }
+
+  async function resetOne(id) {
+    if (!confirm('确认生成新随机密码并通过邮件发送给该客户？')) return;
+    const r = await fetch('/api/admin/reset/' + id, { method: 'POST' });
+    const j = await r.json();
+    if (j.ok) {
+      alert('已' + (j.simulated ? '模拟' : '真实') + '发送邮件给 ' + j.email + (j.simulated ? '（当前未配置 163 邮箱，为模拟发送）' : ''));
+    } else {
+      alert(j.error || '操作失败');
+    }
+    load();
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  document.getElementById('loginForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.fromEntries(fd.entries()))
+    });
+    const j = await r.json();
+    const m = document.getElementById('loginMsg');
+    if (j.ok) { loginBox.classList.add('hidden'); dash.classList.remove('hidden'); load(); }
+    else { m.textContent = j.error || '登录失败'; m.className = 'err'; }
+  };
+
+  document.getElementById('logout').onclick = () => location.reload();
+
+  (async () => {
+    const m = await fetch('/api/admin/me').then(r => r.json());
+    if (m.admin) { loginBox.classList.add('hidden'); dash.classList.remove('hidden'); load(); }
+  })();
+</script>
+</body>
+</html>

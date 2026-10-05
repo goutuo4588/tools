@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>具坊 · 密码找回</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>🔑 密码找回</h1>
+    <p class="sub">填写您的用户名与注册邮箱申请重置密码。管理员核实后，会通过邮件把新的随机密码发送给您。</p>
+    <form id="f">
+      <label>用户名
+        <input name="username" required autocomplete="username" placeholder="注册时的用户名">
+      </label>
+      <label>注册邮箱
+        <input name="email" type="email" required autocomplete="email" placeholder="name@example.com">
+      </label>
+      <label>验证码
+        <span class="cap-row">
+          <input name="captcha" required style="width:140px" placeholder="输入右图" autocomplete="off">
+          <img id="cap" src="/api/captcha" alt="验证码" title="看不清？点击刷新">
+        </span>
+      </label>
+      <button class="btn" type="submit">提交申请</button>
+    </form>
+    <div id="msg"></div>
+    <a class="link" href="/register">还没有账号？去注册</a>
+    <a class="link" href="/admin">管理员入口</a>
+  </div>
+</div>
+<script>
+  const cap = document.getElementById('cap');
+  cap.onclick = () => cap.src = '/api/captcha?t=' + Date.now();
+  document.getElementById('f').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const b = Object.fromEntries(fd.entries());
+    const r = await fetch('/api/request-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(b)
+    });
+    const j = await r.json();
+    const m = document.getElementById('msg');
+    m.textContent = j.msg || j.error || '提交失败';
+    m.className = j.ok ? 'ok' : 'err';
+    if (j.ok) { e.target.reset(); cap.src = '/api/captcha?t=' + Date.now(); }
+  };
+</script>
+</body>
+</html>
