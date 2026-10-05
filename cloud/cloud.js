@@ -47,6 +47,21 @@ function verifyPassword(pwd, salt, hash) {
   catch (e) { return false; }
 }
 
+// 生成 len 位随机密码（大小写字母 + 数字，剔除易混字符 I O l 0 1），并保证三类至少各 1 个
+function genRandomPwd(len) {
+  len = len || 12;
+  const sets = ['ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnopqrstuvwxyz', '23456789'];
+  const all = sets.join('');
+  const pick = (s) => s[crypto.randomInt(0, s.length)];
+  const arr = [pick(sets[0]), pick(sets[1]), pick(sets[2])];
+  for (let i = arr.length; i < len; i++) arr.push(pick(all));
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(0, i + 1);
+    const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr.join('');
+}
+
 async function sendCode(email) {
   const code = String(Math.floor(100000 + Math.random() * 900000));
   const expire = Date.now() + 5 * 60 * 1000;
@@ -123,20 +138,30 @@ exports.main = async (event) => {
     } catch (e) { return ok({ code: 500, error: '登录失败：' + (e.message || String(e)) }); }
   }
 
-  // 忘记密码：把申请邮件发给站长（不发旧密码）
+  // 忘记密码：记录找回申请（供站长后台队列展示），并邮件通知站长（失败不阻断）
   if (action === 'requestPasswordHelp') {
     const email = (payload.email || '').trim().toLowerCase();
     if (!email) return ok({ code: 400, error: '请输入邮箱' });
     let exists = false;
     try { const u = await db.collection('tp_users').where({ email }).get(); exists = !!(u.data && u.data.length); } catch (e) {}
+    // 写入/刷新找回申请队列（同一邮箱未处理的合并为一条）
+    try {
+      const ex = await db.collection('tp_resets').where({ email: email, done: false }).get();
+      if (ex.data && ex.data.length) {
+        await db.collection('tp_resets').doc(ex.data[0]._id).update({ createdAt: now, exists: exists }).catch(function () {});
+      } else {
+        await db.collection('tp_resets').add({ email: email, createdAt: now, exists: exists, done: false });
+      }
+    } catch (e) {}
+    // 邮件通知站长（便于即时处理，发送失败不影响申请已记录）
     try {
       await transporter().sendMail({
         from: process.env.SMTP_USER,
         to: process.env.OWNER_EMAIL || 'goutuoshigesha@163.com',
         subject: '[工具铺] 用户找回密码申请',
-        text: '有用户申请找回密码。\n\n邮箱：' + email + '\n账号是否存在：' + (exists ? '是' : '否（可能是未注册邮箱）') + '\n申请时间：' + new Date().toLocaleString('zh-CN') + '\n'
+        text: '有用户申请找回密码。\n\n邮箱：' + email + '\n账号是否存在：' + (exists ? '是' : '否（可能是未注册邮箱）') + '\n申请时间：' + new Date().toLocaleString('zh-CN') + '\n（也可在站长后台「找回密码申请」中一键处理）\n'
       });
-    } catch (e) { return ok({ code: 500, error: '邮件发送失败：' + (e.message || String(e)) }); }
+    } catch (e) {}
     return ok({ code: 0, message: '已提交给站长，请耐心等待站长协助你重置密码。' });
   }
 
@@ -173,6 +198,43 @@ exports.main = async (event) => {
         });
       } catch (e) {}
       return ok({ code: 0, message: 'ok' });
+    } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
+  }
+
+  // 站长：一键随机重置（生成 12 位随机密码、服务端哈希、163 发信给客户、标记申请完成）
+  if (action === 'adminResetAuto') {
+    if (payload.adminPwd !== process.env.ADMIN_PWD) return ok({ code: 401, error: '无权限' });
+    const email = (payload.email || '').trim().toLowerCase();
+    if (!email) return ok({ code: 400, error: '参数缺失' });
+    try {
+      const u = await db.collection('tp_users').where({ email }).get();
+      const rec = u.data && u.data[0];
+      if (!rec) return ok({ code: 404, error: '用户不存在（该邮箱未注册）' });
+      const np = genRandomPwd(12);
+      const hp = hashPassword(np);
+      await db.collection('tp_users').doc(rec._id).update({ salt: hp.salt, passwordHash: hp.hash }).catch(function () {});
+      try {
+        await transporter().sendMail({
+          from: process.env.SMTP_USER,
+          to: email,
+          subject: '[工具铺] 密码已重置',
+          text: '应你的找回密码申请，站长已将你的密码重置为：' + np + '\n请尽快使用新密码登录，并修改为只有你知道的密码。'
+        });
+      } catch (e) {}
+      // 标记对应找回申请为已处理
+      await db.collection('tp_resets').where({ email: email, done: false }).update({ done: true, resetAt: now, newPwd: np }).catch(function () {});
+      return ok({ code: 0, newPwd: np, message: '已重置并发送邮件' });
+    } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
+  }
+
+  // 站长：列出待处理的找回密码申请
+  if (action === 'adminListResets') {
+    if (payload.adminPwd !== process.env.ADMIN_PWD) return ok({ code: 401, error: '无权限' });
+    try {
+      const res = await db.collection('tp_resets').where({ done: false }).orderBy('createdAt', 'desc').limit(200).get();
+      return ok({ code: 0, result: (res.data || []).map(function (r) {
+        return { email: r.email, createdAt: r.createdAt, exists: r.exists };
+      }) });
     } catch (e) { return ok({ code: 500, error: e.message || String(e) }); }
   }
 

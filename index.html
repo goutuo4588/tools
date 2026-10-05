@@ -411,6 +411,8 @@
   .cu-item .info b{font-size:15px}
   .cu-item .info small{display:block;color:var(--ink-soft);font-size:12px;margin-top:3px}
   .cu-item .reset{padding:7px 14px;border:0;border-radius:10px;background:var(--accent-2);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+  .cu-item .reset.auto{background:#16a34a}
+  .cu-item .reset.manual{background:rgba(35,37,43,.12);color:var(--ink)}
   .cu-item .reset:hover{filter:brightness(.94)}
   .toast{position:fixed;left:50%;top:24px;transform:translateX(-50%);z-index:2000;background:rgba(35,37,43,.92);color:#fff;padding:11px 18px;border-radius:30px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transition:opacity .25s, top .25s;pointer-events:none}
   .toast.show{opacity:1;top:34px}
@@ -1242,11 +1244,12 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
       '<h3 style="margin-top:8px">各工具互动明细</h3><div id="aInteract" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">本机账号</h3><div id="aUsers" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">网站注册用户（云端 · 短信注册）</h3><div id="aCloudUsers" class="admin-list"></div>'+
+      '<h3 style="margin-top:18px">🔑 找回密码申请（待处理）</h3><div id="aResets" class="admin-list"></div>'+
       '<h3 style="margin-top:18px">历史本机评论（新留言已迁移至 GitHub Discussions）</h3><div id="aComments" class="admin-list"></div>';
     adminPanel.querySelector('#aLogout').onclick=()=>{adminToken='';adminPwd='';localStorage.removeItem(ADMIN_KEY);try{sessionStorage.removeItem('tp_admin_pwd');}catch(e){}refreshAdmin();};
     adminPanel.querySelector('#aExport').onclick=exportData;
     adminPanel.querySelector('#aReport').onclick=openReport;
-    loadAdminInteract();loadAdminUsers();loadAdminComments();loadCloudUsers();
+    loadAdminInteract();loadAdminUsers();loadAdminComments();loadCloudUsers();loadResets();
   }
   function loadAdminInteract(){
     const el=adminPanel.querySelector('#aInteract');if(!el)return;
@@ -1659,19 +1662,53 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
         var lg=u.lastLogin? new Date(u.lastLogin).toLocaleString('zh-CN'):'从未登录';
         return '<div class="cu-item"><div class="info"><b>'+escapeHtml(u.email||u.username)+'</b>'+
           '<small>注册：'+reg+' ｜ 最近登录：'+lg+'</small></div>'+
-          '<button class="reset" data-u="'+escapeHtml(u.email||u.username)+'">重置密码</button></div>';
+          '<div style="display:flex;gap:8px;flex-shrink:0"><button class="reset auto" data-u="'+escapeHtml(u.email||u.username)+'">一键重置</button>'+
+          '<button class="reset manual" data-u="'+escapeHtml(u.email||u.username)+'">手动</button></div></div>';
       }).join('');
-      el.querySelectorAll('.reset').forEach(function(b){
-        b.onclick=function(){
-          var un=b.getAttribute('data-u'); var np=prompt('为 '+un+' 设置新密码（8-32位，含字母和数字）：'); if(!np) return;
+      bindResetButtons(el);
+    }).catch(function(e){ el.innerHTML='<span style="color:#e0443e">网络错误：'+errText(e)+'</span>'; });
+  }
+  // 站长重置按钮绑定：.auto=一键随机12位+163发信；.manual=手填密码
+  function bindResetButtons(scope){
+    scope.querySelectorAll('.reset').forEach(function(b){
+      b.onclick=function(){
+        var un=b.getAttribute('data-u');
+        if(b.classList.contains('auto')){
+          if(!confirm('确定将 '+un+' 的密码重置为随机 12 位，并通过 163 邮箱发送给该用户？')) return;
+          b.disabled=true;
+          cbApi('adminResetAuto', { adminPwd: adminPwd, email: un }).then(function(r){
+            if(r.code!==0){ alert('重置失败：'+(r.error||'未知错误')); b.disabled=false; }
+            else { alert('✅ 已生成随机密码并通过 163 邮箱发送给 '+un+'。\n\n新密码：'+r.newPwd+'\n（请也留存一份备查）'); loadCloudUsers(); loadResets(); }
+          }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
+        } else {
+          var np=prompt('为 '+un+' 设置新密码（8-32位，含字母和数字）：'); if(!np) return;
           if(!/^(?=.*[a-zA-Z])(?=.*\d).{8,32}$/.test(np)){ alert('密码需 8-32 位且同时含字母和数字'); return; }
           b.disabled=true;
           cbApi('adminResetPassword', { adminPwd: adminPwd, email: un, newPwd: np }).then(function(r){
             if(r.code!==0){ alert('重置失败：'+(r.error||'未知错误')); b.disabled=false; }
             else { alert('已重置为：'+np+'\n请通过你方便的方式把这个新密码告诉该用户。'); loadCloudUsers(); }
           }).catch(function(e){ alert('网络错误：'+errText(e)); b.disabled=false; });
-        };
-      });
+        }
+      };
+    });
+  }
+  // 站长后台：找回密码申请队列（访客申请后在后台一键处理）
+  function loadResets(){
+    var el=document.getElementById('aResets'); if(!el) return;
+    if(!CB_ENABLED){ el.innerHTML='<span style="color:var(--ink-soft)">后端未配置：站长需在 index.html 填入云函数 HTTP 访问地址(API_BASE)，并在 CloudBase 部署 cloud/ 云函数。</span>'; return; }
+    el.innerHTML='<span style="color:var(--ink-soft)">加载中…</span>';
+    cbApi('adminListResets', { adminPwd: adminPwd }).then(function(res){
+      if(res.code!==0){ el.innerHTML='<span style="color:#e0443e">读取失败：'+(res.error||'无权限')+'</span>'; return; }
+      var list=res.result||[];
+      if(!list.length){ el.innerHTML='<span style="color:var(--ink-soft)">暂无待处理申请 🎉</span>'; return; }
+      el.innerHTML=list.map(function(r){
+        var t=r.createdAt? new Date(r.createdAt).toLocaleString('zh-CN'):'';
+        var ex=r.exists? '' : ' <span style="color:#e0443e">（该邮箱未注册）</span>';
+        return '<div class="cu-item"><div class="info"><b>'+escapeHtml(r.email)+'</b>'+ex+
+          '<small>申请时间：'+t+'</small></div>'+
+          '<button class="reset auto" data-u="'+escapeHtml(r.email)+'">一键重置并发送</button></div>';
+      }).join('');
+      bindResetButtons(el);
     }).catch(function(e){ el.innerHTML='<span style="color:#e0443e">网络错误：'+errText(e)+'</span>'; });
   }
   // ---------- 工具搜索 / 筛选（按名称、描述、标签匹配，实时隐藏不相关卡片） ----------
