@@ -520,7 +520,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T18:35:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T18:50:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1856,7 +1856,9 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     var am=document.getElementById('authModal'); if(am) am.addEventListener('click', function(e){ if(e.target===am) closeAuth(); });
     renderUserPill();
     cloudLoadCounts();          // 拉取全站计数（后端未部署时静默退回本机数据）
-    if(!getCloudUser()){ openAuth('login', true); }
+    // 不再开网页自动强制弹全屏登录框：该弹窗用不透明渐变背景盖住整屏，会遮挡站长后台入口 🔧，
+    // 导致站长以为网站卡死、进不去后台。现改为：站长直接点右下角 🔧 进入；
+    // 普通访客如需登录，点击右上角「登录 / 注册」（userPill）即可。
   });
 </script>
 <div id="dlModal" class="dl-modal" hidden>
@@ -1881,4 +1883,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T18:35:00Z -->
+<!-- deploy cache-bust 2026-10-05T18:50:00Z -->
