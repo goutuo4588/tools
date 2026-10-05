@@ -402,6 +402,9 @@ var DL={
   ]},
   'tuban':{name:'图吧工具箱', files:[
     {label:'2026.08 安装包 · 207MB', url:REL+'tuban-toolbox-2026.08/TubanToolbox-2026.08.exe'}
+  ]},
+  'memorykiller':{name:'内存杀手 MemBoost',files:[
+    {label:'v1.0 单文件 · 49MB', url:REL+'memorykiller-v1.0/MemoryKiller.exe'}
   ]}
 };
 function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
@@ -557,7 +560,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
             <h2 class="title">关于这个具坊</h2>
             <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这里集中放我自己写的小软件，也收录一些用着顺手的开源 / 免费工具——收录的部分都标了原作者和出处，方便朋友一站式下载。</p>
             <div class="stat-row">
-              <div class="stat"><b>5</b><span>已收录工具</span></div>
+              <div class="stat"><b>6</b><span>已收录工具</span></div>
               <div class="stat"><b>0</b><span>运行依赖</span></div>
               <div class="stat"><b>∞</b><span>免费使用</span></div>
             </div>
@@ -752,6 +755,29 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
               <ul class="note">
                 <li>图吧出品，免费开源，始于 2014</li>
                 <li><b>官方网址</b>：<a href="https://www.tbtool.cn/" target="_blank" rel="noopener">https://www.tbtool.cn/</a>（本安装包镜像自图吧官方 CDN，仅供方便下载，版权归图吧所有）</li>
+              </ul>
+            </article>
+
+            <!-- 自研 6：内存杀手 MemBoost -->
+            <article class="tool" data-slug="memorykiller">
+              <div class="tool-icon" style="background:var(--c-peach)">🧠</div>
+              <h3>内存杀手 MemBoost</h3>
+              <div class="ver">系统性能优化 · 自研</div>
+              <p>面向 Windows 的内存优化工具，调用系统公开接口安全释放待机 / 已修改内存页、回收进程工作集，毫秒级响应，全程不终止任何进程。内置系统进程黑名单与 UAC 提权隔离。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">单文件</span>
+                <span class="tag">自研</span>
+                <span class="tag">.NET 10</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="memorykiller" data-fallback="https://github.com/goutuo4588/tools/releases/tag/memorykiller-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('memorykiller');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/memorykiller-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/memorykiller.html" target="_blank" rel="noopener" title="内存杀手项目主页">项目主页 ↗</a>
+              </div>
+              <ul class="note">
+                <li>狗托儿自研，基于 .NET 10，源码在仓库 MemoryKiller/ 目录</li>
+                <li><b>.exe 可执行文件</b> · 单文件，右键以管理员身份运行</li>
+                <li><b>安全机制</b> · 系统进程黑名单 + UAC 提权隔离，绝不终止任何进程</li>
               </ul>
             </article>
 
@@ -976,7 +1002,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   const API_BASE = 'https://toolshop-d0gez0cs3e2318df8-1466799812.ap-shanghai.app.tcloudbase.com/toolshop';
   const CB_ENABLED = !API_BASE.startsWith('在此填');
   const CLOUD_USER_KEY = 'tp_cloud_user';
-  const TOOL_SLUGS=['openspeedy','watt-toolkit','wireshark','geek','tuban'];
+  const TOOL_SLUGS=['openspeedy','watt-toolkit','wireshark','geek','tuban','memorykiller'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
   const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
 
