@@ -520,7 +520,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T19:10:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T19:35:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1858,7 +1858,8 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     var pill=document.getElementById('userPill');
     if(pill){ pill.onclick=function(){ var u=getCloudUser(); if(u){ if(confirm('当前登录：'+(u.email||u.username)+'\n确定退出登录？')){ localStorage.removeItem(CLOUD_USER_KEY); profile=null; LS.set(PROFILE_KEY,null); renderUserPill(); refreshMe(); toast('已退出'); } } else { openAuth('login', true); } }; }
     var ac=document.getElementById('authClose'); if(ac) ac.onclick=closeAuth;
-    var am=document.getElementById('authModal'); if(am) am.addEventListener('click', function(e){ if(e.target===am) closeAuth(); });
+    // 点登录框以外的遮罩区域不关闭弹窗（只有右上角 × 可关闭），避免误点导致登录中断
+    var am=document.getElementById('authModal'); if(am) am.addEventListener('click', function(e){ if(e.target===am){ e.stopPropagation(); } });
     renderUserPill();
     cloudLoadCounts();          // 拉取全站计数（后端未部署时静默退回本机数据）
     // 不再开网页自动强制弹全屏登录框：该弹窗用不透明渐变背景盖住整屏，会遮挡站长后台入口 🔧，
@@ -1888,4 +1889,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T19:10:00Z -->
+<!-- deploy cache-bust 2026-10-05T19:35:00Z -->
