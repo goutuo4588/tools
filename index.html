@@ -560,7 +560,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
             <h2 class="title">关于这个具坊</h2>
             <p class="lead">我是 狗托儿，一个爱折腾工具的学生。这里集中放我自己写的小软件，也收录一些用着顺手的开源 / 免费工具——收录的部分都标了原作者和出处，方便朋友一站式下载。</p>
             <div class="stat-row">
-              <div class="stat"><b>6</b><span>已收录工具</span></div>
+              <div class="stat"><b>6</b><span>已上架工具</span></div>
               <div class="stat"><b>0</b><span>运行依赖</span></div>
               <div class="stat"><b>∞</b><span>免费使用</span></div>
             </div>
@@ -614,12 +614,27 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
           <div class="tool-grid">
 
-            <!-- 占位：电脑端工具下架中 -->
-            <article class="tool coming-soon">
-              <div class="tool-icon" style="background:var(--c-lav)">💻</div>
-              <h3>敬请期待</h3>
-              <div class="ver">开发中</div>
-              <p>电脑端工具正在打磨中，重新上架后会在这里出现。先看看开源免费工具吧～</p>
+            <!-- 自研 1：内存杀手 MemBoost -->
+            <article class="tool" data-slug="memorykiller">
+              <div class="tool-icon" style="background:var(--c-peach)">🧠</div>
+              <h3>内存杀手 MemBoost</h3>
+              <div class="ver">系统性能优化 · 自研</div>
+              <p>面向 Windows 的内存优化工具，调用系统公开接口安全释放待机 / 已修改内存页、回收进程工作集，毫秒级响应，全程不终止任何进程。内置系统进程黑名单与 UAC 提权隔离。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">单文件</span>
+                <span class="tag">自研</span>
+                <span class="tag">.NET 10</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="memorykiller" data-fallback="https://github.com/goutuo4588/tools/releases/tag/memorykiller-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('memorykiller');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/memorykiller-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/memorykiller.html" target="_blank" rel="noopener" title="内存杀手项目主页">项目主页 ↗</a>
+              </div>
+              <ul class="note">
+                <li>狗托儿自研，基于 .NET 10，源码在仓库 MemoryKiller/ 目录</li>
+                <li><b>.exe 可执行文件</b> · 单文件，右键以管理员身份运行</li>
+                <li><b>安全机制</b> · 系统进程黑名单 + UAC 提权隔离，绝不终止任何进程</li>
+              </ul>
             </article>
 
           </div>
@@ -758,28 +773,6 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
               </ul>
             </article>
 
-            <!-- 自研 6：内存杀手 MemBoost -->
-            <article class="tool" data-slug="memorykiller">
-              <div class="tool-icon" style="background:var(--c-peach)">🧠</div>
-              <h3>内存杀手 MemBoost</h3>
-              <div class="ver">系统性能优化 · 自研</div>
-              <p>面向 Windows 的内存优化工具，调用系统公开接口安全释放待机 / 已修改内存页、回收进程工作集，毫秒级响应，全程不终止任何进程。内置系统进程黑名单与 UAC 提权隔离。</p>
-              <div class="tags">
-                <span class="tag">Windows</span>
-                <span class="tag">单文件</span>
-                <span class="tag">自研</span>
-                <span class="tag">.NET 10</span>
-              </div>
-              <div class="tool-links">
-                <a class="dl dl-main" href="javascript:void(0)" data-slug="memorykiller" data-fallback="https://github.com/goutuo4588/tools/releases/tag/memorykiller-v1.0" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('memorykiller');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/tag/memorykiller-v1.0','_blank');}})(event);return false;">GitHub 下载</a>
-                <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/memorykiller.html" target="_blank" rel="noopener" title="内存杀手项目主页">项目主页 ↗</a>
-              </div>
-              <ul class="note">
-                <li>狗托儿自研，基于 .NET 10，源码在仓库 MemoryKiller/ 目录</li>
-                <li><b>.exe 可执行文件</b> · 单文件，右键以管理员身份运行</li>
-                <li><b>安全机制</b> · 系统进程黑名单 + UAC 提权隔离，绝不终止任何进程</li>
-              </ul>
-            </article>
 
           </div>
 
