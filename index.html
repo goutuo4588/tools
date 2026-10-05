@@ -520,7 +520,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T18:50:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T19:10:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1255,6 +1255,10 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     };
   }
   function refreshAdmin(){
+    // 站长后台已独立为单独页面 admin.html（点右下角 🔧 新开标签页进入），
+    // 主站不再渲染内嵌后台视图。保留函数名，避免点赞/收藏/分享等旧调用处报错。
+    return;
+    // ↓↓↓ 以下内容已停用：后台功能全部迁移至 admin.html ↓↓↓
     // 新标签页里 sessionStorage 没有口令 → 必须重新登录，避免"已登录但调不动后端"的半残状态
     if(!adminToken||!adminPwd){adminToken='';adminPwd='';localStorage.removeItem(ADMIN_KEY);
       try{sessionStorage.removeItem('tp_admin_pwd');}catch(e){}
@@ -1533,7 +1537,8 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   refreshMe();
   refreshAdmin();
   const adminFab=document.getElementById('adminFab');
-  if(adminFab){adminFab.onclick=()=>{ if(typeof closeAuth==='function') closeAuth(); showView('admin'); refreshAdmin(); };}
+  // 站长后台已独立为单独页面 admin.html：点 🔧 在新标签页打开，主站不再内嵌后台视图
+  if(adminFab){adminFab.onclick=()=>{ window.open('admin.html','_blank','noopener'); };}
   const viewedOnce=new Set();
   const _showView=showView;
   showView=function(name){
@@ -1883,4 +1888,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T18:50:00Z -->
+<!-- deploy cache-bust 2026-10-05T19:10:00Z -->
