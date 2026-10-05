@@ -77,17 +77,28 @@ async function sendCode(email) {
   return code;
 }
 
-exports.main = async (event) => {
-  // 判断是否为 HTTP 触发（云函数 HTTP 访问服务）
+// 兼容解析：CloudBase HTTP 访问服务可能把 JSON 反序列化为对象，也可能保留为字符串；
+// 也可能收到 form 串（控制台测试误填）。无论如何都尽力还原成对象，绝不让解析失败卡死。
+function parsePayload(event) {
   const isHttp = !!(event && (event.httpMethod || event.requestContext || (event.headers && event.headers.host)));
-  let payload = event;
-  if (isHttp) {
-    if (event.httpMethod === 'OPTIONS') return preflight();
-    try {
-      const raw = (typeof event.body === 'string') ? event.body : (event.body || '{}');
-      payload = JSON.parse(raw);
-    } catch (e) { return ok({ code: 400, error: '请求体解析失败' }); }
+  if (!isHttp) return event; // 非 HTTP 触发：event 本身就是入参
+  if (event.httpMethod === 'OPTIONS') return { __preflight: true };
+  let body = event.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) { body = null; }
+  } else if (body == null) {
+    body = {};
   }
+  // 兜底：万一是 form 串（如控制台测试误填），转成对象
+  if (body && typeof body === 'string') {
+    try { const sp = new URLSearchParams(body); const o = {}; sp.forEach(function (v, k) { o[k] = v; }); body = o; } catch (e) { body = {}; }
+  }
+  return body || {};
+}
+
+exports.main = async (event) => {
+  const payload = parsePayload(event);
+  if (payload && payload.__preflight) return preflight();
   const action = payload && payload.action;
   const now = Date.now();
 
