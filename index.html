@@ -520,7 +520,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-05T19:45:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T19:50:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -1556,9 +1556,9 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
     setTimeout(()=>URL.revokeObjectURL(url),60000);
   }
 
-  // 在线徽标（静态说明，无需联网）
+  // 在线徽标：不再展示「本机数据 · 离线可用」文案，整块隐藏（不占位）
   const onlineBadge=document.getElementById('onlineBadge');
-  if(onlineBadge)onlineBadge.innerHTML='<span class="dot"></span>本机数据 · 离线可用';
+  if(onlineBadge){ onlineBadge.innerHTML=''; onlineBadge.style.display='none'; }
 
   // 初始化
   buildCardExtras();
@@ -1918,4 +1918,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-05T19:45:00Z -->
+<!-- deploy cache-bust 2026-10-05T19:50:00Z -->
