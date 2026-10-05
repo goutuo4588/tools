@@ -326,7 +326,7 @@
   .admin-hint{font-size:13px;color:var(--ink-soft);margin:6px 0 0}
 
   /* 右下角浮动按钮 */
-  .admin-fab{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;align-items:center;gap:8px;
+  .admin-fab{position:fixed;right:22px;bottom:22px;z-index:1400;display:flex;align-items:center;gap:8px;
     padding:13px 18px;border:0;border-radius:40px;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;color:#fff;
     background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 10px 30px rgba(35,37,43,.25);
     transition:transform .18s ease, box-shadow .18s ease}
@@ -488,7 +488,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 <script>
 /* ===== 版本自检：每 90 秒异步拉 version.txt，发现旧版自动浮窗提示更新（一次） ===== */
 (function(){
-  var SITE_VERSION='2026-10-02T17:23:00Z'; // 每次部署时同步更新
+  var SITE_VERSION='2026-10-05T17:26:00Z'; // 每次部署时同步更新
   function showUpdateBanner(){
     if(document.getElementById('updateBanner')) return;
     var b=document.createElement('div');
@@ -944,7 +944,8 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   };
   const navBtns = document.querySelectorAll('.nav-btn');
   function showView(name){
-    if(!getCloudUser() && name!=='me'){ openAuth('login', true); return; }
+    // 站长后台自带密码门，无需先登录云账号即可进入（否则站长自己会被云账号墙挡在门外）
+    if(!getCloudUser() && name!=='me' && name!=='admin'){ openAuth('login', true); return; }
     if(!views[name]) return;
     Object.entries(views).forEach(([k,v])=> v.classList.toggle('active', k===name));
     navBtns.forEach(b=> b.classList.toggle('active', b.dataset.view===name));
@@ -1477,7 +1478,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   refreshMe();
   refreshAdmin();
   const adminFab=document.getElementById('adminFab');
-  if(adminFab){adminFab.onclick=()=>{showView('admin');refreshAdmin();};}
+  if(adminFab){adminFab.onclick=()=>{ if(typeof closeAuth==='function') closeAuth(); showView('admin'); refreshAdmin(); };}
   const viewedOnce=new Set();
   const _showView=showView;
   showView=function(name){
@@ -1518,14 +1519,14 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   function msgErr(el, t){ if(el){ el.className='auth-msg'; el.textContent=t; } return false; }
   var regTimer=null;
   var authForce=false;
-  function closeAuth(){ if(authForce) return; var m=document.getElementById('authModal'); if(m) m.hidden=true; document.body.classList.remove('auth-locked'); if(regTimer) clearInterval(regTimer); }
+  function closeAuth(){ var m=document.getElementById('authModal'); if(m) m.hidden=true; document.body.classList.remove('auth-locked'); if(regTimer) clearInterval(regTimer); }
   function openAuth(mode, force){
     if(!CB_ENABLED){ toast('后端未配置：站长尚未接入 CloudBase'); return; }
     authForce = !!force;
     renderAuthView(mode||'login');
     var m=document.getElementById('authModal'); if(m) m.hidden=false;
     var x=document.getElementById('authClose');
-    if(x){ x.style.display = authForce ? 'none' : ''; x.onclick=function(){ if(!authForce) closeAuth(); }; }
+    if(x){ x.style.display=''; x.onclick=function(){ closeAuth(); }; }
     if(authForce){ document.body.classList.add('auth-locked'); } else { document.body.classList.remove('auth-locked'); }
   }
   function renderAuthView(mode){
@@ -1778,4 +1779,4 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 </body>
 </html>
-<!-- deploy cache-bust 2026-10-02T17:23:00Z -->
+<!-- deploy cache-bust 2026-10-05T17:26:00Z -->
