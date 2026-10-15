@@ -451,8 +451,8 @@
 </style>
   <!-- CloudBase Web SDK（腾讯 CDN，国内访问快）。若加载失败，将账号体系降级为「后端未配置」提示。 -->
   <!-- CloudBase Web SDK 已弃用：账号体系改用云函数 HTTP 后端(cbApi) -->
-  <!-- ===== 流动极光背景（QQ 下载页风格）：样式层，参数在 bg-aurora.js 顶部 ===== -->
-  <link rel="stylesheet" href="bg-aurora.css">
+  <!-- ===== 科技感主题（深色赛博霓虹）===== -->
+  <link rel="stylesheet" href="tech-theme.css">
 </head>
 <body>
 <script>
@@ -922,7 +922,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   // 年份
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  /* 旧版 WebGL 液体背景已由 bg-aurora.js（极光流动 + 点击涟漪）接管，见 body 末尾引入 */
+  /* 旧版液体背景已停用：背景改由 bg-aurora.js（赛博光带+涟漪）接管，见 body 末尾 */
   // 视图切换
   const views = {
     intro: document.getElementById('view-intro'),
@@ -1872,12 +1872,8 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 
 
-<!-- ====== 流动极光背景（QQ 电脑版官网下载页风格）======
-     光带漂移 + 色相循环 + 点击涟漪/粒子扩散。
-     全部可调参数：bg-aurora.js 顶部 CFG
-     一键静态：网址加 ?bg=static ；控制台 JuFangBG.setStatic(true)
-     关闭：?bg=none ；深色预设：?bg=dark
-     自包含零依赖，仅在内容层之下绘制，不影响任何点击与功能。 -->
+<!-- ===== 动态背景引擎：赛博光带 + 点击涟漪（参数在 bg-aurora.js 顶部）=====
+     模式：默认科技深色 | ?bg=light 浅色 | ?bg=static 纯静态 | ?bg=none 关闭 -->
 <script src="bg-aurora.js" defer></script>
 </body>
 </html>
