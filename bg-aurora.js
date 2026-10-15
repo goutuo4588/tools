@@ -15,20 +15,22 @@
   /* =========================================================
      【第 1 处】可调参数 —— 改这里就够了
      ========================================================= */
+  /* 默认 = 科技深色（赛博霓虹：青→紫） */
   var CFG = {
     /* --- 颜色（HSL 色相循环，连续变化，不会跳变/闪烁） --- */
-    hueSpeed:    0.030,  // 色相循环速度：圈/秒。0.03 ≈ 33 秒转一整圈（推荐 0.01~0.12）
-    saturation:  0.62,   // 饱和度 0~1。越大越艳（0.45 淡雅 / 0.8 浓烈）
-    lightness:   0.74,   // 亮度 0~1。越大越浅（浅色站点建议 ≥0.68，保证文字可读）
-    hueSpread:   0.28,   // 画面内的色相跨度：越大，同一屏里颜色越丰富
-    baseHue:     0.58,   // 起始色相 0~1（0 红 .33 绿 .58 蓝 .78 紫）
+    hueSpeed:    0.022,  // 色相循环速度：圈/秒（默认约 45 秒一圈，克制、有科技感）
+    saturation:  0.78,   // 饱和度 0~1
+    lightness:   0.30,   // 亮度 0~1（深色主题用 0.26~0.36；浅色主题用 0.72~0.78）
+    hueSpread:   0.22,   // 画面内的色相跨度
+    baseHue:     0.55,   // 起始色相（0.5 青 / 0.55 青蓝 / 0.72 紫）
+    baseColor:   '#060a16', // 光带之间的底色（深色主题=深蓝黑；浅色主题=纸白）
 
     /* --- 流动光带 --- */
-    flowSpeed:   0.085,  // 光带漂移速度（0.03 极慢 / 0.3 明显流动）
-    bandCount:   2.6,    // 光带密度：数值越大，条带越密
-    bandStrength:0.55,   // 光带强度 0~1：越大越浓（0.3 若隐若现 / 0.85 浓墨重彩）
-    warp:        2.4,    // 扭曲程度：越大越"液体感"
-    grain:       0.012,  // 细微颗粒，消除大面积渐变的色带断层（0 关闭）
+    flowSpeed:   0.070,  // 光带漂移速度
+    bandCount:   2.2,    // 光带密度
+    bandStrength:0.88,   // 光带强度 0~1
+    warp:        2.6,    // 扭曲程度
+    grain:       0.018,  // 细微颗粒，消除色带断层
 
     /* --- 点击涟漪（着色器里的光环） --- */
     ripple:      true,
@@ -53,9 +55,10 @@
     static:  false        // true = 只画一帧静止画面
   };
 
-  /* 深色预设：?bg=dark 时自动套用（QQ 下载页那种深蓝紫） */
-  var DARK_PRESET = {
-    lightness: 0.34, saturation: 0.70, bandStrength: 0.85, baseHue: 0.60, grain: 0.02
+  /* 备选预设：?bg=light 浅色清爽（原配色） / ?bg=vivid 霓虹浓烈 */
+  var PRESETS = {
+    light: { lightness: 0.74, saturation: 0.62, bandStrength: 0.55, baseHue: 0.58, hueSpread: 0.28, baseColor: '#fffdf9', grain: 0.012 },
+    vivid: { hueSpeed: 0.075, saturation: 0.92, lightness: 0.36, bandStrength: 0.95, flowSpeed: 0.13, grain: 0.022 }
   };
 
   /* =========================================================
@@ -72,7 +75,19 @@
   var root = document.documentElement;
   if (mode === 'static') { CFG.static = true; root.classList.add('bg-static'); }
   if (mode === 'none')   { CFG.enabled = false; root.classList.add('bg-none'); }
-  if (mode === 'dark')   { root.classList.add('bg-dark'); for (var k in DARK_PRESET) CFG[k] = DARK_PRESET[k]; }
+  if (mode === 'light')  { root.classList.add('bg-light'); applyPreset(PRESETS.light); }
+  if (mode === 'vivid')  { applyPreset(PRESETS.vivid); }
+  if (mode === 'dark')   { applyPreset({}); }   // 兼容旧写法：即默认科技深色
+
+  function applyPreset(p) { for (var kk in p) CFG[kk] = p[kk]; }
+
+  /* 底色 #060a16 → 归一化 rgb，交给着色器 */
+  function hex2rgb(hex) {
+    var h = String(hex).replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var n = parseInt(h, 16);
+    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  }
 
   var reduceMQ = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
   var reduceMotion = !!(reduceMQ && reduceMQ.matches);
@@ -101,6 +116,7 @@
     'precision highp float;',
     'uniform vec2 u_res; uniform float u_time; uniform float u_aspect;',
     'uniform float u_hueSpeed,u_sat,u_light,u_flow,u_bands,u_strength,u_warp,u_spread,u_baseHue,u_grain;',
+    'uniform vec3 u_base;',
     'uniform float u_rSpeed,u_rLife,u_rGlow;',
     'uniform vec4 u_clicks[8];', // xy=归一化坐标 z=起始时间 w=强度
     'vec3 hsl2rgb(vec3 c){',
@@ -127,7 +143,7 @@
     '  float lig=u_light+(band-0.5)*0.10;',
     '  vec3 col=hsl2rgb(vec3(fract(hue),u_sat,clamp(lig,0.03,0.97)));',
     /* 与页面底色融合：越靠近光带中心越浓，其余留白 → 文字永远有干净底 */
-    '  vec3 base=vec3(0.992,0.988,0.973);',
+    '  vec3 base=u_base;',
     '  col=mix(base,col,u_strength*(0.30+0.70*band));',
     /* 点击涟漪 */
     '  for(int i=0;i<8;i++){',
@@ -169,7 +185,7 @@
     var loc = gl.getAttribLocation(prog, 'p');
     gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     ['u_res','u_time','u_aspect','u_hueSpeed','u_sat','u_light','u_flow','u_bands','u_strength',
-     'u_warp','u_spread','u_baseHue','u_grain','u_rSpeed','u_rLife','u_rGlow']
+     'u_warp','u_spread','u_baseHue','u_grain','u_rSpeed','u_rLife','u_rGlow','u_base']
       .forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
     U.u_clicks = gl.getUniformLocation(prog, 'u_clicks') || gl.getUniformLocation(prog, 'u_clicks[0]');
     return true;
@@ -272,6 +288,7 @@
       gl.uniform1f(U.u_spread, CFG.hueSpread);
       gl.uniform1f(U.u_baseHue, CFG.baseHue);
       gl.uniform1f(U.u_grain, CFG.grain);
+      var bc = hex2rgb(CFG.baseColor); gl.uniform3f(U.u_base, bc[0], bc[1], bc[2]);
       gl.uniform1f(U.u_rSpeed, CFG.rippleSpeed);
       gl.uniform1f(U.u_rLife, CFG.rippleLife);
       gl.uniform1f(U.u_rGlow, CFG.rippleGlow);
@@ -336,6 +353,7 @@
     gl.uniform1f(U.u_spread, CFG.hueSpread);
     gl.uniform1f(U.u_baseHue, CFG.baseHue);
     gl.uniform1f(U.u_grain, CFG.grain);
+    var bc0 = hex2rgb(CFG.baseColor); gl.uniform3f(U.u_base, bc0[0], bc0[1], bc0[2]);
     gl.uniform1f(U.u_rSpeed, CFG.rippleSpeed);
     gl.uniform1f(U.u_rLife, CFG.rippleLife);
     gl.uniform1f(U.u_rGlow, 0);
