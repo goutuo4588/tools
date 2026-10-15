@@ -1,0 +1,222 @@
+/* =========================================================
+   具坊 · 科技感主题（深色赛博霓虹）
+   ---------------------------------------------------------
+   只做「外观」：配色、光效、网格、卡片质感。
+   页面结构、内容、功能一律不动。
+   动态背景引擎：bg-aurora.js（参数在它顶部 CFG）
+   ========================================================= */
+
+/* ---------- 主题色板（改这里就能整体换色） ---------- */
+:root{
+  --bg:        #060a16;                 /* 页面底色 */
+  --panel:     rgba(12,19,40,.72);      /* 卡片玻璃底 */
+  --panel-2:   rgba(16,24,48,.85);      /* 卡片玻璃底（强调） */
+  --line:      rgba(0,229,255,.16);     /* 分隔线 */
+  --line-2:    rgba(124,92,255,.22);
+  --neon:      #00e5ff;                 /* 主霓虹：青 */
+  --neon-2:    #7c5cff;                 /* 副霓虹：紫 */
+  --neon-3:    #ff4d9d;                 /* 点缀：品红 */
+  --ink:       #e9f2ff;                 /* 主文字 */
+  --ink-soft:  #93a7cc;                 /* 次级文字 */
+  --ink-dim:   #6b7ea6;
+  --radius:    16px;
+  --glow:      0 0 24px rgba(0,229,255,.22);
+  --glow-2:    0 0 34px rgba(124,92,255,.28);
+  --shadow:    0 18px 50px -22px rgba(0,0,0,.9);
+}
+
+/* ---------- 背景层：光带画布（下）+ 网格（中）+ 扫描线（上） ---------- */
+#liquid-bg,#bg-fx{
+  position:fixed; inset:0; width:100%; height:100%;
+  display:block; pointer-events:none; border:0;
+}
+#liquid-bg{ z-index:-3; }
+#bg-fx{     z-index:-2; }
+
+/* 细网格：科技感的骨架，铺满全屏、随窗口自适应 */
+body::before{
+  content:''; position:fixed; inset:-60px; z-index:-1; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,229,255,.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,.075) 1px, transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 12%, #000 0%, rgba(0,0,0,.55) 45%, transparent 82%);
+          mask-image:radial-gradient(ellipse 90% 70% at 50% 12%, #000 0%, rgba(0,0,0,.55) 45%, transparent 82%);
+  animation:gridDrift 26s linear infinite;
+}
+@keyframes gridDrift{ from{transform:translate3d(0,0,0)} to{transform:translate3d(46px,46px,0)} }
+
+/* 扫描线：一道极淡的光带缓慢下移 */
+body::after{
+  content:''; position:fixed; left:0; right:0; height:220px; z-index:-1; pointer-events:none;
+  background:linear-gradient(180deg, transparent, rgba(0,229,255,.055), transparent);
+  animation:scan 9s linear infinite;
+}
+@keyframes scan{ from{transform:translateY(-25vh)} to{transform:translateY(115vh)} }
+
+html{ background:var(--bg); }
+body{ background:transparent; color:var(--ink); }
+::selection{ background:rgba(0,229,255,.28); color:#fff; }
+
+/* 滚动条 */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:rgba(8,13,28,.6)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(0,229,255,.45),rgba(124,92,255,.45));border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(0,229,255,.7),rgba(124,92,255,.7))}
+
+/* ---------- 侧边导航 ---------- */
+.sidebar{
+  background:linear-gradient(180deg, rgba(10,16,34,.86), rgba(8,12,26,.78)) !important;
+  border-right:1px solid var(--line) !important;
+  backdrop-filter:blur(18px) saturate(160%);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);
+  box-shadow:1px 0 0 rgba(0,229,255,.08), 24px 0 60px -40px rgba(0,229,255,.35);
+}
+.side-brand{color:var(--ink)}
+.side-brand .dot{background:linear-gradient(135deg,var(--neon),var(--neon-2)) !important;box-shadow:0 0 14px rgba(0,229,255,.75)}
+.nav-btn{color:var(--ink-soft) !important;border:1px solid transparent}
+.nav-btn:hover{background:rgba(0,229,255,.07) !important;color:var(--ink) !important;border-color:rgba(0,229,255,.2)}
+.nav-btn.active{
+  background:linear-gradient(90deg, rgba(0,229,255,.16), rgba(124,92,255,.10)) !important;
+  color:#fff !important;border-color:rgba(0,229,255,.35) !important;
+  box-shadow:inset 3px 0 0 var(--neon), 0 0 22px -6px rgba(0,229,255,.5);
+}
+.side-foot{color:var(--ink-dim) !important}
+.online-badge{background:rgba(0,229,255,.10) !important;border:1px solid var(--line) !important;color:var(--ink-soft) !important}
+.online-badge .dot{background:var(--neon) !important;box-shadow:0 0 10px var(--neon)}
+
+/* ---------- 大色块区块 → 深色玻璃 ---------- */
+.hero,.about,.tools,.contact{
+  background:var(--panel) !important;
+  border:1px solid var(--line) !important;
+  backdrop-filter:blur(20px) saturate(150%);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);
+  box-shadow:var(--shadow);
+  position:relative; overflow:hidden;
+}
+/* 区块顶部一道霓虹描边 */
+.hero::before,.about::before,.tools::before,.contact::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--neon), var(--neon-2), transparent);
+  opacity:.65;
+}
+.blob{opacity:.35 !important;filter:blur(6px) !important}
+
+/* ---------- 标题：渐变霓虹 ---------- */
+.hero h1{
+  background:linear-gradient(96deg,#8ff6ff 0%,#b9a3ff 55%,#ff8fd0 100%);
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; letter-spacing:-.5px;
+}
+.hero h1 .hl{color:var(--neon) !important;-webkit-text-fill-color:var(--neon)}
+h2.title{
+  background:linear-gradient(96deg,#bff4ff,#c9b6ff);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.eyebrow{color:var(--neon) !important;opacity:.9;letter-spacing:4px}
+.lead{color:var(--ink-soft) !important}
+.subhead h3{color:var(--ink) !important}
+.subhead p{color:var(--ink-soft) !important}
+
+/* ---------- 卡片：玻璃 + 霓虹描边 ---------- */
+.tool,.about-card,.me-card,.admin-card,.admin-item,.auth-wrap,.cloud-monitor,
+.modal,.auth-card,.admin-login-card,.dl-card,.me-stat .box,.stat,.act-btn,
+.socials a,.btn-ghost,.tool-search input,.field input,.cloud-table{
+  background:var(--panel-2) !important;
+  border:1px solid var(--line) !important;
+  color:var(--ink) !important;
+  box-shadow:var(--shadow);
+}
+.tool,.about-card,.me-card,.admin-card,.cloud-monitor,.modal,.auth-card,.dl-card{
+  transition:transform .18s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.tool:hover,.about-card:hover,.me-card:hover,.admin-card:hover,.dl-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(0,229,255,.45) !important;
+  box-shadow:0 0 0 1px rgba(0,229,255,.18), 0 0 34px -8px rgba(0,229,255,.45), var(--shadow);
+}
+.tool h3,.about-card h3,.dl-card h3{color:var(--ink) !important}
+.tool p,.about-card p,.card-stats{color:var(--ink-soft) !important}
+.card-stats b,.stat b{color:var(--neon) !important}
+.tool-icon{
+  background:linear-gradient(135deg, rgba(0,229,255,.16), rgba(124,92,255,.16)) !important;
+  border:1px solid var(--line-2);
+  box-shadow:inset 0 0 18px rgba(0,229,255,.12);
+}
+.sub-dot{box-shadow:0 0 10px currentColor}
+
+/* ---------- 按钮 ---------- */
+.btn{font-weight:800}
+.btn-primary{
+  background:linear-gradient(135deg,var(--neon),var(--neon-2)) !important;
+  color:#04101f !important;
+  box-shadow:0 0 26px -6px rgba(0,229,255,.65), 0 10px 30px -12px rgba(124,92,255,.8) !important;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 34px -4px rgba(0,229,255,.85),0 14px 34px -12px rgba(124,92,255,.9) !important}
+.btn-ghost:hover{background:rgba(0,229,255,.10) !important;border-color:rgba(0,229,255,.35) !important}
+.act-btn:hover{background:rgba(0,229,255,.12) !important;border-color:rgba(0,229,255,.4) !important;color:#fff !important}
+.copy-btn{background:linear-gradient(135deg,var(--neon),var(--neon-2)) !important;color:#04101f !important}
+.mail-pill{background:var(--panel-2) !important;border:1px solid var(--line) !important;color:var(--neon) !important;box-shadow:var(--glow)}
+.socials a:hover{background:rgba(0,229,255,.12) !important;border-color:rgba(0,229,255,.4) !important;color:#fff !important}
+
+/* ---------- 表单 ---------- */
+.field input,.tool-search input{
+  background:rgba(8,13,28,.85) !important; color:var(--ink) !important;
+  border-color:var(--line) !important;
+}
+.field input:focus,.tool-search input:focus{
+  outline:none; border-color:rgba(0,229,255,.55) !important;
+  box-shadow:0 0 0 3px rgba(0,229,255,.12), 0 0 22px -6px rgba(0,229,255,.6) !important;
+}
+.field input::placeholder,.tool-search input::placeholder{color:var(--ink-dim)}
+
+/* ---------- 表格 / 列表 / 页脚 ---------- */
+.cloud-table{color:var(--ink)}
+.cloud-table th{background:linear-gradient(90deg,rgba(0,229,255,.14),rgba(124,92,255,.14)) !important;color:var(--ink) !important}
+.cloud-table td,.cloud-table th{border-bottom:1px solid var(--line) !important}
+.cu-item{background:var(--panel) !important;border-color:var(--line) !important;color:var(--ink) !important}
+.dl-src{background:var(--panel) !important;border-color:var(--line) !important;color:var(--ink-soft) !important}
+footer{background:rgba(8,13,28,.6) !important;border-top:1px solid var(--line);color:var(--ink-dim) !important}
+.modal{background:var(--panel-2) !important}
+
+/* ---------- 提示条 / 徽章 ---------- */
+.toast{background:linear-gradient(135deg,rgba(0,229,255,.95),rgba(124,92,255,.95)) !important;color:#04101f !important;box-shadow:var(--glow-2) !important}
+.tag,.chip,.badge{background:rgba(0,229,255,.12) !important;border-color:var(--line) !important;color:var(--neon) !important}
+
+/* ---------- 移动端 ---------- */
+@media (max-width:860px){
+  body::before{ background-size:34px 34px; }
+}
+
+/* =========================================================
+   回退开关
+   ========================================================= */
+/* 纯静态：?bg=static —— 关掉画布与网格动画，只留深色渐变 */
+html.bg-static #liquid-bg,html.bg-static #bg-fx{display:none}
+html.bg-static body::before,html.bg-static body::after{animation:none;opacity:.5}
+html.bg-static{ background:radial-gradient(120% 100% at 50% 0%, #12203f 0%, #0a1226 45%, #060a16 100%); }
+/* 关闭：?bg=none —— 纯深色，无任何背景层 */
+html.bg-none #liquid-bg,html.bg-none #bg-fx{display:none}
+html.bg-none body::before,html.bg-none body::after{display:none}
+html.bg-none{ background:#060a16; }
+/* 浅色回退：?bg=light —— 回到原来的浅色清爽配色 */
+html.bg-light{
+  --bg:#fffdf9; --panel:rgba(255,253,249,.72); --panel-2:rgba(255,255,255,.86);
+  --line:rgba(35,37,43,.10); --line-2:rgba(35,37,43,.12);
+  --neon:#ff7a59; --neon-2:#5b8def; --ink:#23252b; --ink-soft:#5b6170; --ink-dim:#8a90a0;
+  --shadow:0 18px 50px -22px rgba(35,37,43,.45);
+}
+html.bg-light body::before,html.bg-light body::after{display:none}
+html.bg-light .hero h1,html.bg-light h2.title{background:none;-webkit-text-fill-color:currentColor;color:var(--ink)}
+html.bg-light .hero h1 .hl{color:var(--neon) !important;-webkit-text-fill-color:var(--neon)}
+html.bg-light .eyebrow{color:var(--ink-soft) !important}
+/* WebGL 不可用 */
+body.no-webgl #liquid-bg,body.no-webgl #bg-fx{display:none}
+
+/* ---------- 尊重系统「减弱动态效果」：只留静态画面 ---------- */
+@media (prefers-reduced-motion: reduce){
+  body::before,body::after{animation:none !important}
+  #bg-fx{display:none}
+  html{animation:none !important}
+  *{scroll-behavior:auto !important}
+}
