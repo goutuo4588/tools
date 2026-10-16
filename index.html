@@ -481,6 +481,9 @@ var DL={
   ]},
   'memorykiller':{name:'内存杀手 MemBoost',files:[
     {label:'v1.0 单文件 · 49MB', url:REL+'memorykiller-v1.0/MemoryKiller.exe'}
+  ]},
+  'cdiskblade':{name:'C盘利刃',files:[
+    {label:'v2.2 单文件 · 38MB', url:'https://goutuo4588.github.io/tools/files/C盘利刃.exe'}
   ]}
 };
 function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
@@ -497,8 +500,8 @@ function openDl(slug){
   if(!d||!body||!modal){ alert('下载面板未就绪，请刷新页面重试'); return; }
   var h='';
   d.files.forEach(function(f){
-    var tag=f.url.slice(REL.length).split('/')[0];
-    var man='https://github.com/goutuo4588/tools/releases/tag/'+tag;
+    var tag = (f.url.indexOf(REL)===0) ? f.url.slice(REL.length).split('/')[0] : '';
+    var man = tag ? 'https://github.com/goutuo4588/tools/releases/tag/'+tag : f.url;
     var u=esc(f.url);
     h+='<div class="dl-file"><div class="dl-fname">📦 '+f.label+'</div>';
     h+='<button class="dl-src on" onclick="startDl(\'\',\''+u+'\')">🐢 官方直连下载</button>';
@@ -715,6 +718,29 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
                 <li>狗托儿自研，基于 .NET 10，源码在仓库 MemoryKiller/ 目录</li>
                 <li><b>.exe 可执行文件</b> · 单文件，右键以管理员身份运行</li>
                 <li><b>安全机制</b> · 系统进程黑名单 + UAC 提权隔离，绝不终止任何进程</li>
+              </ul>
+            </article>
+
+            <!-- 自研 2：C盘利刃 -->
+            <article class="tool" data-slug="cdiskblade">
+              <div class="tool-icon" style="background:var(--c-peach)">🗡️</div>
+              <h3>C盘利刃</h3>
+              <div class="ver">C盘维护之刃 · 自研</div>
+              <p>面向个人与小微团队的 Windows C盘维护工具，可清理第三方软件残留、把微信 / QQ 等缓存迁移出 C 盘释放空间，并在需要时调用系统重置彻底清空 C 盘。内置安全围栏，系统目录与受保护档案不被误删。</p>
+              <div class="tags">
+                <span class="tag">Windows</span>
+                <span class="tag">单文件</span>
+                <span class="tag">自研</span>
+                <span class="tag">PyQt6</span>
+              </div>
+              <div class="tool-links">
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="cdiskblade" data-fallback="https://goutuo4588.github.io/tools/files/C盘利刃.exe" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdiskblade');}catch(err){console.error(err);window.open('https://goutuo4588.github.io/tools/files/C盘利刃.exe','_blank');}})(event);return false;">GitHub 下载</a>
+                <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/" target="_blank" rel="noopener" title="C盘利刃项目主页">项目主页 ↗</a>
+              </div>
+              <ul class="note">
+                <li>狗托儿自研，基于 PyQt6，单文件零依赖</li>
+                <li><b>.exe 可执行文件</b> · 单文件，右键以管理员身份运行</li>
+                <li><b>高危操作</b> · C盘初始化会清空 C 盘全部数据且不可逆，运行前请务必备份</li>
               </ul>
             </article>
 
@@ -1027,7 +1053,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
   const API_BASE = 'https://toolshop-d0gez0cs3e2318df8-1466799812.ap-shanghai.app.tcloudbase.com/toolshop';
   const CB_ENABLED = !API_BASE.startsWith('在此填');
   const CLOUD_USER_KEY = 'tp_cloud_user';
-  const TOOL_SLUGS=['openspeedy','watt-toolkit','wireshark','geek','tuban','memorykiller'];
+  const TOOL_SLUGS=['openspeedy','watt-toolkit','wireshark','geek','tuban','memorykiller','cdiskblade'];
   // Giscus 评论：GitHub Discussions 当评论库（公开可见，站长可在仓库 Discussions 管理）
   const GISCUS={repo:'goutuo4588/tools',repoId:'R_kgDOUBXNCw',category:'General',categoryId:'DIC_kwDOUBXNC84DEu6r'};
 
