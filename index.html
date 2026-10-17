@@ -483,7 +483,7 @@ var DL={
     {label:'v1.0 单文件 · 49MB', url:REL+'memorykiller-v1.0/MemoryKiller.exe'}
   ]},
   'cdiskblade':{name:'C盘利刃',files:[
-    {label:'v2.2 单文件 · 38MB', url:'https://goutuo4588.github.io/tools/files/C盘利刃.exe'}
+    {label:'v2.2 单文件 · 38MB', url:'https://raw.githubusercontent.com/goutuo4588/tools/main/files/C盘利刃.exe'}
   ]}
 };
 function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
@@ -504,7 +504,8 @@ function openDl(slug){
     var man = tag ? 'https://github.com/goutuo4588/tools/releases/tag/'+tag : f.url;
     var u=esc(f.url);
     h+='<div class="dl-file"><div class="dl-fname">📦 '+f.label+'</div>';
-    h+='<button class="dl-src on" onclick="startDl(\'\',\''+u+'\')">🐢 官方直连下载</button>';
+    var defBase = (slug==='cdiskblade' && MIRRORS[1] && MIRRORS[1].base) ? MIRRORS[1].base : '';
+    h+='<button class="dl-src on" onclick="startDl(\''+esc(defBase)+'\',\''+u+'\')">'+(defBase?'⚡ 推荐·gh-proxy 高速源':'🐢 官方直连下载')+'</button>';
     MIRRORS.slice(1).forEach(function(m){
       h+='<button class="dl-src" onclick="startDl(\''+esc(m.base)+'\',\''+u+'\')">'+m.name+'</button>';
     });
@@ -734,7 +735,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
                 <span class="tag">PyQt6</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="javascript:void(0)" data-slug="cdiskblade" data-fallback="https://goutuo4588.github.io/tools/files/C盘利刃.exe" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdiskblade');}catch(err){console.error(err);window.open('https://goutuo4588.github.io/tools/files/C盘利刃.exe','_blank');}})(event);return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="cdiskblade" data-fallback="https://raw.githubusercontent.com/goutuo4588/tools/main/files/C盘利刃.exe" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdiskblade');}catch(err){console.error(err);window.open('https://raw.githubusercontent.com/goutuo4588/tools/main/files/C盘利刃.exe','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/" target="_blank" rel="noopener" title="C盘利刃项目主页">项目主页 ↗</a>
               </div>
               <ul class="note">
