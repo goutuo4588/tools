@@ -486,7 +486,7 @@ var DL={
     {label:'v1.0 单文件 · 49MB', url:REL+'memorykiller-v1.0/MemoryKiller.exe'}
   ]},
   'cdiskblade':{name:'C盘利刃',files:[
-    {label:'v2.5 单文件 · 37MB · 新图标+玻璃拟态界面', url:'https://github.com/goutuo4588/tools/releases/download/v2.5-cdiskblade/cdiskblade-v2.5-win64.exe'}
+    {label:'v2.8 单文件 · 37MB · 系统组件保护 + 资源自愈', url:'https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.8-win64.exe'}
   ]}
 };
 function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
@@ -727,9 +727,9 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
             <!-- 自研 2：C盘利刃 -->
             <article class="tool" data-slug="cdiskblade">
-              <div class="tool-icon app-ico"><img src="assets/icons/cdiskblade-128.png?v=20261019" alt="C盘利刃 图标" width="60" height="60" loading="lazy"></div>
+              <div class="tool-icon app-ico"><img src="assets/icons/cdiskblade-128.png?v=20261021" alt="C盘利刃 图标" width="60" height="60" loading="lazy"></div>
               <h3>C盘利刃</h3>
-              <div class="ver">C盘维护之刃 · 自研 · v2.5</div>
+              <div class="ver">C盘维护之刃 · 自研 · v2.8</div>
               <p>面向个人与小微团队的 Windows C盘维护工具，可清理第三方软件残留、把微信 / QQ 等缓存迁移出 C 盘释放空间，并在需要时调用系统重置彻底清空 C 盘。内置安全围栏，系统目录与受保护档案不被误删。</p>
               <div class="tags">
                 <span class="tag">Windows</span>
@@ -738,13 +738,13 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
                 <span class="tag">PyQt6</span>
               </div>
               <div class="tool-links">
-                <a class="dl dl-main" href="javascript:void(0)" data-slug="cdiskblade" data-fallback="https://github.com/goutuo4588/tools/releases/download/v2.5-cdiskblade/cdiskblade-v2.5-win64.exe" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdiskblade');}catch(err){console.error(err);window.open('https://github.com/goutuo4588/tools/releases/download/v2.5-cdiskblade/cdiskblade-v2.5-win64.exe','_blank');}})(event);return false;">GitHub 下载</a>
+                <a class="dl dl-main" href="javascript:void(0)" data-slug="cdiskblade" data-fallback="https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.8-win64.exe" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdiskblade');}catch(err){console.error(err);window.open('https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.8-win64.exe','_blank');}})(event);return false;">GitHub 下载</a>
                 <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/" target="_blank" rel="noopener" title="C盘利刃项目主页">项目主页 ↗</a>
               </div>
               <ul class="note">
                 <li>狗托儿自研，基于 PyQt6，单文件零依赖</li>
                 <li><b>.exe可执行文件</b> · 单文件，右键以管理员身份运行</li>
-                <li><b>v2.5 更新</b> · 全新高端应用图标 +玻璃拟态界面（柴犬主题背景）+ 深度性能优化，全程无卡顿</li>
+                <li><b>v2.8 更新</b> · ① Program Files 下系统组件（Common Files / IE / Defender / WindowsPowerShell 等）列入保护永不删除；② 桌面快捷方式只创建一次，不再每次启动重建；③ 资源守卫：快捷方式 / 配置 / 本体被删后下次启动自动补回</li>
                 <li><b>高危操作</b> · C盘初始化会清空 C 盘全部数据且不可逆，运行前请务必备份</li>
               </ul>
             </article>
