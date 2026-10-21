@@ -19,19 +19,24 @@ window.SITE = {
   tagline:      '一把给 Windows 用的 C 盘清理小刀：扫得快、删得准，系统组件碰不得。', /* {{TAGLINE}} 一句话定位 */
 
   /* ---------- 链接（都换成你自己的地址） ---------- */
-  downloadUrl:  'https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe', /* {{DOWNLOAD_URL}} 自建站点直链（默认同绿色版） */
+  downloadUrl:  'https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-v2.9-win64.exe', /* {{DOWNLOAD_URL}} 默认下载链接（同绿色版，走 Releases 通道） */
   officialUrl:  'https://github.com/goutuo4588/tools/releases/tag/cdiskblade-v2.9',                       /* {{OFFICIAL_PAGE_URL}} 官方下载页（GitHub Releases） */
   homeUrl:      'https://goutuo4588.github.io/tools/',                                                    /* {{HOME_URL}} 具坊首页（返回入口） */
   repoUrl:      'https://github.com/goutuo4588/tools',                                                    /* {{REPO_URL}} 源码仓库 */
 
   /* ---------- 两种下载方式：程序完全一样，只是分发形式不同 ---------- */
+  /* 说明：下载走 GitHub Releases 附件通道，比 raw.githubusercontent 快得多；
+     再叠一层国内镜像（实测 900KB/s～2MB/s，而 raw 直连只有 40～270KB/s）。
+     镜像站是第三方，页面上给了 SHA256，下完建议核一下。 */
   setupName:    '安装版',                                                                                   /* {{SETUP_NAME}} */
   setupTag:     '推荐 · 长期用',                                                                            /* {{SETUP_TAG}} */
   setupDesc:    '带安装向导，双击后可以自己选装到哪个盘、哪个目录；开始菜单有入口，控制面板 / 设置里能正常卸载。适合装在常用电脑上一直用。', /* {{SETUP_DESC}} */
   setupFile:    'cdiskblade-setup-v2.9.exe',                                                               /* {{SETUP_FILE}} */
   setupSize:    '38.3 MB（40,173,081 字节）',                                                               /* {{SETUP_SIZE}} */
   setupSha256:  '8fe2f1fa5e4ad833a3e66064bfb058e321d30d57308bec6fe97c528141c61b58',                        /* {{SETUP_SHA256}} */
-  setupUrl:     'https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-setup-v2.9.exe', /* {{SETUP_URL}} 安装版直链 */
+  setupUrl:     'https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-setup-v2.9.exe',        /* {{SETUP_URL}} 官方源（GitHub Releases） */
+  setupFastUrl: 'https://gh-proxy.com/https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-setup-v2.9.exe',   /* {{SETUP_FAST_URL}} 高速源① */
+  setupFastUrl2:'https://ghfast.top/https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-setup-v2.9.exe',     /* {{SETUP_FAST_URL2}} 高速源② */
 
   portableName: '绿色版',                                                                                   /* {{PORTABLE_NAME}} */
   portableTag:  '免安装 · 可带走的',                                                                        /* {{PORTABLE_TAG}} */
@@ -39,7 +44,9 @@ window.SITE = {
   portableFile: 'cdiskblade-v2.9-win64.exe',                                                               /* {{PORTABLE_FILE}} */
   portableSize: '36.6 MB（38,386,667 字节）',                                                               /* {{PORTABLE_SIZE}} */
   portableSha256:'a94031f7ede41be8b4c9f3372ab84c0b3ad5d778506e69f3e0e520af69ee4921',                       /* {{PORTABLE_SHA256}} */
-  portableUrl:  'https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe', /* {{PORTABLE_URL}} 绿色版直链 */
+  portableUrl:  'https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-v2.9-win64.exe',        /* {{PORTABLE_URL}} 官方源 */
+  portableFastUrl:'https://gh-proxy.com/https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-v2.9-win64.exe',   /* {{PORTABLE_FAST_URL}} 高速源① */
+  portableFastUrl2:'https://ghfast.top/https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-v2.9-win64.exe',    /* {{PORTABLE_FAST_URL2}} 高速源② */
 
   /* ---------- 署名 ---------- */
   author:       '狗托儿',                          /* {{AUTHOR_NAME}}     作者署名 */
