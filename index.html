@@ -486,7 +486,7 @@ var DL={
     {label:'v1.0 单文件 · 49MB', url:REL+'memorykiller-v1.0/MemoryKiller.exe'}
   ]},
   'cdiskblade':{name:'C盘利刃',files:[
-    {label:'v2.9 单文件 · 37MB · 系统组件保护 + 资源自愈', url:'https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe'}
+    {label:'v2.9 单文件 · 37MB · 系统组件保护 + 资源自愈 + 异常兜底', url:'https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe'}
   ]}
 };
 function esc(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
@@ -745,7 +745,13 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
                 <li>狗托儿自研，基于 PyQt6，单文件零依赖</li>
                 <li><b>.exe可执行文件</b> · 单文件，右键以管理员身份运行</li>
                 <li><b>v2.9 更新</b> · ① Program Files 下系统组件（Common Files / IE / Defender / WindowsPowerShell 等）列入保护永不删除；② 桌面快捷方式只创建一次，不再每次启动重建；③ 资源守卫：快捷方式 / 配置 / 本体被删后下次启动自动补回</li>
-                <li><b>高危操作</b> · C盘初始化会清空 C 盘全部数据且不可逆，运行前请务必备份</li>
+                <li><b>系统要求</b> · Windows 10 <b>1809 及以上</b> 或 Windows 11（均为 64 位）；需管理员权限。Win7 / Win8 / 32 位系统不支持（依赖 Qt6 + Python 3.13 运行环境）</li>
+
+<li><b>文件校验</b> · SHA256 <code style="font-size:11px;word-break:break-all">1ae0b0a1d1359c9057a0a428de8c8999750bede8934dcd0f03783e87f5db7b8d</code>（37,836,382 字节），下载后可自行核对是否被篡改</li>
+
+<li><b>首次运行提示</b> · Edge 下载点「保留」→ 双击若弹 SmartScreen 蓝框点「更多信息 → 仍要运行」→ UAC 点「是」。未签名软件必经这三步，不是软件故障</li>
+
+<li><b>高危操作</b> · C盘初始化会清空 C 盘全部数据且不可逆，运行前请务必备份</li>
               </ul>
             </article>
 
