@@ -1,0 +1,71 @@
+/* ============================================================
+   tokens.css —— 设计变量（与「具坊」主站保持一致，改这里即可换肤）
+   说明：本文件是全站唯一的色彩/字阶/间距/动效来源，
+        组件样式里禁止硬编码色值。
+   ============================================================ */
+:root{
+  /* ---------- 文字 ---------- */
+  --ink:#23252b;          /* 主文字（暖调近黑，不用纯黑） */
+  --ink-soft:#5b6170;     /* 次级文字 */
+  --paper:#fffdf9;        /* 页面底色 */
+
+  /* ---------- 大色块（清新、柔和、彼此区分） ---------- */
+  --c-peach:#ffe3d3;      /* 首屏 */
+  --c-mint:#d6f3e4;       /* 简介与故事 */
+  --c-lav:#e7defb;        /* 功能亮点 */
+  --c-sky:#d6e9fb;        /* 截图演示 */
+  --c-butter:#fdf0c8;     /* 更新日志 */
+  --c-teal:#d3f0ee;       /* 系统要求 */
+  --c-blush:#ffd9e2;      /* 下载区 */
+
+  /* ---------- 强调色（全站仅此两个，克制使用） ---------- */
+  --accent:#ff7a59;       /* 主强调：橙 —— 只给关键动作 */
+  --accent-2:#5b8def;     /* 次强调：蓝 —— 链接与数据 */
+  --accent-ink:#1f6b4f;   /* 成功/安全语义色（安全围栏文案） */
+
+  /* ---------- 面板与描边 ---------- */
+  --surface:#ffffff;
+  --surface-soft:rgba(255,255,255,.72);
+  --line:rgba(35,37,43,.12);
+  --line-strong:rgba(35,37,43,.20);
+
+  /* ---------- 形状 ---------- */
+  --radius:28px;          /* 大区块圆角 */
+  --radius-md:18px;       /* 卡片 */
+  --radius-sm:12px;       /* 小控件 */
+  --radius-pill:999px;
+
+  /* ---------- 阴影（三级高度：2 / 8 / 24） ---------- */
+  --shadow-1:0 2px 8px rgba(35,37,43,.08);
+  --shadow-2:0 8px 24px -8px rgba(35,37,43,.28);
+  --shadow-3:0 18px 50px -22px rgba(35,37,43,.45);
+
+  /* ---------- 间距梯度 ---------- */
+  --sp-1:4px; --sp-2:8px; --sp-3:16px; --sp-4:24px;
+  --sp-5:40px; --sp-6:64px; --sp-7:96px;
+
+  /* ---------- 字阶（1.25 模块化比例） ---------- */
+  --fs-xs:12.5px;
+  --fs-sm:14px;
+  --fs-base:16px;
+  --fs-md:18px;
+  --fs-lg:21px;
+  --fs-xl:clamp(28px,4.5vw,46px);   /* 区块标题 */
+  --fs-hero:clamp(38px,6.4vw,72px); /* 首屏标题 */
+
+  /* ---------- 动效 ---------- */
+  --dur-fast:160ms;
+  --dur-base:320ms;
+  --dur-slow:680ms;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+
+  /* ---------- 布局 ---------- */
+  --maxw:1080px;
+  --sidebar-w:248px;
+
+  /* ---------- 字体（系统字体优先，零网络请求） ---------- */
+  --font-sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",
+              -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,"JetBrains Mono",
+              "Cascadia Mono",Consolas,"Courier New",monospace;
+}

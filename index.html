@@ -215,6 +215,8 @@
   .dl-main:hover{background:#000}
   .dl-sub{background:rgba(35,37,43,.06);color:var(--ink)}
   .dl-sub:hover{background:rgba(35,37,43,.12)}
+  .dl-site{background:var(--c-teal);color:#1f6b4f;border:1px solid rgba(31,107,79,.18)}
+  .dl-site:hover{background:#c2e9e6}
   .empty{margin-top:16px;padding:36px 20px;border-radius:var(--radius);border:2px dashed rgba(35,37,43,.16);background:rgba(35,37,43,.02);text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
   .empty-ico{font-size:34px;opacity:.5}
   .empty b{font-size:15px;font-weight:800}
@@ -739,7 +741,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
               </div>
               <div class="tool-links">
                 <a class="dl dl-main" href="javascript:void(0)" data-slug="cdiskblade" data-fallback="https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe" onclick="(function(e){try{if(e&&e.preventDefault)e.preventDefault();window.openDl('cdiskblade');}catch(err){console.error(err);window.open('https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe','_blank');}})(event);return false;">GitHub 下载</a>
-                <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/" target="_blank" rel="noopener" title="C盘利刃项目主页">项目主页 ↗</a>
+                <a class="dl dl-site" href="https://goutuo4588.github.io/tools/cdiskblade/" target="_blank" rel="noopener" title="C 盘之刃 官方网址">官方网址 ↗</a>
               </div>
               <ul class="note">
                 <li>狗托儿自研，基于 PyQt6，单文件零依赖</li>
@@ -749,6 +751,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
 
 <li><b>文件校验</b> · SHA256 <code style="font-size:11px;word-break:break-all">1ae0b0a1d1359c9057a0a428de8c8999750bede8934dcd0f03783e87f5db7b8d</code>（37,836,382 字节），下载后可自行核对是否被篡改</li>
 
+<li><b>官方网址</b> · 完整介绍、功能清单与更新日志：<a href="https://goutuo4588.github.io/tools/cdiskblade/" target="_blank" rel="noopener" style="color:#5b8def;font-weight:700">https://goutuo4588.github.io/tools/cdiskblade/</a></li>
 <li><b>首次运行提示</b> · Edge 下载点「保留」→ 双击若弹 SmartScreen 蓝框点「更多信息 → 仍要运行」→ UAC 点「是」。未签名软件必经这三步，不是软件故障</li>
 
 <li><b>高危操作</b> · C盘初始化会清空 C 盘全部数据且不可逆，运行前请务必备份</li>
