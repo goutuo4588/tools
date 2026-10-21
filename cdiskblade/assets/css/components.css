@@ -225,6 +225,63 @@
 .dl-hint{
   font-size:var(--fs-xs);color:var(--ink-soft);text-align:center;line-height:1.7;
 }
+
+/* ---------- 下载方式二选一：安装版 / 绿色版（左右并列、样式统一） ---------- */
+/* 面板改单列：上方信息铺满整行，两张卡片在下方左右并排，方便直接对比 */
+.download-panel.is-solo{grid-template-columns:1fr}
+.download-panel.is-solo .lead{max-width:none}
+.download-panel.is-solo .dl-meta{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:10px clamp(16px,3vw,36px);
+}
+
+.dl-choices{
+  grid-column:1/-1;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(14px,2vw,22px);
+  margin-top:clamp(22px,3vw,34px);
+  align-items:stretch;
+}
+.dl-opt{
+  display:flex;flex-direction:column;gap:12px;
+  background:var(--surface-soft);border:1px solid var(--line);
+  border-radius:var(--radius-md);padding:24px 24px 22px;
+  box-shadow:var(--shadow-1);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:transform var(--dur-base) var(--ease-out),
+             box-shadow var(--dur-base) var(--ease-out);
+}
+.dl-opt:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
+.dl-opt-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dl-opt-name{font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+.dl-opt-tag{
+  font-size:var(--fs-xs);font-weight:700;color:var(--ink);
+  background:rgba(35,37,43,.08);border-radius:var(--radius-pill);
+  padding:4px 12px;white-space:nowrap;
+}
+.dl-opt-tag.is-rec{
+  color:#fff;background:linear-gradient(135deg,var(--accent),#ff5f3d);
+  box-shadow:0 6px 16px -8px rgba(255,122,89,.9);
+}
+.dl-opt-desc{font-size:14.5px;color:var(--ink-soft);line-height:1.8}
+.dl-opt-meta{
+  list-style:none;display:flex;flex-direction:column;gap:7px;
+  font-size:var(--fs-xs);color:var(--ink-soft);line-height:1.7;
+}
+.dl-opt-meta li{display:flex;gap:10px;align-items:flex-start}
+.dl-opt-meta .k{flex:0 0 52px;font-weight:700;color:var(--ink)}
+.dl-opt-meta .sha{
+  font-family:var(--font-mono);font-size:11px;word-break:break-all;
+  background:rgba(255,255,255,.75);padding:6px 10px;
+  border-radius:var(--radius-sm);border:1px solid var(--line);
+}
+.dl-opt .mini-btn{align-self:flex-start}
+/* 按钮推到卡片底部：两张卡片的下载键永远在同一水平线上 */
+.dl-opt .btn{margin-top:auto;width:100%}
+.dl-opt .btn-primary{background:linear-gradient(135deg,var(--accent),#ff5f3d)}
+@media (max-width:760px){
+  .dl-choices{grid-template-columns:1fr}
+}
 .dl-actions .badge-row{
   display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:2px;
 }
