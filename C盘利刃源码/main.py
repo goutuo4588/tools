@@ -102,9 +102,63 @@ class GlassDialog(QDialog):
         self._bg_timer.start()
 
 
+# ===================== 下载窗口（选保存位置 → 下载 → 完成） =====================
+# 放在 GlassDialog 定义之后导入：DownloadDialog 会自动复用主程序这个玻璃拟态基类，
+# 视觉/层级/背景与主窗口完全一致（放文件顶部也能跑，只是会降级用模块自带的同款基类）。
+from download_dialog import DownloadDialog, DownloadItem
+
+
+# 启动时要下载的文件清单。留空 = 只做「选择保存位置」，不下载任何东西。
+# 想真正下载时往这里填，例：
+#   DownloadItem("C盘利刃_V2.3.exe", url="https://你的站点/C盘利刃_V2.3.exe", size=18 * 1024 * 1024)
+#   DownloadItem("手势刷.apk", path=r"D:\打包产物\手势刷.apk")   # path = 本地复制模式，不走网络
+# size 填预估字节数用于提前校验磁盘空间；不知道就填 0（进度改为按文件个数推进）。
+DOWNLOAD_MANIFEST = [
+    # DownloadItem("示例工具.exe", url="https://example.com/示例工具.exe", size=0),
+]
+
+
+def run_download_window_if_needed(parent=None, dark=False):
+    """启动阶段弹出下载窗口。
+
+    返回 (保存目录, 已下载文件列表)；用户取消 / 本次不弹 → ("", [])。
+    全生命周期只有这一个实例：exec() 模态显示，下载在 QThread 里跑，
+    主线程不阻塞；实例函数结束即销毁，closeEvent 里已兜底停线程，不会重复弹出。
+
+    弹出时机取舍（这是刻意设计的，不是随手写的）：
+      · 清单非空（有真实东西要下）→ 每次启动都弹，用户要有机会确认/改保存位置
+      · 清单为空                  → 一律不弹（安装器已经让用户选过安装位置了，
+                                    启动再问一次就是重复劳动，纯属打扰）
+      · config.download_popup_on_start = False → 彻底关掉，不再弹
+    理由：软件分发已经改成 Inno Setup 安装器，"装到哪"由安装器负责；
+    这个窗口回归本职——只在真有文件要下载时出现。
+    """
+    cfg = load_config()
+    if not cfg.get("download_popup_on_start", True):
+        return ("", [])
+    # 没有下载内容就不弹：安装器已经问过安装位置，这里再问一次没意义
+    if not DOWNLOAD_MANIFEST:
+        return ("", [])
+
+    dlg = DownloadDialog(parent, DOWNLOAD_MANIFEST, dark=dark, title="下载工具")
+    try:
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return ("", [])
+        return (dlg.saved_dir, list(dlg.saved_files))
+    finally:
+        # 关窗即释放：切断信号连接，避免线程回调打到已销毁的控件上
+        try:
+            if dlg.worker is not None:
+                dlg.worker.quit()
+                dlg.worker.wait(3000)
+        except Exception:
+            pass
+        dlg.deleteLater()
+
+
 # ===================== 全局常量配置 =====================
 APP_NAME = "C盘利刃"
-APP_VERSION = "V2.2"
+APP_VERSION = "V2.9"   # 与线上已发布的 v2.9 对齐（原常量漏改成 V2.2，功能其实是同一版）
 
 
 def _user_desktop_dir():
@@ -174,6 +228,8 @@ DEFAULT_CONFIG = {
     "auto_restore_stable_exe": True,  # 程序本体/图标缺失 -> 下次启动自动补回
     "hide_exe_from_desktop": True,    # 桌面只保留快捷方式，本体归位到隐藏目录
     "guardian_log": True,             # 记录资源守卫执行日志
+    "download_popup_on_start": True,  # 启动时弹「下载/选择保存位置」窗口（False = 彻底不弹）
+    "download_last_dir": "",          # 上次选择的保存目录（由下载窗口自动写入）
 }
 
 # 资源登记表（顺序 = 补回顺序，被依赖的排在前面）
@@ -4480,10 +4536,19 @@ if __name__ == "__main__":
     if d_disclaim.exec() != QDialog.DialogCode.Accepted:
         sys.exit(0)
 
+    # 免责协议通过后、主窗口出现前：弹「下载 / 选择保存位置」窗口。
+    # 放在主窗口之前是为了让用户第一眼就看到（对齐安装器那种「先选位置」的体感）；
+    # 用户取消也只是跳过，不影响后面任何启动逻辑。
+    # 主题跟主窗口默认一致（MainWindow 默认浅色，dark_mode 不持久化）
+    download_result = run_download_window_if_needed(parent=None, dark=False)
+
     # 桌面快捷方式创建（复制 exe + 起 PowerShell COM，同步做会冻结启动界面 1~3 秒）
     # 改为主窗口显示后由后台线程执行，启动零等待
     w = MainWindow()
     w.show()
+    if download_result[1]:
+        # 有实际下载才写日志，避免每次启动都刷一行没意义的话
+        w.log(f"启动下载完成：{len(download_result[1])} 个文件已保存到 {download_result[0]}")
     w.shortcut_worker = ShortcutWorker()
     w.shortcut_worker.start()
     sys.exit(app.exec())
