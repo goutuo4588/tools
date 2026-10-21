@@ -130,13 +130,53 @@ cdiskblade-site/
 - **可访问性**：唯一 `h1`（在下载区）、语义地标、跳转链接、`aria-label`、可见 `:focus-visible` 描边、触摸目标 ≥44px、表格移动端自动转卡片堆叠。
 - **降级**：`prefers-reduced-motion: reduce` 下关闭所有动效；禁用 JS 时显示 `noscript` 直链。
 
-## 六、部署到 GitHub Pages
+## 六、部署位置与依赖资源路径（已上线）
 
-1. 把整个 `cdiskblade-site/` 目录的内容放到仓库 `tools/` 下（例如 `tools/cdiskblade.html` + `tools/assets/...`），
-   或单独建仓库后开启 Pages。
-2. 若放在子目录，把 `site-data.js` 里的 `homeUrl` 等地址改成实际地址，`index.html` 的 `canonical` 也要改。
-3. 提交后等 Pages 构建（约 1 分钟）即可访问。
+仓库：`github.com/goutuo4588/tools`（Pages 根目录 = `https://goutuo4588.github.io/tools/`）
 
-## 七、在「具坊」网站的「C 盘之刃」模块加官网入口
+| 仓库路径 | 线上地址 | 说明 |
+|---|---|---|
+| `cdiskblade/index.html` | `https://goutuo4588.github.io/tools/cdiskblade/` | 官网首页（5 个界面都在这一页内） |
+| `cdiskblade/assets/css/tokens.css` | 同上目录 + `assets/css/tokens.css` | 设计变量 |
+| `cdiskblade/assets/css/base.css` | 同上 + `assets/css/base.css` | 骨架与无障碍 |
+| `cdiskblade/assets/css/components.css` | 同上 + `assets/css/components.css` | 界面转场、卡片、表格 |
+| `cdiskblade/assets/js/site-data.js` | 同上 + `assets/js/site-data.js` | 内容源（要改文本只动它） |
+| `cdiskblade/assets/js/main.js` | 同上 + `assets/js/main.js` | 路由与交互 |
+| `cdiskblade/README.md` | — | 说明文档（不参与渲染） |
+| `assets/shots/*.png` | 未上传（截图区已删，目录为空） | 若以后加截图，放这里并改 `site-data.js` 的 `shots` |
 
-见 `integration/jufang-card-entry.snippet.html`，里面写清了插入位置和三种写法（推荐把原来的「项目主页 ↗」次按钮直接指向本站）。
+全部用**相对路径**引用（`assets/css/...`），所以整目录换个位置也照样能跑；只有「返回具坊」「下载链接」这类外链是绝对地址，写在 `site-data.js` 里。
+
+## 七、接入「具坊」主站的方式（已实际应用）
+
+### 采用的方案：同站独立页面 + 卡片按钮跳转（**不用 iframe、不合入源码**）
+
+| 方案 | 结论 | 原因 |
+|---|---|---|
+| 把官网 HTML 结构合进具坊 `index.html` | ❌ 不采用 | 具坊首页是 130KB 单页应用，自带 `.view` 路由、`.sidebar`、`:root` CSS 变量；官网也有同名类名与变量，合并后样式互相覆盖、两套 JS 路由打架，且首页体积再涨一大截 |
+| iframe 内嵌 | ⚠️ 备选 | 需要固定高度、会出现第二根滚动条，移动端体验与收录都不好；真要内嵌看 `integration/iframe-embed.snippet.html`（含自适应高度脚本） |
+| **同站独立页面 + 入口按钮** | ✅ 采用 | 零冲突、零性能影响、可单独收录与分享，点按钮 `target="_blank"` 打开，不把访客带离具坊 |
+
+### 具体插入位置与代码
+
+**位置**：具坊 `index.html` → 搜索 `data-slug="cdiskblade"` → 该卡片的 `<div class="tool-links">`，**GitHub 下载按钮的右侧**（即原来的 `.dl-sub` 次按钮位）。
+
+**改动**：把原先指向具坊首页的「项目主页 ↗」替换为（代码见 `integration/jufang-card-entry.snippet.html`）：
+
+```html
+<a class="dl dl-site" href="https://goutuo4588.github.io/tools/cdiskblade/"
+   target="_blank" rel="noopener" title="C 盘之刃 官方网址">官方网址 ↗</a>
+```
+
+同时新增两处配套内容：
+1. `.dl-sub:hover` 规则后加 `.dl-site` 样式（青绿底，呼应「查看介绍」而非「下载」）；
+2. 卡片的 `<ul class="note">` 说明区加一行「官方网址」链接。
+3. `sitemap.xml` 增加官网地址，方便搜索引擎收录。
+
+### 桌面端 / 移动端
+
+官网自身是响应式：≤900px 左侧导航自动变顶部横条、≤480px 按钮撑满、表格转卡片堆叠，已在 1440 / 390 两档实测无横向溢出；具坊侧按钮沿用现有 `.dl` 弹性布局，卡片内自动换行，不挤坏原有布局。
+
+### 性能影响
+
+具坊首页只多了 1 个 `<a>` 和 2 行 CSS（+392 字节），官网的 CSS/JS 全部只在 `cdiskblade/` 页面加载，不影响具坊首屏与加载速度。
