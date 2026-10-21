@@ -53,7 +53,8 @@
     <noscript>
       <div class="noscript">
         当前浏览器禁用了 JavaScript，五个模块会依次平铺显示（内容完整，只是没有转场动画）。<br />
-        直接下载：<a href="{{DOWNLOAD_URL}}">{{DOWNLOAD_URL}}</a>
+        直接下载：<a href="https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-setup-v2.9.exe">安装版</a>
+        · <a href="https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe">绿色版</a>
       </div>
     </noscript>
 
@@ -63,7 +64,7 @@
       <div class="view" id="view-download" data-view="download" role="region" aria-label="下载">
         <section class="block download is-first">
           <span class="blob b1"></span><span class="blob b2"></span>
-          <div class="wrap download-panel">
+          <div class="wrap download-panel is-solo">
             <div class="dl-copy">
               <div class="eyebrow">Download · Windows C 盘维护</div>
               <h1 class="title">下载 <span data-bind="appName" data-token="APP_NAME">C 盘之刃</span></h1>
@@ -74,24 +75,59 @@
                 <li><span class="k">文件大小</span><span data-bind="fileSize" data-token="FILE_SIZE">{{FILE_SIZE}}</span></li>
                 <li><span class="k">更新日期</span><span class="mono" data-bind="releaseDate" data-token="UPDATE_DATE">{{UPDATE_DATE}}</span></li>
                 <li><span class="k">系统要求</span><span>Windows 10（1809+）/ Windows 11，64 位，需管理员权限</span></li>
-                <li><span class="k">SHA256</span><span class="sha mono" data-bind="sha256" data-token="SHA256">{{SHA256}}</span></li>
               </ul>
               <div class="badge-row" style="margin-top:12px">
-                <button class="mini-btn" type="button" data-copy="sha256">复制校验值</button>
                 <a class="mini-btn" data-href="repoUrl" href="{{REPO_URL}}" target="_blank" rel="noopener" style="text-decoration:none">查看源码 ↗</a>
+                <a class="mini-btn" data-href="officialUrl" href="{{OFFICIAL_PAGE_URL}}" target="_blank" rel="noopener" style="text-decoration:none">历史版本（GitHub Releases）↗</a>
               </div>
             </div>
 
-            <div class="dl-actions">
-              <a class="btn btn-primary btn-xl" data-href="downloadUrl" href="{{DOWNLOAD_URL}}" download>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4.5 20h15"/></svg>
-                立即下载安装包 <span class="btn-sub" data-bind="version" data-token="VERSION">{{VERSION}}</span>
-              </a>
-              <a class="btn btn-ghost btn-xl" data-href="officialUrl" href="{{OFFICIAL_PAGE_URL}}" target="_blank" rel="noopener">
-                前往官方下载页 ↗
-              </a>
-              <p class="dl-hint">主按钮走自建直链 · 秒下；打不开就走下面的官方页</p>
+            <!-- 两种下载方式：程序完全一样，只是分发形式不同。两张卡片样式统一、左右并列 -->
+            <div class="dl-choices" role="list" aria-label="下载方式">
+
+              <!-- 选项一：安装版 -->
+              <section class="dl-opt" role="listitem" aria-labelledby="opt-setup-name">
+                <div class="dl-opt-head">
+                  <span class="dl-opt-name" id="opt-setup-name" data-bind="setupName" data-token="SETUP_NAME">{{SETUP_NAME}}</span>
+                  <span class="dl-opt-tag is-rec" data-bind="setupTag" data-token="SETUP_TAG">{{SETUP_TAG}}</span>
+                </div>
+                <p class="dl-opt-desc" data-bind="setupDesc" data-token="SETUP_DESC">{{SETUP_DESC}}</p>
+                <ul class="dl-opt-meta">
+                  <li><span class="k">文件名</span><span class="mono" data-bind="setupFile" data-token="SETUP_FILE">{{SETUP_FILE}}</span></li>
+                  <li><span class="k">大小</span><span data-bind="setupSize" data-token="SETUP_SIZE">{{SETUP_SIZE}}</span></li>
+                  <li><span class="k">适用</span><span>常用电脑 · 想自己选安装目录 · 需要正常卸载</span></li>
+                  <li><span class="k">SHA256</span><span class="sha mono" data-bind="setupSha256" data-token="SETUP_SHA256">{{SETUP_SHA256}}</span></li>
+                </ul>
+                <button class="mini-btn" type="button" data-copy="setupSha256">复制校验值</button>
+                <a class="btn btn-primary" data-href="setupUrl" href="{{SETUP_URL}}" download>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4.5 20h15"/></svg>
+                  下载安装版 <span class="btn-sub" data-bind="version" data-token="VERSION">{{VERSION}}</span>
+                </a>
+              </section>
+
+              <!-- 选项二：绿色版 -->
+              <section class="dl-opt" role="listitem" aria-labelledby="opt-portable-name">
+                <div class="dl-opt-head">
+                  <span class="dl-opt-name" id="opt-portable-name" data-bind="portableName" data-token="PORTABLE_NAME">{{PORTABLE_NAME}}</span>
+                  <span class="dl-opt-tag" data-bind="portableTag" data-token="PORTABLE_TAG">{{PORTABLE_TAG}}</span>
+                </div>
+                <p class="dl-opt-desc" data-bind="portableDesc" data-token="PORTABLE_DESC">{{PORTABLE_DESC}}</p>
+                <ul class="dl-opt-meta">
+                  <li><span class="k">文件名</span><span class="mono" data-bind="portableFile" data-token="PORTABLE_FILE">{{PORTABLE_FILE}}</span></li>
+                  <li><span class="k">大小</span><span data-bind="portableSize" data-token="PORTABLE_SIZE">{{PORTABLE_SIZE}}</span></li>
+                  <li><span class="k">适用</span><span>即用即走 · 放 U 盘随身带 · 拷给别人直接用</span></li>
+                  <li><span class="k">SHA256</span><span class="sha mono" data-bind="portableSha256" data-token="PORTABLE_SHA256">{{PORTABLE_SHA256}}</span></li>
+                </ul>
+                <button class="mini-btn" type="button" data-copy="portableSha256">复制校验值</button>
+                <a class="btn btn-primary" data-href="portableUrl" href="{{PORTABLE_URL}}" download>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4.5 20h15"/></svg>
+                  下载绿色版 <span class="btn-sub" data-bind="version" data-token="VERSION">{{VERSION}}</span>
+                </a>
+              </section>
+
             </div>
+
+            <p class="dl-hint" style="grid-column:1/-1">两个版本是同一个程序，只是分发形式不同 · 都是 GitHub 直连，点哪个都能秒下；万一没反应，刷新页面重试即可</p>
 
             <div class="dl-tips" style="grid-column:1/-1">
               <h3>第一次运行，注意三步</h3>
