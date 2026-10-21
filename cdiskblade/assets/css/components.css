@@ -276,9 +276,17 @@
   border-radius:var(--radius-sm);border:1px solid var(--line);
 }
 .dl-opt .mini-btn{align-self:flex-start}
-/* 按钮推到卡片底部：两张卡片的下载键永远在同一水平线上 */
-.dl-opt .btn{margin-top:auto;width:100%}
+/* 按钮组推到卡片底部：两张卡片的下载键永远在同一水平线上 */
+.dl-opt-btns{
+  margin-top:auto;display:grid;grid-template-columns:1.65fr 1fr;gap:10px;
+}
+.dl-opt-btns .btn{width:100%;padding:14px 16px;font-size:15.5px;min-height:52px}
+.dl-opt-btns .btn .btn-sub{display:none}
 .dl-opt .btn-primary{background:linear-gradient(135deg,var(--accent),#ff5f3d)}
+@media (max-width:420px){
+  .dl-opt-btns{grid-template-columns:1fr}
+  .dl-opt-btns .btn .btn-sub{display:inline}
+}
 @media (max-width:760px){
   .dl-choices{grid-template-columns:1fr}
 }
