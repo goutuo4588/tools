@@ -53,8 +53,9 @@
     <noscript>
       <div class="noscript">
         当前浏览器禁用了 JavaScript，五个模块会依次平铺显示（内容完整，只是没有转场动画）。<br />
-        直接下载：<a href="https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-setup-v2.9.exe">安装版</a>
-        · <a href="https://raw.githubusercontent.com/goutuo4588/tools/main/files/cdiskblade-v2.9-win64.exe">绿色版</a>
+        直接下载：<a href="https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-setup-v2.9.exe">安装版</a>
+        · <a href="https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-v2.9-win64.exe">绿色版</a>
+        · <a href="https://gh-proxy.com/https://github.com/goutuo4588/tools/releases/download/cdiskblade-v2.9/cdiskblade-v2.9-win64.exe">绿色版（高速镜像）</a>
       </div>
     </noscript>
 
@@ -99,10 +100,14 @@
                   <li><span class="k">SHA256</span><span class="sha mono" data-bind="setupSha256" data-token="SETUP_SHA256">{{SETUP_SHA256}}</span></li>
                 </ul>
                 <button class="mini-btn" type="button" data-copy="setupSha256">复制校验值</button>
-                <a class="btn btn-primary" data-href="setupUrl" href="{{SETUP_URL}}" download>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4.5 20h15"/></svg>
-                  下载安装版 <span class="btn-sub" data-bind="version" data-token="VERSION">{{VERSION}}</span>
-                </a>
+                <div class="dl-opt-btns">
+                  <a class="btn btn-primary" data-href="setupFastUrl" href="{{SETUP_FAST_URL}}" download>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4.5 20h15"/></svg>
+                    ⚡ 高速下载安装版 <span class="btn-sub" data-bind="version" data-token="VERSION">{{VERSION}}</span>
+                  </a>
+                  <a class="btn btn-ghost" data-href="setupUrl" href="{{SETUP_URL}}" download>官方源</a>
+                </div>
+                <a class="mini-btn" data-href="setupFastUrl2" href="{{SETUP_FAST_URL2}}" download style="text-decoration:none">备用高速源② ↗</a>
               </section>
 
               <!-- 选项二：绿色版 -->
@@ -119,15 +124,19 @@
                   <li><span class="k">SHA256</span><span class="sha mono" data-bind="portableSha256" data-token="PORTABLE_SHA256">{{PORTABLE_SHA256}}</span></li>
                 </ul>
                 <button class="mini-btn" type="button" data-copy="portableSha256">复制校验值</button>
-                <a class="btn btn-primary" data-href="portableUrl" href="{{PORTABLE_URL}}" download>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4.5 20h15"/></svg>
-                  下载绿色版 <span class="btn-sub" data-bind="version" data-token="VERSION">{{VERSION}}</span>
-                </a>
+                <div class="dl-opt-btns">
+                  <a class="btn btn-primary" data-href="portableFastUrl" href="{{PORTABLE_FAST_URL}}" download>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M4.5 20h15"/></svg>
+                    ⚡ 高速下载绿色版 <span class="btn-sub" data-bind="version" data-token="VERSION">{{VERSION}}</span>
+                  </a>
+                  <a class="btn btn-ghost" data-href="portableUrl" href="{{PORTABLE_URL}}" download>官方源</a>
+                </div>
+                <a class="mini-btn" data-href="portableFastUrl2" href="{{PORTABLE_FAST_URL2}}" download style="text-decoration:none">备用高速源② ↗</a>
               </section>
 
             </div>
 
-            <p class="dl-hint" style="grid-column:1/-1">两个版本是同一个程序，只是分发形式不同 · 都是 GitHub 直连，点哪个都能秒下；万一没反应，刷新页面重试即可</p>
+            <p class="dl-hint" style="grid-column:1/-1">两个版本是同一个程序，只是分发形式不同 · 默认走<b>国内高速镜像</b>，36 MB 一般半分钟内下完；镜像抽风就点卡片里的「官方源」，还有个「备用高速源②」可以换</p>
 
             <div class="dl-tips" style="grid-column:1/-1">
               <h3>第一次运行，注意三步</h3>
