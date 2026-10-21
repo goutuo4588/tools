@@ -709,7 +709,7 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
               <div class="tool-icon" style="background:var(--c-peach)">🧠</div>
               <h3>内存杀手 MemBoost</h3>
               <div class="ver">系统性能优化 · 自研</div>
-              <p>面向 Windows 的内存优化工具，调用系统公开接口安全释放待机 / 已修改内存页、回收进程工作集，毫秒级响应，全程不终止任何进程。内置系统进程黑名单与 UAC 提权隔离。</p>
+              <p>面向 Windows 的一键内存释放与硬件监控工具：调用系统公开接口清理待机 / 已修改内存页、收缩全部进程工作集，毫秒级出结果，全程不终止任何进程。内置系统进程黑名单与按需 UAC 提权隔离，同时实时监控内存 / CPU / GPU 三路数据，支持一键节能降温与电源计划切换。</p>
               <div class="tags">
                 <span class="tag">Windows</span>
                 <span class="tag">单文件</span>
@@ -721,9 +721,18 @@ window.MIRRORS=MIRRORS; window.REL=REL; window.DL=DL;
                 <a class="dl dl-sub" href="https://goutuo4588.github.io/tools/memorykiller.html" target="_blank" rel="noopener" title="内存杀手项目主页">项目主页 ↗</a>
               </div>
               <ul class="note">
-                <li>狗托儿自研，基于 .NET 10，源码在仓库 MemoryKiller/ 目录</li>
-                <li><b>.exe 可执行文件</b> · 单文件，右键以管理员身份运行</li>
-                <li><b>安全机制</b> · 系统进程黑名单 + UAC 提权隔离，绝不终止任何进程</li>
+                <li>狗托儿自研，基于 .NET 10 + WinForms 自绘界面，源码在仓库 MemoryKiller/ 目录</li>
+                <li><b>.exe 可执行文件</b> · 单文件自包含，无需安装 .NET 运行时，绿色免安装；双击即可打开，点「一键释放」时按需申请 UAC 提权（也可直接右键以管理员身份运行）</li>
+                <li><b>核心功能 · 一键大力度释放</b> · ① 清空系统待机列表 ② 刷新已修改内存页 ③ 清理待机缓存 ④ 对全部用户进程收缩工作集（EmptyWorkingSet）。全部走 Windows 公开 API，不写注册表、不改系统设置，效果接近一次轻量「重启级」整理，毫秒级出结果</li>
+                <li><b>实时监控</b> · 内存 / CPU / GPU 三页：环形仪表 + 近 60 秒占用趋势 + 本次累计释放 / 可用 / 物理内存总量；CPU 占用率（性能计数器，读不到自动回退 WMI）、温度、主频、物理核心数；GPU 名称、专用显存、利用率；高占用进程 Top 6 每 3 秒自动刷新</li>
+                <li><b>安全机制</b> · 系统进程黑名单 + UAC 提权隔离：23 项关键进程（System / csrss / smss / lsass / winlogon / services / svchost / audiodg / dwm / explorer / fontdrvhost / Memory Compression / ShellExperienceHost / RuntimeBroker / conhost 等）永不收缩、永不结束；一键释放全程只压缩工作集，绝不终止任何进程</li>
+                <li><b>手动结束进程</b> · 高占用进程每一行都带「结束」按钮，只有你点了才动手；黑名单内的进程点了会直接拒绝并提示「系统进程不可结束」</li>
+                <li><b>附加模式</b> · 「❄ 一键节能降温」切回平衡电源计划降温降噪；也能切「终极性能 / 高性能」拉高 CPU 主频；单个进程还可手动提到高优先级</li>
+                <li><b>适合谁用</b> · 8G / 16G 内存、浏览器几十个标签 + IDE + 虚拟机一起跑、长时间不关机越用越卡、切回桌面硬盘狂转（待机页挤占内存）、游戏加载慢，但又不愿意让「一键清理」把后台程序和复制内容一起清掉的人</li>
+                <li><b>系统要求</b> · Windows 10 / 11，64 位（win-x64 单文件）；Win7 / Win8 / 32 位系统不支持。约 50 MB，删掉 exe 即卸载</li>
+                <li><b>文件校验</b> · MemoryKiller.exe <b>52,107,665 字节</b>（≈ 49.7 MB，v1.0 · 2026-10-05 发布）；下载后可在 PowerShell 执行 <code style="font-size:11px">Get-FileHash .\MemoryKiller.exe -Algorithm SHA256</code> 核对是否被篡改</li>
+                <li><b>首次运行提示</b> · 浏览器下载点「保留」→ 双击若弹 SmartScreen 蓝框点「更多信息 → 仍要运行」→ UAC 点「是」。未签名软件必经这三步，不是软件故障</li>
+                <li><b>已知限制</b> · 专用显存由显卡驱动独占，外部程序无法强制释放，「清理显存缓存」缓解的是系统内存划出的共享 GPU 内存，真显存还得关占用程序；CPU 温度依赖主板 WMI 探针，部分主板读不到会显示「—」</li>
               </ul>
             </article>
 
