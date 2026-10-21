@@ -2931,6 +2931,26 @@ class MainWindow(QMainWindow):
                                   if self.c_free_before else ""))
 
     def on_migrate_click(self):
+        """【开始迁移】入口：整段 try/except 兜底，任何异常只弹窗报告，绝不让软件闪退。"""
+        try:
+            self._on_migrate_click_impl()
+        except SystemExit:
+            raise
+        except Exception as e:
+            import traceback
+            tb = traceback.format_exc()
+            try:
+                self.log(f"【C盘文件迁出】执行出错：{e}", color="red")
+                self.log(tb, color="red")
+            except Exception:
+                pass
+            QMessageBox.critical(
+                self, "执行出错（软件未退出）",
+                "文件迁出准备阶段出现异常，操作已中止，未迁移的源文件保持原样：\n\n"
+                f"{type(e).__name__}: {e}\n\n"
+                "如重复出现，请把下方日志截图反馈。")
+
+    def _on_migrate_click_impl(self):
         """【开始迁移】按钮：收集勾选项 -> 自动选非C盘+建落地文件夹 -> 容量校验 -> 迁移。"""
         # 惰性触发：访问该功能时也校验一次受管资源
         try:
